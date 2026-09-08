@@ -1,0 +1,128 @@
+import SwiftUI
+
+struct SystemPageHeader: View {
+    let eyebrow: String
+    let title: String
+    var detail: String? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(eyebrow)
+                .font(FamilyTypography.sectionLabel)
+                .tracking(1.2)
+                .foregroundStyle(.secondary)
+
+            Text(title)
+                .font(FamilyTypography.pageTitle)
+                .monospacedDigit()
+                .foregroundStyle(.primary)
+
+            if let detail {
+                Text(detail)
+                .font(.system(.subheadline, design: .rounded))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+struct SystemPanel<Content: View>: View {
+    let title: String?
+    let detail: String?
+    let content: Content
+
+    init(title: String, detail: String? = nil, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.detail = detail
+        self.content = content()
+    }
+
+    init(@ViewBuilder content: () -> Content) {
+        self.title = nil
+        self.detail = nil
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            if let title {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(title)
+                        .font(FamilyTypography.sectionLabel)
+                        .tracking(1.2)
+                        .foregroundStyle(.secondary)
+
+                    if let detail {
+                        Text(detail)
+                            .font(.system(.subheadline, design: .rounded))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+
+            content
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(FamilyUI.panelBackground)
+        .overlay(
+            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
+                .stroke(FamilyUI.panelBorder, lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
+    }
+}
+
+struct SystemPanelDivider: View {
+    var body: some View {
+        Rectangle()
+            .fill(FamilyUI.divider)
+            .frame(height: 1)
+    }
+}
+
+struct SystemStatusBadge: View {
+    enum Tone {
+        case neutral
+        case accent
+        case success
+        case warning
+        case danger
+
+        var foreground: Color {
+            switch self {
+            case .neutral:
+                return .secondary
+            case .accent:
+                return FamilyUI.accent
+            case .success:
+                return FamilyUI.success
+            case .warning:
+                return FamilyUI.warning
+            case .danger:
+                return FamilyUI.danger
+            }
+        }
+
+        var background: Color {
+            foreground.opacity(0.10)
+        }
+    }
+
+    let text: String
+    var tone: Tone = .neutral
+
+    var body: some View {
+        Text(text)
+            .font(FamilyTypography.badge)
+            .tracking(0.8)
+            .foregroundStyle(tone.foreground)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .background(
+                RoundedRectangle(cornerRadius: FamilyUI.badgeCornerRadius)
+                    .fill(tone.background)
+            )
+    }
+}
