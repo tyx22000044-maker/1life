@@ -178,59 +178,57 @@ struct DashboardView: View {
         let targetLabel = isBalancedMode ? "参考目标" : "\(selectedDateScopeLabel)目标"
 
         return SystemPanel(title: "\(selectedDateScopeLabel)摄入", detail: "\(selectedDateTitle)摄入、目标差值与宏量营养执行情况") {
-            HStack(alignment: .top, spacing: 16) {
-                VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text("总摄入")
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .tracking(1.2)
-                        .foregroundStyle(.secondary)
+                        .font(FamilyTypography.sectionLabel)
+                        .tracking(1)
+                        .foregroundStyle(FamilyUI.inkSoft)
+                    Spacer()
+                    Text("\(Int(max(progress * 100, 0)))%")
+                        .font(.custom("Archivo-Bold", size: 11))
+                        .monospacedDigit()
+                        .foregroundStyle(FamilyUI.inkSoft)
+                    Text(targetLabel)
+                        .font(FamilyTypography.sectionLabel)
+                        .tracking(1)
+                        .foregroundStyle(FamilyUI.inkSoft)
+                }
 
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text("\(Int(snapshot.nutrition.totalCalories))")
                         .font(FamilyTypography.hero)
                         .monospacedDigit()
-
-                    Text("kcal")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
-
-                    HStack(spacing: 8) {
-                        SystemStatusBadge(
-                            text: remainingCalories >= 0 ? "剩余 \(remainingCalories)" : "超出 \(abs(remainingCalories))",
-                            tone: remainingCalories >= 0 ? .accent : .danger
-                        )
-                        if currentSettings?.useHealthKitForDynamicTDEE == true, healthTDEE != nil {
-                            SystemStatusBadge(text: "动态", tone: .neutral)
-                        }
-                        if isBalancedMode {
-                            SystemStatusBadge(text: "参考", tone: .neutral)
-                        }
-                    }
+                    Text("/ \(Int(calorieTarget)) kcal")
+                        .font(.custom("Archivo-SemiBold", size: 16))
+                        .monospacedDigit()
+                        .foregroundStyle(FamilyUI.inkSoft)
+                    Spacer()
                 }
 
-                Spacer(minLength: 0)
-
-                ZStack {
-                    Circle()
-                        .stroke(FamilyUI.divider, lineWidth: 10)
-                    Circle()
-                        .trim(from: 0, to: min(progress, 1.5))
-                        .stroke(
-                            progressColor(progress),
-                            style: StrokeStyle(lineWidth: 10, lineCap: .square)
-                        )
-                        .rotationEffect(.degrees(-90))
-
-                    VStack(spacing: 4) {
-                        Text("\(Int(max(progress * 100, 0)))%")
-                            .font(.system(size: 22, weight: .black, design: .rounded))
-                            .monospacedDigit()
-                        Text(targetLabel)
-                            .font(.system(size: 10, weight: .semibold, design: .rounded))
-                            .tracking(1)
-                            .foregroundStyle(.secondary)
+                // Ledger tick: hairline track, single accent fill.
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Rectangle().fill(FamilyUI.hairlineSubtle)
+                        Rectangle()
+                            .fill(progressColor(progress))
+                            .frame(width: geo.size.width * min(max(progress, 0), 1))
                     }
                 }
-                .frame(width: 124, height: 124)
+                .frame(height: 2)
+
+                HStack(spacing: 8) {
+                    SystemStatusBadge(
+                        text: remainingCalories >= 0 ? "剩余 \(remainingCalories)" : "超出 \(abs(remainingCalories))",
+                        tone: remainingCalories >= 0 ? .accent : .danger
+                    )
+                    if currentSettings?.useHealthKitForDynamicTDEE == true, healthTDEE != nil {
+                        SystemStatusBadge(text: "动态", tone: .neutral)
+                    }
+                    if isBalancedMode {
+                        SystemStatusBadge(text: "参考", tone: .neutral)
+                    }
+                }
             }
 
             SystemPanelDivider()
@@ -249,19 +247,19 @@ struct DashboardView: View {
 
     private func spotlightNutrientGrid(snapshot: DashboardDaySnapshot) -> some View {
         let keys = currentSettings?.spotlightNutrientKeys ?? [.protein, .carbs, .fat, .fiber, .sodium]
-        return LazyVGrid(
-            columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)],
-            spacing: 10
-        ) {
-            ForEach(keys) { key in
+        return VStack(spacing: 0) {
+            ForEach(Array(keys.enumerated()), id: \.element.id) { index, key in
                 let nv = nutrientValue(for: key, snapshot: snapshot)
-                MacroProgressBar(
+                MacroProgressRow(
                     name: key.shortDisplayName,
                     current: nv.current,
                     target: nv.target,
                     color: key.spotlightColor,
                     unit: key.unit
                 )
+                if index < keys.count - 1 {
+                    SystemPanelDivider()
+                }
             }
         }
     }
@@ -275,8 +273,8 @@ struct DashboardView: View {
 
     private func mealStatusPanel(mealSummaries: [MealNutritionSummary]) -> some View {
         SystemPanel(title: "餐食快照", detail: "\(selectedDateTitle)各餐次是否已记录，以及每餐热量概览。点击餐次可到饮食页补记。") {
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
-                ForEach(MealType.allCases) { type in
+            VStack(spacing: 0) {
+                ForEach(Array(MealType.allCases.enumerated()), id: \.element) { index, type in
                     let meal = mealSummaries.first { $0.mealType == type }
                     let hasMeal = meal != nil
 
@@ -287,42 +285,53 @@ struct DashboardView: View {
                             appViewModel.navigateToFood(mealType: type)
                         }
                     } label: {
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack(spacing: 6) {
-                                Image(systemName: mealIcon(type))
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(hasMeal ? .primary : .secondary)
+                        HStack(spacing: 12) {
+                            Rectangle()
+                                .fill(hasMeal ? FamilyUI.ink : Color.clear)
+                                .frame(width: 8, height: 8)
+                                .overlay(Rectangle().stroke(hasMeal ? FamilyUI.ink : FamilyUI.ink, lineWidth: 1))
+
+                            VStack(alignment: .leading, spacing: 2) {
                                 Text(type.displayName)
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(.primary)
-                                Spacer()
-                                SystemStatusBadge(text: hasMeal ? "已记录" : "可补记", tone: hasMeal ? .success : .neutral)
+                                    .font(.custom("Archivo-SemiBold", size: 13.5))
+                                    .foregroundStyle(FamilyUI.ink)
+                                Text(mealMetaLabel(meal))
+                                    .font(.custom("Archivo-Regular", size: 10.5))
+                                    .foregroundStyle(FamilyUI.inkSoft)
                             }
 
-                            Text(mealSnapshotLabel(meal))
-                                .font(.system(size: 18, weight: .bold, design: .rounded))
-                                .foregroundStyle(hasMeal ? FamilyUI.accent : .secondary)
-                                .monospacedDigit()
+                            Spacer()
+
+                            VStack(alignment: .trailing, spacing: 4) {
+                                Text(mealCalorieLabel(meal))
+                                    .font(.custom("Archivo-Bold", size: 13.5))
+                                    .monospacedDigit()
+                                    .foregroundStyle(hasMeal ? FamilyUI.ink : FamilyUI.inkSoft)
+                                SystemStatusBadge(text: hasMeal ? "已记录" : "可补记", tone: hasMeal ? .neutral : .accent)
+                            }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(12)
-                        .background(FamilyUI.panelMutedBackground)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
-                                .stroke(FamilyUI.panelBorder, lineWidth: 1)
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
+                        .padding(.vertical, 11)
+                        .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+
+                    if index < MealType.allCases.count - 1 {
+                        SystemPanelDivider()
+                    }
                 }
             }
         }
     }
 
-    private func mealSnapshotLabel(_ meal: MealNutritionSummary?) -> String {
-        guard let meal else { return "点按补记" }
-        let countLabel = meal.mealCount > 1 ? "\(meal.mealCount)份 · " : ""
-        return "\(countLabel)\(Int(meal.totalCalories)) kcal"
+    private func mealMetaLabel(_ meal: MealNutritionSummary?) -> String {
+        guard let meal else { return "尚未记录" }
+        if meal.mealCount > 1 { return "\(meal.mealCount) 份 · \(meal.foodItemCount) 项" }
+        return "\(meal.foodItemCount) 项"
+    }
+
+    private func mealCalorieLabel(_ meal: MealNutritionSummary?) -> String {
+        guard let meal, meal.totalCalories > 0 else { return "—" }
+        return "\(Int(meal.totalCalories)) kcal"
     }
 
     private func nutrientValue(for key: NutrientKey, snapshot: DashboardDaySnapshot) -> NutrientValue {
@@ -417,25 +426,25 @@ struct DashboardView: View {
                     icon: "figure.walk",
                     label: "步数",
                     value: healthActivitySummary.map { "\(Int($0.stepCount))" } ?? "—",
-                    color: .green
+                    color: FamilyUI.ink
                 )
                 HealthMetricItem(
                     icon: "bed.double.fill",
                     label: "睡眠",
                     value: sleepHours.map { String(format: "%.1fh", $0) } ?? "—",
-                    color: .indigo
+                    color: FamilyUI.ink
                 )
                 HealthMetricItem(
                     icon: "figure.run",
                     label: "运动",
                     value: "\(Int(workout.totalDurationMinutes))分",
-                    color: FamilyUI.accent
+                    color: FamilyUI.ink
                 )
                 HealthMetricItem(
                     icon: "sun.max.fill",
                     label: "日照",
                     value: daylightMinutes.map { "\(Int($0))分" } ?? "—",
-                    color: .orange
+                    color: FamilyUI.ink
                 )
             }
 
@@ -479,7 +488,7 @@ struct DashboardView: View {
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(waterProgressText(current: current, target: target))
-                        .font(.system(size: 28, weight: .black, design: .rounded))
+                        .font(.custom("Archivo-Black", size: 28))
                         .monospacedDigit()
                         .lineLimit(1)
                         .minimumScaleFactor(0.72)
@@ -498,17 +507,16 @@ struct DashboardView: View {
                     }
                 } label: {
                     Text("+ 记录饮水")
-                        .font(.subheadline.weight(.semibold))
+                        .font(.custom("Archivo-Bold", size: 14))
                         .padding(.horizontal, 14)
                         .padding(.vertical, 12)
-                        .background(Color.black)
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
+                        .background(FamilyUI.ink)
+                        .foregroundStyle(FamilyUI.pageBackground)
                 }
             }
 
             ProgressView(value: min(progress, 1.0))
-                .tint(.cyan)
+                .tint(FamilyUI.accent)
         }
     }
 
@@ -538,12 +546,11 @@ struct DashboardView: View {
                     isShowingBowelEditor = true
                 } label: {
                     Label("记录", systemImage: "plus")
-                        .font(.subheadline.weight(.semibold))
+                        .font(.custom("Archivo-Bold", size: 14))
                         .padding(.horizontal, 14)
                         .padding(.vertical, 12)
-                        .background(Color.black)
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
+                        .background(FamilyUI.ink)
+                        .foregroundStyle(FamilyUI.pageBackground)
                 }
             }
 
@@ -580,18 +587,17 @@ struct DashboardView: View {
         HStack(spacing: 10) {
             Text(pendingWaterUndoMessage)
                 .font(.caption)
-                .foregroundStyle(.white)
+                .foregroundStyle(FamilyUI.pageBackground)
             Spacer()
             Button("撤销") {
                 undoLastWaterLog()
             }
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(.cyan)
+            .font(.custom("Archivo-Bold", size: 12))
+            .foregroundStyle(FamilyUI.pageBackground)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(Color(.label).opacity(0.88))
-        .clipShape(RoundedRectangle(cornerRadius: AppCornerRadius.card))
+        .background(FamilyUI.ink)
     }
 
     private func addWater(_ amount: Double) {
@@ -725,12 +731,13 @@ struct DashboardView: View {
                         HStack {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.caption)
-                                .foregroundStyle(.green)
+                                .foregroundStyle(FamilyUI.success)
                             Text("每日习惯")
                                 .font(.caption.weight(.medium))
                             Spacer()
                             Text("\(snapshot.completedHabitsCount)/\(activeHabits.count) 完成")
                                 .font(.caption2)
+                                .monospacedDigit()
                                 .foregroundStyle(.secondary)
                         }
                         HStack(spacing: 6) {
@@ -742,9 +749,8 @@ struct DashboardView: View {
                                         .foregroundStyle(done ? Color(hex: habit.colorHex) : Color(.systemGray4))
                                         .frame(width: 26, height: 26)
                                         .background(done ? Color(hex: habit.colorHex).opacity(0.12) : Color(.systemGray6))
-                                        .clipShape(RoundedRectangle(cornerRadius: 6))
                                     Text(String(habit.name.prefix(2)))
-                                        .font(.system(size: 9, design: .rounded))
+                                        .font(.custom("Archivo-Regular", size: 9))
                                         .foregroundStyle(.secondary)
                                         .lineLimit(1)
                                 }
@@ -776,7 +782,7 @@ struct DashboardView: View {
                     } else if snapshot.workout.isRestDay {
                         Text("休息日")
                             .font(.caption)
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(FamilyUI.inkSoft)
                     } else {
                         Text("\(selectedDateTitle)还没有训练")
                             .font(.caption)
@@ -811,12 +817,13 @@ struct DashboardView: View {
                                 HStack(spacing: 4) {
                                     ForEach(journal.activityTags.prefix(3)) { tag in
                                         Text(tag.displayName)
-                                            .font(.system(size: 10, design: .rounded))
+                                            .font(.custom("Archivo-Medium", size: 10))
                                             .padding(.horizontal, 5)
                                             .padding(.vertical, 2)
-                                            .background(FamilyUI.accent.opacity(0.08))
-                                            .foregroundStyle(FamilyUI.accent)
-                                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                                            .foregroundStyle(FamilyUI.inkSoft)
+                                            .overlay(
+                                                Rectangle().stroke(FamilyUI.hairlineRegular, lineWidth: 1)
+                                            )
                                     }
                                 }
                             }
@@ -867,10 +874,6 @@ struct DashboardView: View {
         let total = dayLogs.reduce(0) { $0 + $1.value }
         return total >= (habit.targetCount ?? 1)
     }
-
-    private func mealIcon(_ type: MealType) -> String {
-        type.icon
-    }
 }
 
 // MARK: - Sub Components
@@ -890,7 +893,8 @@ private struct HealthMetricItem: View {
                 .font(.caption2)
                 .foregroundStyle(.secondary)
             Text(value)
-                .font(.system(.caption2, design: .rounded, weight: .medium))
+                .font(.custom("Archivo-Medium", size: 11))
+                .monospacedDigit()
                 .foregroundStyle(value == "—" ? .tertiary : .primary)
         }
         .padding(.vertical, 4)
@@ -898,7 +902,7 @@ private struct HealthMetricItem: View {
     }
 }
 
-private struct MacroProgressBar: View {
+private struct MacroProgressRow: View {
     let name: String
     let current: Double?
     let target: Double
@@ -906,33 +910,31 @@ private struct MacroProgressBar: View {
     let unit: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(name)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.primary)
-                Spacer()
-                Text(current.map { "\(Int($0))/\(Int(target))\(unit)" } ?? "—")
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.secondary)
+        let progress = (target > 0 && current != nil) ? current! / target : 0
+        HStack(spacing: 10) {
+            Text(name)
+                .font(FamilyTypography.sectionLabel)
+                .tracking(0.8)
+                .foregroundStyle(FamilyUI.inkSoft)
+                .frame(width: 52, alignment: .leading)
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Rectangle().fill(FamilyUI.hairlineSubtle)
+                    Rectangle()
+                        .fill(color)
+                        .frame(width: geo.size.width * min(max(progress, 0), 1))
+                }
             }
-            if let current {
-                let progress = target > 0 ? current / target : 0
-                ProgressView(value: min(progress, 1.0))
-                    .tint(color)
-                Text(progress > 1 ? "超出目标" : "执行中")
-                    .font(.caption2)
-                    .foregroundStyle(progress > 1 ? FamilyUI.danger : .secondary)
-            } else {
-                ProgressView(value: 0)
-                    .tint(color)
-                Text("—")
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-            }
+            .frame(height: 3)
+
+            Text(current.map { "\(Int($0)) / \(Int(target))\(unit)" } ?? "— / \(Int(target))\(unit)")
+                .font(.custom("Archivo-SemiBold", size: 11))
+                .monospacedDigit()
+                .foregroundStyle(progress > 1 ? FamilyUI.danger : FamilyUI.ink)
+                .frame(width: 86, alignment: .trailing)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 6)
     }
 }
 
@@ -961,11 +963,11 @@ private struct MetricStrip: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .font(FamilyTypography.sectionLabel)
                 .tracking(1)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(FamilyUI.inkSoft)
             Text(value)
-                .font(.subheadline.weight(.bold))
+                .font(.custom("Archivo-Bold", size: 15))
                 .foregroundStyle(tone.color)
                 .monospacedDigit()
         }
@@ -990,20 +992,22 @@ private struct NutrientRow: View {
                 Spacer()
                 Text("\(pct)%")
                     .font(.caption2.weight(.medium))
+                    .monospacedDigit()
                     .foregroundStyle(pctColor)
             }
             ProgressView(value: min(current / max(value.target, 1), 1.0))
                 .tint(pctColor)
             Text("\(format(current)) / \(format(value.target)) \(value.key.unit)")
                 .font(.caption2)
+                .monospacedDigit()
                 .foregroundStyle(.secondary)
         }
     }
 
     private var pctColor: Color {
-        if pct > 100 { return .red }
-        if pct > 80 { return .green }
-        return .blue
+        if pct > 100 { return FamilyUI.danger }
+        if pct > 80 { return FamilyUI.success }
+        return FamilyUI.ink
     }
 
     private func format(_ value: Double) -> String {

@@ -86,46 +86,49 @@ private struct AppTabBar: View {
     @Binding var selectedTab: AppTab
 
     var body: some View {
-        HStack(spacing: 6) {
-            ForEach(AppTab.allCases) { tab in
-                Button {
-                    HapticEngine.tap()
-                    withAnimation(.snappy(duration: 0.22)) {
-                        selectedTab = tab
-                    }
-                } label: {
-                    VStack(spacing: 4) {
-                        Image(systemName: tab.systemImage)
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .frame(height: 17)
-                        Text(tab.title)
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
-                    }
-                    .foregroundStyle(selectedTab == tab ? .white : .secondary)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 46)
-                    .background(selectedTab == tab ? FamilyUI.accent : FamilyUI.panelMutedBackground)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
-                            .stroke(selectedTab == tab ? Color.black.opacity(0.18) : FamilyUI.panelBorder, lineWidth: 1)
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .padding(.horizontal, 10)
-        .padding(.top, 8)
-        .padding(.bottom, 6)
-        .background(
+        VStack(spacing: 0) {
             Rectangle()
-                .fill(FamilyUI.panelBackground)
-                .overlay(alignment: .top) {
-                    Rectangle()
-                        .fill(FamilyUI.panelBorder)
-                        .frame(height: 1)
+                .fill(FamilyUI.hairlineStrong)
+                .frame(height: 1)
+            HStack(spacing: 0) {
+                ForEach(AppTab.allCases) { tab in
+                    Button {
+                        HapticEngine.tap()
+                        withAnimation(.snappy(duration: 0.22)) {
+                            selectedTab = tab
+                        }
+                    } label: {
+                        VStack(spacing: 4) {
+                            if tab == .ai {
+                                // Swiss Ledger AI mark: solid square when active.
+                                Text("AI")
+                                    .font(.custom("Archivo-Black", size: 9))
+                                    .foregroundStyle(selectedTab == tab ? FamilyUI.pageBackground : FamilyUI.ink)
+                                    .frame(width: 20, height: 20)
+                                    .background(selectedTab == tab ? FamilyUI.accent : Color.clear)
+                            } else {
+                                Image(systemName: tab.systemImage)
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .frame(height: 17)
+                            }
+                            Text(tab.title)
+                                .font(.custom("Archivo-Bold", size: 8.5))
+                                .tracking(0.6)
+                                .textCase(.uppercase)
+                        }
+                        .foregroundStyle(selectedTab == tab ? FamilyUI.ink : FamilyUI.inkFaint)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 10)
+                        .padding(.bottom, 12)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(tab.title)
+                    .accessibilityAddTraits(selectedTab == tab ? .isSelected : [])
                 }
-        )
+            }
+            .background(FamilyUI.panelBackground)
+        }
     }
 }
 
@@ -153,12 +156,13 @@ struct DaySelectorView: View {
             } label: {
                 VStack(spacing: 2) {
                     Text(selectedDate.dayDisplay)
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(.primary)
+                        .font(.custom("Archivo-Bold", size: 15))
+                        .monospacedDigit()
+                        .foregroundStyle(FamilyUI.ink)
                     Text(selectedDate.isToday ? "TODAY" : "ARCHIVE")
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .font(FamilyTypography.sectionLabel)
                         .tracking(1)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(FamilyUI.inkSoft)
                 }
                 .frame(maxWidth: .infinity)
             }
