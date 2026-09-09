@@ -19,8 +19,8 @@ struct SystemPageHeader: View {
 
             if let detail {
                 Text(detail)
-                .font(.system(.subheadline, design: .rounded))
-                    .foregroundStyle(.secondary)
+                .font(.custom("Archivo-Regular", size: 13, relativeTo: .subheadline))
+                    .foregroundStyle(FamilyUI.inkSoft)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -55,8 +55,8 @@ struct SystemPanel<Content: View>: View {
 
                     if let detail {
                         Text(detail)
-                            .font(.system(.subheadline, design: .rounded))
-                            .foregroundStyle(.secondary)
+                            .font(.custom("Archivo-Regular", size: 13, relativeTo: .subheadline))
+                            .foregroundStyle(FamilyUI.inkSoft)
                     }
                 }
             }
@@ -93,7 +93,7 @@ struct SystemStatusBadge: View {
         var foreground: Color {
             switch self {
             case .neutral:
-                return .secondary
+                return FamilyUI.ink
             case .accent:
                 return FamilyUI.accent
             case .success:
@@ -104,25 +104,22 @@ struct SystemStatusBadge: View {
                 return FamilyUI.danger
             }
         }
-
-        var background: Color {
-            foreground.opacity(0.10)
-        }
     }
 
     let text: String
     var tone: Tone = .neutral
 
+    // Swiss Ledger tag: outlined rectangle, uppercase, tracked — no fill.
     var body: some View {
-        Text(text)
+        Text(text.uppercased())
             .font(FamilyTypography.badge)
-            .tracking(0.8)
+            .tracking(0.6)
             .foregroundStyle(tone.foreground)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
-            .background(
-                RoundedRectangle(cornerRadius: FamilyUI.badgeCornerRadius)
-                    .fill(tone.background)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2.5)
+            .overlay(
+                Rectangle()
+                    .stroke(tone.foreground, lineWidth: 1)
             )
     }
 }
