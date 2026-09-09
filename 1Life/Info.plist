@@ -14,5 +14,14 @@
 	<string>1Life 需要读取 Apple Health 的活动热量、静息热量、步数、训练记录和体重身高，用于动态估算 TDEE、训练摘要和营养目标。</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>当您主动开启身体数据同步时，1Life 需要将您记录的体重和体脂写入 Apple Health。</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Archivo-Regular.ttf</string>
+		<string>Archivo-Medium.ttf</string>
+		<string>Archivo-SemiBold.ttf</string>
+		<string>Archivo-Bold.ttf</string>
+		<string>Archivo-ExtraBold.ttf</string>
+		<string>Archivo-Black.ttf</string>
+	</array>
 </dict>
 </plist>
