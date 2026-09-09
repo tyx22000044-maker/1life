@@ -80,7 +80,6 @@ struct AIConfigurationSettingsView: View {
                     } label: {
                         AppSettingsRow(
                             icon: "sparkles.rectangle.stack",
-                            iconColor: .purple,
                             title: "AI 服务商",
                             subtitle: "切换 Provider 会同步刷新默认模型",
                             value: settings.selectedAIProvider.displayName
@@ -196,16 +195,16 @@ struct AIConfigurationSettingsView: View {
                         ForEach(apiKeyLinks) { item in
                             Link(destination: item.url) {
                                 HStack(spacing: 12) {
-                                    RoundedRectangle(cornerRadius: 8)
+                                    Rectangle()
                                         .fill(FamilyUI.panelMutedBackground)
                                         .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
+                                            Rectangle()
                                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                                         )
                                         .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                                         .overlay(
                                             Image(systemName: "key.viewfinder")
-                                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                                .font(.system(size: 14, weight: .semibold))
                                                 .foregroundStyle(FamilyUI.accent)
                                         )
 
@@ -246,7 +245,7 @@ struct AIConfigurationSettingsView: View {
                     } label: {
                         AppSettingsRow(
                             icon: "trash",
-                            iconColor: .red,
+                            iconColor: FamilyUI.danger,
                             title: "清空聊天历史",
                             subtitle: "删除所有 AI 对话消息，不可恢复",
                             value: chatMessages.isEmpty ? "无数据" : "清空"
@@ -353,25 +352,24 @@ private struct SystemActionButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.subheadline.weight(.semibold))
+            .font(.custom("Archivo-SemiBold", size: 15, relativeTo: .subheadline))
             .padding(.vertical, 12)
             .padding(.horizontal, 14)
             .background(background(configuration: configuration))
             .foregroundStyle(foreground)
             .overlay(
-                RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
+                Rectangle()
                     .stroke(border, lineWidth: tone == .dark ? 0 : 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
             .opacity(configuration.isPressed ? 0.85 : 1.0)
     }
 
     private var foreground: Color {
         switch tone {
         case .dark:
-            return .white
+            return FamilyUI.pageBackground
         case .outline:
-            return isEnabled ? .primary : .secondary
+            return isEnabled ? FamilyUI.ink : FamilyUI.inkSoft
         case .dangerOutline:
             return FamilyUI.danger
         }
@@ -392,13 +390,13 @@ private struct SystemActionButtonStyle: ButtonStyle {
     private func background(configuration: Configuration) -> some View {
         switch tone {
         case .dark:
-            RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
-                .fill(isEnabled ? Color.black : Color(.systemGray3))
+            Rectangle()
+                .fill(isEnabled ? FamilyUI.ink : FamilyUI.hairlineRegular)
         case .outline:
-            RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
-                .fill(isEnabled ? Color.white : FamilyUI.panelMutedBackground)
+            Rectangle()
+                .fill(isEnabled ? Color.clear : FamilyUI.panelMutedBackground)
         case .dangerOutline:
-            RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
+            Rectangle()
                 .fill(FamilyUI.danger.opacity(configuration.isPressed ? 0.12 : 0.08))
         }
     }

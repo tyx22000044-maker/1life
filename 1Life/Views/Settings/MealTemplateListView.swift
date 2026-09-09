@@ -359,17 +359,17 @@ private struct MealTemplateRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            Rectangle()
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    Rectangle()
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: iconName)
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundStyle(.orange)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(FamilyUI.ink)
                 )
 
             VStack(alignment: .leading, spacing: 3) {
@@ -490,14 +490,14 @@ private struct MealTemplateGroupSection: View {
                             } label: {
                                 Image(systemName: "trash")
                                     .font(.caption.weight(.bold))
-                                    .foregroundStyle(.red)
+                                    .foregroundStyle(FamilyUI.danger)
                                     .frame(width: 34, height: 34)
                                     .background(FamilyUI.panelMutedBackground)
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 6)
+                                        Rectangle()
                                             .stroke(FamilyUI.panelBorder, lineWidth: 1)
                                     )
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                    .clipShape(Rectangle())
                             }
                             .accessibilityLabel("删除这个模板")
                         }
@@ -515,17 +515,17 @@ private struct MealTemplateGroupHeader: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            Rectangle()
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    Rectangle()
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: category.icon)
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundStyle(category == .beverage ? .teal : .orange)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(FamilyUI.ink)
                 )
 
             VStack(alignment: .leading, spacing: 3) {
@@ -715,10 +715,10 @@ private struct MealTemplateJSONExportSheet: View {
             .padding(10)
             .background(FamilyUI.panelMutedBackground)
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
+                Rectangle()
                     .stroke(isSelected ? FamilyUI.accent.opacity(0.5) : FamilyUI.panelBorder, lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
@@ -732,10 +732,10 @@ private struct MealTemplateJSONExportSheet: View {
                 .padding(.vertical, 8)
                 .background(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 6)
+                    Rectangle()
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .clipShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
@@ -852,17 +852,17 @@ private struct MealTemplateDrinkBrandGroupHeader: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            Rectangle()
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    Rectangle()
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: "building.2.fill")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundStyle(.teal)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(FamilyUI.ink)
                 )
 
             VStack(alignment: .leading, spacing: 3) {
@@ -962,17 +962,17 @@ private struct MealTemplateDrinkRecordGroupHeader: View {
     }
 
     private var drinkIcon: some View {
-        RoundedRectangle(cornerRadius: 8)
+        Rectangle()
             .fill(FamilyUI.panelMutedBackground)
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
+                Rectangle()
                     .stroke(FamilyUI.panelBorder, lineWidth: 1)
             )
             .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
             .overlay(
                 Image(systemName: "cup.and.saucer.fill")
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
-                    .foregroundStyle(.teal)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(FamilyUI.ink)
             )
     }
 
@@ -992,17 +992,17 @@ private struct MealTemplateDrinkRecordRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            Rectangle()
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    Rectangle()
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: "cup.and.saucer.fill")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundStyle(.teal)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(FamilyUI.ink)
                 )
 
             VStack(alignment: .leading, spacing: 3) {
@@ -1382,10 +1382,10 @@ private struct TemplateFoodItemEditRow: View {
                         .padding(.vertical, 6)
                         .background(FamilyUI.panelMutedBackground)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 6)
+                            Rectangle()
                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .clipShape(Rectangle())
                 }
                 Button(role: .destructive, action: onDelete) {
                     Image(systemName: "trash")
@@ -1542,10 +1542,10 @@ private struct TemplateFoodItemEditRow: View {
             .padding(.vertical, 4)
             .background(FamilyUI.panelMutedBackground)
             .overlay(
-                RoundedRectangle(cornerRadius: 6)
+                Rectangle()
                     .stroke(focusedField == field ? FamilyUI.accent : FamilyUI.panelBorder, lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .clipShape(Rectangle())
     }
 
     private func nutritionField(_ label: String, text: Binding<String>, unit: String, field: Field) -> some View {

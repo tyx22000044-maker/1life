@@ -177,16 +177,16 @@ private struct InAppMessageCard: View {
     }
 
     private var icon: some View {
-        RoundedRectangle(cornerRadius: 8)
+        Rectangle()
             .fill(isRead ? FamilyUI.panelMutedBackground : FamilyUI.accent.opacity(0.12))
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
+                Rectangle()
                     .stroke(FamilyUI.panelBorder, lineWidth: 1)
             )
             .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
             .overlay(
                 Image(systemName: isRead ? "envelope.open.fill" : "envelope.badge.fill")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(isRead ? Color.secondary : FamilyUI.accent)
             )
     }
@@ -265,16 +265,16 @@ struct PrivacySheet: View {
                             if index > 0 { SystemPanelDivider() }
 
                             HStack(alignment: .top, spacing: 12) {
-                                RoundedRectangle(cornerRadius: 8)
+                                Rectangle()
                                     .fill(FamilyUI.panelMutedBackground)
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
+                                        Rectangle()
                                             .stroke(FamilyUI.panelBorder, lineWidth: 1)
                                     )
                                     .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                                     .overlay(
                                         Image(systemName: item.icon)
-                                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                            .font(.system(size: 14, weight: .semibold))
                                             .foregroundStyle(FamilyUI.accent)
                                     )
 
@@ -349,16 +349,16 @@ struct UserManualSheet: View {
                             if index > 0 { SystemPanelDivider() }
 
                             HStack(alignment: .top, spacing: 12) {
-                                RoundedRectangle(cornerRadius: 8)
+                                Rectangle()
                                     .fill(FamilyUI.panelMutedBackground)
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
+                                        Rectangle()
                                             .stroke(FamilyUI.panelBorder, lineWidth: 1)
                                     )
                                     .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                                     .overlay(
                                         Image(systemName: item.icon)
-                                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                            .font(.system(size: 14, weight: .semibold))
                                             .foregroundStyle(FamilyUI.accent)
                                     )
 

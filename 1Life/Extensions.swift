@@ -194,8 +194,8 @@ struct AppSwitchStyle: ToggleStyle {
                     )
                     .frame(width: 50, height: 30)
                     .overlay(alignment: configuration.isOn ? .trailing : .leading) {
-                        RoundedRectangle(cornerRadius: 7)
-                            .fill(configuration.isOn ? Color.white : Color.secondary.opacity(0.55))
+                        Rectangle()
+                            .fill(configuration.isOn ? Color.white : FamilyUI.inkFaint)
                             .frame(width: 20, height: 20)
                             .padding(5)
                     }

@@ -172,7 +172,6 @@ struct SettingsView: View {
                 )) {
                     AppSettingsRow(
                         icon: "heart.text.square.fill",
-                        iconColor: .red,
                         title: "动态 TDEE",
                         subtitle: "根据活动与静息能量动态更新今日目标",
                         value: s.useHealthKitForDynamicTDEE ? "已开启" : "关闭",
@@ -188,7 +187,6 @@ struct SettingsView: View {
                 } label: {
                     AppSettingsRow(
                         icon: "bolt.heart.fill",
-                        iconColor: .orange,
                         title: isLoadingHealth ? "读取中..." : "连接 Apple Health",
                         subtitle: "授权读取活动热量、静息热量、步数与体重",
                         value: healthStatusText,
@@ -355,7 +353,6 @@ struct SettingsView: View {
                 } label: {
                     AppSettingsRow(
                         icon: "flame.fill",
-                        iconColor: .orange,
                         title: "每日目标",
                         subtitle: "热量与三大营养素目标",
                         value: "\(Int(goal.dailyCalories)) kcal",
@@ -399,7 +396,6 @@ struct SettingsView: View {
                 ), in: 500...5000, step: 50) {
                     AppSettingsRow(
                         icon: "drop.fill",
-                        iconColor: .cyan,
                         title: "饮水目标",
                         subtitle: "当天饮水基准",
                         value: "\(Int(s.dailyWaterGoalMl)) ml"
@@ -434,7 +430,6 @@ struct SettingsView: View {
             } label: {
                 AppSettingsRow(
                     icon: "fork.knife",
-                    iconColor: .pink,
                     title: "餐食库",
                     subtitle: "餐食记录、单品和餐食模板",
                     value: "\(userFoods.count + mealLibraryTemplates.count) 个",
@@ -450,7 +445,6 @@ struct SettingsView: View {
             } label: {
                 AppSettingsRow(
                     icon: "cup.and.saucer.fill",
-                    iconColor: .teal,
                     title: "饮品库",
                     subtitle: "品牌饮品、杯型、糖度和营养版本",
                     value: "\(drinkRecords.count) 条",
@@ -466,7 +460,6 @@ struct SettingsView: View {
             } label: {
                 AppSettingsRow(
                     icon: "pills.fill",
-                    iconColor: .orange,
                     title: "补剂库",
                     subtitle: "蛋白粉、维生素、肌酸等补剂资料",
                     value: "\(supplementRecords.count) 条",
@@ -486,7 +479,6 @@ struct SettingsView: View {
             } label: {
                 AppSettingsRow(
                     icon: "camera.macro",
-                    iconColor: .pink,
                     title: "餐食营养识别",
                     subtitle: "参照饮品识别流程，输出到餐食库",
                     value: currentVisionSupport ? "支持图片" : "文字可用",
@@ -502,7 +494,6 @@ struct SettingsView: View {
             } label: {
                 AppSettingsRow(
                     icon: "cup.and.saucer.fill",
-                    iconColor: .teal,
                     title: "饮品营养识别",
                     subtitle: "拍成分表校对后保存到饮品库",
                     value: currentVisionSupport ? "支持图片" : "文字可用",
@@ -518,7 +509,6 @@ struct SettingsView: View {
             } label: {
                 AppSettingsRow(
                     icon: "pills.fill",
-                    iconColor: .orange,
                     title: "补剂营养识别",
                     subtitle: "识别包装和成分表，输出到补剂库",
                     value: currentVisionSupport ? "支持图片" : "文字可用",
@@ -620,7 +610,6 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         AppSettingsRow(
                             icon: "sparkles",
-                            iconColor: .purple,
                             title: "AI 服务商",
                             subtitle: "配置 AI 服务商、模型与 API Key",
                             value: s.isAIConfigured ? s.selectedAIProvider.displayName : "未配置",
@@ -756,7 +745,7 @@ struct SettingsView: View {
 
             HStack {
                 Text("版本")
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .font(.custom("Archivo-SemiBold", size: 11))
                     .tracking(1.2)
                     .foregroundStyle(.secondary)
                 Spacer()
@@ -1074,7 +1063,6 @@ private struct MealLibraryHubView: View {
                     } label: {
                         AppSettingsRow(
                             icon: "heart.fill",
-                            iconColor: .pink,
                             title: "餐食记录",
                             subtitle: "保存单品和已确认营养条目",
                             value: "\(userFoods.count) 个",
@@ -1095,7 +1083,6 @@ private struct MealLibraryHubView: View {
                     } label: {
                         AppSettingsRow(
                             icon: "doc.on.doc.fill",
-                            iconColor: .purple,
                             title: "餐食模板",
                             subtitle: "保存组合餐、固定搭配和常用菜单",
                             value: "\(mealOnlyTemplates.count) 个",
@@ -1170,7 +1157,7 @@ private struct MealLibraryFoodPreviewRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            mealLibraryIcon("fork.knife", color: .pink)
+            mealLibraryIcon("fork.knife", color: FamilyUI.ink)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(food.name)
@@ -1206,7 +1193,7 @@ private struct MealLibraryFoodBrandHeader: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            mealLibraryIcon("building.2.fill", color: .orange)
+            mealLibraryIcon("building.2.fill", color: FamilyUI.ink)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(brand)
@@ -1237,7 +1224,7 @@ private struct MealLibraryTemplatePreviewRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            mealLibraryIcon("doc.on.doc.fill", color: .purple)
+            mealLibraryIcon("doc.on.doc.fill", color: FamilyUI.ink)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(template.name)
@@ -1268,16 +1255,16 @@ private struct MealLibraryTemplatePreviewRow: View {
 
 @ViewBuilder
 private func mealLibraryIcon(_ systemName: String, color: Color) -> some View {
-    RoundedRectangle(cornerRadius: 8)
+    Rectangle()
         .fill(FamilyUI.panelMutedBackground)
         .overlay(
-            RoundedRectangle(cornerRadius: 8)
+            Rectangle()
                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
         )
         .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
         .overlay(
             Image(systemName: systemName)
-                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .font(.system(size: 14, weight: .bold))
                 .foregroundStyle(color)
         )
 }

@@ -20,44 +20,41 @@ struct UserAvatarView: View {
                 Image(uiImage: img)
                     .resizable().scaledToFill()
                     .frame(width: size, height: size)
-                    .clipShape(RoundedRectangle(cornerRadius: size * 0.28))
+                    .clipShape(Rectangle())
             } else if !symbolName.isEmpty {
                 ZStack {
-                    RoundedRectangle(cornerRadius: size * 0.28)
+                    Rectangle()
                         .fill(FamilyUI.panelMutedBackground)
                         .frame(width: size, height: size)
                         .overlay(
-                            RoundedRectangle(cornerRadius: size * 0.28)
+                            Rectangle()
                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                         )
                     Image(systemName: symbolName)
-                        .font(.system(size: size * 0.48, design: .rounded))
-                        .foregroundStyle(FamilyUI.accent)
+                        .font(.system(size: size * 0.48))
+                        .foregroundStyle(FamilyUI.ink)
                 }
             } else if !name.isEmpty {
-                RoundedRectangle(cornerRadius: size * 0.28)
-                    .fill(LinearGradient(
-                        colors: [Color(hex: "1e4ed8"), Color(hex: "6650a4")],
-                        startPoint: .topLeading, endPoint: .bottomTrailing
-                    ))
+                Rectangle()
+                    .fill(FamilyUI.ink)
                     .frame(width: size, height: size)
                     .overlay(
                         Text(initials)
-                            .font(.system(size: size * 0.35, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
+                            .font(.custom("Archivo-Bold", size: size * 0.35))
+                            .foregroundStyle(FamilyUI.pageBackground)
                     )
             } else {
-                RoundedRectangle(cornerRadius: size * 0.28)
+                Rectangle()
                     .fill(FamilyUI.panelMutedBackground)
                     .frame(width: size, height: size)
                     .overlay(
-                        RoundedRectangle(cornerRadius: size * 0.28)
+                        Rectangle()
                             .stroke(FamilyUI.panelBorder, lineWidth: 1)
                     )
                     .overlay(
                         Image(systemName: "person.fill")
-                            .font(.system(size: size * 0.4, design: .rounded))
-                            .foregroundColor(Color(.systemGray3))
+                            .font(.system(size: size * 0.4))
+                            .foregroundStyle(FamilyUI.inkFaint)
                     )
             }
         }

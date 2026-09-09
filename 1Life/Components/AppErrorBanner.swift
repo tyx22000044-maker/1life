@@ -44,12 +44,12 @@ struct AppErrorBanner: View {
         VStack {
             if isVisible {
                 HStack(alignment: .top, spacing: 12) {
-                    RoundedRectangle(cornerRadius: 8)
+                    Rectangle()
                         .fill(Color.white.opacity(0.16))
                         .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                         .overlay(
                             Image(systemName: tone.icon)
-                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                                .font(.system(size: 15, weight: .bold))
                                 .foregroundStyle(tone.foreground)
                         )
 
@@ -79,11 +79,6 @@ struct AppErrorBanner: View {
                 }
                 .padding(12)
                 .background(tone.background)
-                .overlay(
-                    RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
-                        .stroke(Color.black.opacity(0.18), lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
                 .padding(.horizontal, AppSpacing.pageHorizontal)
                 .padding(.top, 8)
                 .transition(.move(edge: .top).combined(with: .opacity))

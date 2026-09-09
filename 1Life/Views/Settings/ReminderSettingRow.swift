@@ -15,17 +15,17 @@ struct ReminderSettingRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            Rectangle()
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    Rectangle()
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: icon)
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.orange)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(FamilyUI.ink)
                 )
 
             VStack(alignment: .leading, spacing: 4) {

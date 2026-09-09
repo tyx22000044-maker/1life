@@ -73,7 +73,7 @@ struct SettingsDataSection: View {
             } label: {
                 AppSettingsRow(
                     icon: "trash",
-                    iconColor: .red,
+                    iconColor: FamilyUI.danger,
                     title: "清空所有数据",
                     subtitle: "删除饮食、习惯、日志、模板和聊天历史",
                     value: "不可恢复"

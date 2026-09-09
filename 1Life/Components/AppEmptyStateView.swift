@@ -9,28 +9,28 @@ struct AppEmptyStateView: View {
 
     var body: some View {
         VStack(spacing: 14) {
-            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
+            Rectangle()
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
+                    Rectangle()
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: 72, height: 72)
                 .overlay(
                     Image(systemName: icon)
-                        .font(.system(size: 30, weight: .semibold, design: .rounded))
-                        .foregroundStyle(FamilyUI.accent)
+                        .font(.system(size: 30, weight: .semibold))
+                        .foregroundStyle(FamilyUI.ink)
                 )
 
             Text(title)
-                .font(.headline.weight(.black))
+                .font(.custom("Archivo-Bold", size: 17, relativeTo: .headline))
                 .foregroundStyle(.primary)
                 .multilineTextAlignment(.center)
 
             if let subtitle {
                 Text(subtitle)
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(FamilyUI.inkSoft)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -38,16 +38,12 @@ struct AppEmptyStateView: View {
             if let buttonTitle, let buttonAction {
                 Button(action: buttonAction) {
                     Text(buttonTitle)
-                        .font(.subheadline.weight(.black))
+                        .font(.custom("Archivo-Bold", size: 15))
+                        .tracking(0.4)
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
                         .background(FamilyUI.accent)
-                        .foregroundStyle(.white)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
-                                .stroke(Color.black.opacity(0.18), lineWidth: 1)
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
+                        .foregroundStyle(Color.white)
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 4)
@@ -58,9 +54,8 @@ struct AppEmptyStateView: View {
         .padding(.vertical, 36)
         .background(FamilyUI.panelBackground)
         .overlay(
-            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
+            Rectangle()
                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
     }
 }

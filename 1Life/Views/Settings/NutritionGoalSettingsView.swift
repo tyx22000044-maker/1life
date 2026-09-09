@@ -190,7 +190,7 @@ struct NutritionGoalSettingsView: View {
                         HapticEngine.tap()
                     } label: {
                         HStack(spacing: 12) {
-                            RoundedRectangle(cornerRadius: 4)
+                            Rectangle()
                                 .fill(key.spotlightColor)
                                 .frame(width: 6, height: 22)
                             Text(key.displayName)

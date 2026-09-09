@@ -24,13 +24,13 @@ struct ProfileEditorSheet: View {
                             PhotosPicker(selection: $selectedItem, matching: .images) {
                                 ZStack(alignment: .bottomTrailing) {
                                     UserAvatarView(avatarData: avatarData, name: nickname, size: 108)
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .fill(Color.black)
+                                    Rectangle()
+                                        .fill(FamilyUI.accent)
                                         .frame(width: 30, height: 30)
                                         .overlay(
                                             Image(systemName: "camera.fill")
-                                                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                                                .foregroundStyle(.white)
+                                                .font(.system(size: 12, weight: .semibold))
+                                                .foregroundStyle(FamilyUI.pageBackground)
                                         )
                                 }
                             }

@@ -171,17 +171,17 @@ private struct UserFoodRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            Rectangle()
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    Rectangle()
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: "fork.knife")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundStyle(.orange)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(FamilyUI.ink)
                 )
 
             VStack(alignment: .leading, spacing: 3) {
@@ -223,10 +223,10 @@ private struct UserFoodBrandHeader: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "building.2.fill")
-                .foregroundStyle(.orange)
+                .foregroundStyle(FamilyUI.ink)
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .background(FamilyUI.panelMutedBackground)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(Rectangle())
             VStack(alignment: .leading, spacing: 3) {
                 Text(brand)
                     .font(.subheadline.weight(.bold))

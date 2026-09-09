@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AppSettingsRow: View {
     let icon: String
-    var iconColor: Color = FamilyUI.accent
+    var iconColor: Color = FamilyUI.ink
     let title: String
     var subtitle: String? = nil
     var value: String? = nil
@@ -11,10 +11,10 @@ struct AppSettingsRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            Rectangle()
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    Rectangle()
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
@@ -26,13 +26,13 @@ struct AppSettingsRow: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                    .font(.custom("Archivo-SemiBold", size: 15, relativeTo: .subheadline))
                     .foregroundStyle(.primary)
 
                 if let subtitle {
                     Text(subtitle)
-                        .font(.system(.caption, design: .rounded))
-                        .foregroundStyle(.secondary)
+                        .font(.custom("Archivo-Regular", size: 12, relativeTo: .caption))
+                        .foregroundStyle(FamilyUI.inkSoft)
                 }
             }
 
@@ -40,15 +40,16 @@ struct AppSettingsRow: View {
 
             if let value {
                 Text(value)
-                    .font(.system(.subheadline, design: .rounded, weight: emphasizesValue ? .semibold : .regular))
-                    .foregroundStyle(emphasizesValue ? FamilyUI.accent : .secondary)
+                    .font(.custom("Archivo-SemiBold", size: 15, relativeTo: .subheadline))
+                    .monospacedDigit()
+                    .foregroundStyle(emphasizesValue ? FamilyUI.accent : FamilyUI.inkSoft)
                     .multilineTextAlignment(.trailing)
             }
 
             if showsChevron {
                 Image(systemName: "chevron.right")
-                    .font(.system(.caption, design: .rounded, weight: .semibold))
-                    .foregroundStyle(.secondary)
+                    .font(.system(.caption, weight: .semibold))
+                    .foregroundStyle(FamilyUI.inkFaint)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
