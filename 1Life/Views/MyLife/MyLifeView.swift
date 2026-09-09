@@ -414,7 +414,7 @@ private struct ReviewSummaryPanel: View {
                 let day = calendar.startOfDay(for: log.date)
                 dayValues[day, default: 0] += log.value
             }
-            valuesByHabit[habit.id] = dayValues
+            valuesByHabitDay[habit.id] = dayValues
         }
 
         var completed = 0

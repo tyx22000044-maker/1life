@@ -99,8 +99,10 @@ enum SettingsSchemaV1: VersionedSchema {
 
         var hasCompletedOnboarding: Bool = false
 
-        var createdAt: Date = .now
-        var updatedAt: Date = .now
+        var createdAt: Date = Date.now
+        var updatedAt: Date = Date.now
+
+        init() {}
     }
 }
 

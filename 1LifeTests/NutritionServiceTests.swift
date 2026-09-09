@@ -78,10 +78,12 @@ final class NutritionServiceTests: XCTestCase {
 
     func testBMRFormulasDifferByGender() {
         let male = NutritionService.bmr(gender: .male, weightKg: 70, heightCm: 175, age: 30)
-        XCTAssertEqual(male, 10 * 70 + 6.25 * 175 - 5 * 30 + 5, accuracy: 0.0001)
+        let expectedMale: Double = 10 * 70 + 6.25 * 175 - 5 * 30 + 5
+        XCTAssertEqual(male, expectedMale, accuracy: 0.0001)
 
         let female = NutritionService.bmr(gender: .female, weightKg: 60, heightCm: 165, age: 28)
-        XCTAssertEqual(female, 10 * 60 + 6.25 * 165 - 5 * 28 - 161, accuracy: 0.0001)
+        let expectedFemale: Double = 10 * 60 + 6.25 * 165 - 5 * 28 - 161
+        XCTAssertEqual(female, expectedFemale, accuracy: 0.0001)
     }
 
     private func day(_ offset: Int, from date: Date) -> Date {

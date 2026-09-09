@@ -204,6 +204,7 @@ struct WorkoutTimelineView: View {
         return s.weeklyWorkoutTargetCount == 3 && s.weeklyWorkoutTargetMinutes == 150
     }
 
+    @ViewBuilder
     private var weeklyGoalCard: some View {
         let weekly = weeklySummary
         let today = todayWorkoutSummary

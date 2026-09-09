@@ -155,7 +155,7 @@ struct FoodTimelineView: View {
             .sorted { $0.date > $1.date }
             .flatMap { $0.foodItems ?? [] }
             .filter { $0.name.localizedCaseInsensitiveContains(query) }
-            .compactMap { item in
+            .compactMap { item -> FoodItem? in
                 let key = item.name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                 guard !key.isEmpty, !seen.contains(key) else { return nil }
                 seen.insert(key)

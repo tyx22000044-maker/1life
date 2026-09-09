@@ -30,7 +30,7 @@ final class AppSettingsCalculationTests: XCTestCase {
 
     func testEstimatedBMRAndTDEEForMale() {
         let settings = makeSettings()
-        let expectedBMR = 10 * 70 + 6.25 * 175 - 5 * 30 + 5
+        let expectedBMR: Double = 10 * 70 + 6.25 * 175 - 5 * 30 + 5
         XCTAssertEqual(settings.estimatedBMR ?? -1, expectedBMR, accuracy: 0.0001)
         XCTAssertEqual(settings.estimatedTDEE ?? -1, expectedBMR * ActivityLevel.moderatelyActive.multiplier, accuracy: 0.0001)
         XCTAssertTrue(settings.hasBodyParameters)
