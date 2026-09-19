@@ -198,6 +198,7 @@ struct SettingsDataCoordinator {
         try modelContext.save()
         DrinkLibraryIndex.shared.invalidate()
         SupplementLibraryIndex.shared.invalidate()
+        HealthKitService.shared.disableEnergyBackgroundDelivery()
         return ClearAllDataSummary(sections: sections)
     }
 }

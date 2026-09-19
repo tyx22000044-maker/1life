@@ -57,12 +57,15 @@ final class HealthKitService {
     static let shared = HealthKitService()
 
     private let store = HKHealthStore()
-    private var activeEnergyObserver: HKObserverQuery?
+    private var activeEnergyBackgroundObserver: HKObserverQuery?
 
     var isAvailable: Bool {
         HKHealthStore.isHealthDataAvailable()
     }
 
+    /// Registers the hourly active-energy observer. Callers must only invoke this once the
+    /// user has turned Apple Health on: registering it at launch asked for background
+    /// delivery from people who never connected HealthKit.
     func enableEnergyBackgroundDelivery() {
         guard isAvailable,
               let activeType = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else { return }
@@ -75,8 +78,19 @@ final class HealthKitService {
                 NotificationCenter.default.post(name: .healthEnergyDidUpdate, object: nil)
             }
         }
-        activeEnergyObserver = query
+        activeEnergyBackgroundObserver = query
         store.execute(query)
+    }
+
+    /// Stops the observer and background delivery, e.g. after the user disconnects HealthKit.
+    func disableEnergyBackgroundDelivery() {
+        guard isAvailable,
+              let activeType = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else { return }
+        if let query = activeEnergyBackgroundObserver {
+            store.stop(query)
+            activeEnergyBackgroundObserver = nil
+        }
+        store.disableBackgroundDelivery(for: activeType) { _, _ in }
     }
 
     func requestAuthorization(needsWriteAccess: Bool = false) async throws {

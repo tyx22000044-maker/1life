@@ -72,9 +72,6 @@ struct OneLifeApp: App {
                     .transition(.opacity)
                 }
             }
-            .task {
-                HealthKitService.shared.enableEnergyBackgroundDelivery()
-            }
         }
         .modelContainer(modelContainer)
     }

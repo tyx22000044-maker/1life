@@ -52,6 +52,11 @@ struct ContentView: View {
                         appViewModel.selectedTab = tab
                     }
                     NotificationManager.shared.rescheduleRemindersIfNeeded(settings: settings.first)
+                    if settings.first?.isHealthKitEnabled == true {
+                        HealthKitService.shared.enableEnergyBackgroundDelivery()
+                    } else {
+                        HealthKitService.shared.disableEnergyBackgroundDelivery()
+                    }
                     if let currentSettings = settings.first {
                         FeedbackPreferences.shared.apply(settings: currentSettings)
                     }
