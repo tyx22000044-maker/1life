@@ -37,6 +37,7 @@ struct HealthBodyMeasurementSnapshot {
 enum HealthKitServiceError: LocalizedError {
     case unavailable
     case unsupportedType
+    case valueOutOfRange(kind: String)
 
     var errorDescription: String? {
         switch self {
@@ -44,6 +45,8 @@ enum HealthKitServiceError: LocalizedError {
             return "当前设备不支持 Apple Health。"
         case .unsupportedType:
             return "无法读取所需的健康数据类型。"
+        case .valueOutOfRange(let kind):
+            return "\(kind)超出可写入 Apple Health 的合理范围，已取消同步。"
         }
     }
 }
@@ -302,13 +305,19 @@ final class HealthKitService {
 
     func saveBodyMeasurement(weightKg: Double?, bodyFatPercentage: Double?, date: Date) async throws {
         guard isAvailable else { throw HealthKitServiceError.unavailable }
+        // Re-validate at the write boundary: callers include AI output and manual entry,
+        // and HealthKit keeps whatever it is handed.
+        let validatedWeight = BodyMeasurementLimits.validatedWeight(weightKg)
+        let validatedBodyFat = BodyMeasurementLimits.validatedBodyFat(bodyFatPercentage)
+        if weightKg != nil, validatedWeight == nil { throw HealthKitServiceError.valueOutOfRange(kind: "体重") }
+        if bodyFatPercentage != nil, validatedBodyFat == nil { throw HealthKitServiceError.valueOutOfRange(kind: "体脂") }
         var samples: [HKQuantitySample] = []
 
-        if let weightKg, let bodyMass = HKObjectType.quantityType(forIdentifier: .bodyMass) {
+        if let weightKg = validatedWeight, let bodyMass = HKObjectType.quantityType(forIdentifier: .bodyMass) {
             let quantity = HKQuantity(unit: .gramUnit(with: .kilo), doubleValue: weightKg)
             samples.append(HKQuantitySample(type: bodyMass, quantity: quantity, start: date, end: date))
         }
-        if let bodyFatPercentage, let bodyFat = HKObjectType.quantityType(forIdentifier: .bodyFatPercentage) {
+        if let bodyFatPercentage = validatedBodyFat, let bodyFat = HKObjectType.quantityType(forIdentifier: .bodyFatPercentage) {
             let quantity = HKQuantity(unit: .percent(), doubleValue: bodyFatPercentage / 100)
             samples.append(HKQuantitySample(type: bodyFat, quantity: quantity, start: date, end: date))
         }

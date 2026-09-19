@@ -1446,8 +1446,15 @@ private struct BodyMeasurementEditorSheet: View {
     }
 
     private func save() async {
-        let weight = Double(weightText)
-        let bodyFat = Double(bodyFatText)
+        let weight = BodyMeasurementLimits.validatedWeight(Double(weightText))
+        let bodyFat = BodyMeasurementLimits.validatedBodyFat(Double(bodyFatText))
+        if let notice = BodyMeasurementLimits.outOfRangeNotice(
+            weight: Double(weightText), height: nil, age: nil, bodyFat: Double(bodyFatText)
+        ) {
+            HapticEngine.warning()
+            bannerCenter.show(title: "数值超出合理范围", message: notice, tone: .error)
+            return
+        }
         let measurement = BodyMeasurement(
             date: date,
             weightKg: weight,

@@ -8,8 +8,8 @@ nonisolated enum AIValueBounds {
     static let workoutMinutes: ClosedRange<Double> = 1...1_440
     static let workoutCalories: ClosedRange<Double> = 0...5_000
     static let habitValue: ClosedRange<Double> = 0...10_000
-    static let weightKg: ClosedRange<Double> = 20...300
-    static let bodyFatPercent: ClosedRange<Double> = 1...70
+    static var weightKg: ClosedRange<Double> { BodyMeasurementLimits.weightKg }
+    static var bodyFatPercent: ClosedRange<Double> { BodyMeasurementLimits.bodyFatPercent }
     static let foodAmount: ClosedRange<Double> = 0...5_000
     static let mealCalories: ClosedRange<Double> = 0...10_000
 

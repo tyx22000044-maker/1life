@@ -12,6 +12,7 @@ struct BodyParamsSettingsView: View {
     @State private var ageText = ""
     @State private var heightText = ""
     @State private var weightText = ""
+    @State private var invalidValueNotice: String?
     @State private var healthSyncMessage: String?
     @State private var isSyncingHealth = false
     @State private var showRecalculateAlert = false
@@ -100,6 +101,12 @@ struct BodyParamsSettingsView: View {
             metricField(label: "身高", text: $heightText, unit: "cm", keyboard: .decimalPad, field: .height)
             SystemPanelDivider()
             metricField(label: "体重", text: $weightText, unit: "kg", keyboard: .decimalPad, field: .weight)
+            if let invalidValueNotice {
+                Text(invalidValueNotice)
+                    .font(FamilyTypography.text(size: 12))
+                    .foregroundStyle(FamilyUI.danger)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
@@ -287,9 +294,14 @@ struct BodyParamsSettingsView: View {
     }
 
     private func syncTextFieldsToSettings() {
-        settings.age = Int(ageText.trimmingCharacters(in: .whitespacesAndNewlines))
-        settings.heightCm = Double(heightText.replacingOccurrences(of: ",", with: "."))
-        settings.weightKg = Double(weightText.replacingOccurrences(of: ",", with: "."))
+        let parsedAge = Int(ageText.trimmingCharacters(in: .whitespacesAndNewlines))
+        let parsedHeight = Double(heightText.replacingOccurrences(of: ",", with: "."))
+        let parsedWeight = Double(weightText.replacingOccurrences(of: ",", with: "."))
+
+        settings.age = BodyMeasurementLimits.validatedAge(parsedAge)
+        settings.heightCm = BodyMeasurementLimits.validatedHeight(parsedHeight)
+        settings.weightKg = BodyMeasurementLimits.validatedWeight(parsedWeight)
+        invalidValueNotice = BodyMeasurementLimits.outOfRangeNotice(weight: parsedWeight, height: parsedHeight, age: parsedAge, bodyFat: nil)
         settings.updatedAt = .now
     }
 

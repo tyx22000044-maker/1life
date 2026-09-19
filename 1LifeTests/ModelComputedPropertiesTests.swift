@@ -99,4 +99,28 @@ final class ModelComputedPropertiesTests: XCTestCase {
         let different = DrinkRecord(brand: "喜茶", productName: "多肉葡萄", sizeML: 650, sugarLevel: "无糖")
         XCTAssertNotEqual(a.dedupeKey, different.dedupeKey)
     }
+
+    // MARK: - Body measurement ranges
+
+    func testImpossibleBodyValuesAreRejectedAtTheBoundary() {
+        XCTAssertNil(BodyMeasurementLimits.validatedWeight(-10))
+        XCTAssertNil(BodyMeasurementLimits.validatedWeight(1_200))
+        XCTAssertEqual(BodyMeasurementLimits.validatedWeight(62.5), 62.5)
+        XCTAssertNil(BodyMeasurementLimits.validatedBodyFat(150))
+        XCTAssertNil(BodyMeasurementLimits.validatedHeight(3))
+        XCTAssertNil(BodyMeasurementLimits.validatedAge(9))
+        XCTAssertEqual(BodyMeasurementLimits.validatedAge(30), 30)
+    }
+
+    func testOutOfRangeNoticeOnlyFiresForValuesThatWereEntered() {
+        XCTAssertNil(BodyMeasurementLimits.outOfRangeNotice(weight: nil, height: nil, age: nil, bodyFat: nil))
+        XCTAssertNil(BodyMeasurementLimits.outOfRangeNotice(weight: 70, height: 175, age: 30, bodyFat: 18))
+        guard let notice = BodyMeasurementLimits.outOfRangeNotice(weight: -10, height: 175, age: 30, bodyFat: 150) else {
+            return XCTFail("expected a notice")
+        }
+
+        XCTAssertTrue(notice.contains("体重"), notice)
+        XCTAssertTrue(notice.contains("体脂"), notice)
+        XCTAssertFalse(notice.contains("身高"), notice)
+    }
 }
