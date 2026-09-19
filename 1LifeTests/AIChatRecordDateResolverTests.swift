@@ -43,7 +43,59 @@ final class AIChatRecordDateResolverTests: XCTestCase {
     func testExplicitHourTakesPriorityOverMealInference() {
         let now = referenceDate()
         let resolved = AIChatRecordDateResolver.date(from: "早上10点吃了鸡蛋", now: now)
-        XCTAssertEqual(resolved, expected(base: now, hour: 10, minute: 22))
+        // An explicitly stated clock time anchors the minute too: 10:00, not 10:22.
+        XCTAssertEqual(resolved, expected(base: now, hour: 10, minute: 0))
+    }
+
+    func testAfternoonMeridiemShiftsExplicitHour() {
+        let now = referenceDate()
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: now)!
+        let resolved = AIChatRecordDateResolver.date(from: "昨天下午3点跑了步", now: now)
+        XCTAssertEqual(resolved, expected(base: yesterday, hour: 15, minute: 0))
+    }
+
+    func testEveningMeridiemWithoutDayWord() {
+        let now = referenceDate()
+        let resolved = AIChatRecordDateResolver.date(from: "晚上8点记录训练", now: now)
+        XCTAssertEqual(resolved, expected(base: now, hour: 20, minute: 0))
+    }
+
+    func testHalfPastAndExplicitMinutes() {
+        let now = referenceDate()
+        XCTAssertEqual(
+            AIChatRecordDateResolver.date(from: "早上七点半吃了鸡蛋", now: now),
+            expected(base: now, hour: 7, minute: 30)
+        )
+        XCTAssertEqual(
+            AIChatRecordDateResolver.date(from: "前天下午3点15分喝了三杯水", now: now),
+            expected(base: calendar.date(byAdding: .day, value: -2, to: now)!, hour: 15, minute: 15)
+        )
+    }
+
+    func testNoonAndMidnightMeridiem() {
+        let now = referenceDate()
+        XCTAssertEqual(
+            AIChatRecordDateResolver.date(from: "中午12点吃了午饭", now: now),
+            expected(base: now, hour: 12, minute: 0)
+        )
+        XCTAssertEqual(
+            AIChatRecordDateResolver.date(from: "凌晨1点饿了", now: now),
+            expected(base: now, hour: 1, minute: 0)
+        )
+    }
+
+    func testTonightKeepsTodayAndDinnerHour() {
+        let now = referenceDate()
+        let resolved = AIChatRecordDateResolver.date(from: "今晚吃了火锅", now: now)
+        XCTAssertEqual(resolved, expected(base: now, hour: 19, minute: 22))
+    }
+
+    func testAmbiguousBareNumberHourIsNotRejected() {
+        let now = referenceDate()
+        XCTAssertEqual(
+            AIChatRecordDateResolver.date(from: "20点加餐", now: now),
+            expected(base: now, hour: 20, minute: 0)
+        )
     }
 
     func testMealKeywordInfersHourWhenNoExplicitHour() {
