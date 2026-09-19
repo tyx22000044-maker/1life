@@ -22,7 +22,7 @@ final class AIChatViewModel {
     private var lastInputText: String = ""
     private var lastPhotoInputText: String?
     private var lastPhotoImageDataList: [Data] = []
-    private var stableMealResultCache: [String: AIChatIntentResult] = [:]
+    private var stableMealResults = AIChatMealResultCache()
 
     func configure(modelContext: ModelContext, settings: UserSettings) {
         self.modelContext = modelContext
@@ -202,8 +202,9 @@ final class AIChatViewModel {
         context: AIDataContext?,
         settings: UserSettings
     ) async throws -> AIChatIntentResult? {
-        let key = stableMealCacheKey(text: text, settings: settings)
-        if let cached = stableMealResultCache[key] {
+        let scope = stableMealCacheScope(settings: settings)
+        let key = stableMealCacheKey(text: text)
+        if let cached = stableMealResults.result(forScope: scope, key: key) {
             return cached
         }
 
@@ -220,18 +221,21 @@ final class AIChatViewModel {
             modelContext: modelContext
         )
         if libraryAwareResult.isMealResult {
-            stableMealResultCache[key] = libraryAwareResult
+            stableMealResults.store(libraryAwareResult, forScope: scope, key: key)
         }
         return libraryAwareResult
     }
 
-    private func stableMealCacheKey(text: String, settings: UserSettings) -> String {
-        let normalized = text
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+    /// Provider + model + record day. A cached meal parsed by a different model, or for a
+    /// different day, must never be replayed, so changing this invalidates the cache.
+    private func stableMealCacheScope(settings: UserSettings) -> String {
+        "\(settings.selectedAIProvider.rawValue)|\(settings.selectedAIModel)|\(Date.now.formatted(.iso8601.year().month().day()))"
+    }
+
+    private func stableMealCacheKey(text: String) -> String {
+        text.trimmingCharacters(in: .whitespacesAndNewlines)
             .lowercased()
             .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
-        let day = Date.now.formatted(.iso8601.year().month().day())
-        return "\(settings.selectedAIProvider.rawValue)|\(settings.selectedAIModel)|\(day)|\(normalized)"
     }
 
     private func validatedMealIntent(_ aiResult: AIChatIntentResult, localResult: AIChatIntentResult?) -> AIChatIntentResult {
