@@ -10,8 +10,12 @@ final class AIChatViewModel {
     var isLoading = false
     var errorMessage: String?
     var pendingConfirmation: MealIdentificationConfirmation?
-    var pendingMealResult: AIParsedMeal?
-    var pendingMealsResult: [AIParsedMeal]?
+    /// Every meal awaiting user confirmation — one for 单餐, N for `add_meals`/`batch`.
+    /// Confirmation, cancellation and manual editing all read and write this list, so a
+    /// multi-meal result can no longer be recorded as only its first entry.
+    var pendingMeals: [AIParsedMeal] = []
+
+    var pendingMealForEditing: AIParsedMeal? { pendingMeals.first }
 
     private var modelContext: ModelContext?
     private var settings: UserSettings?
@@ -74,7 +78,7 @@ final class AIChatViewModel {
                         if settings.isAIConfigured {
                             if let aiResult = try await aiParseMeal(text: text, settings: settings) {
                                 let validated = validatedMealIntent(aiResult, localResult: libraryAwareResult)
-                                showMealConfirmation(validated, originalText: text, isLocal: false)
+                                beginMealReview(validated, originalText: text, isLocal: false)
                             } else {
                                 let matched = meal.items.filter { $0.calories > 0 }
                                 if matched.isEmpty {
@@ -83,7 +87,7 @@ final class AIChatViewModel {
                                     let partialMeal = AIParsedMeal(mealType: meal.mealType, items: matched, note: meal.note)
                                     let unmatched = meal.items.filter { $0.calories == 0 }.map(\.name).joined(separator: "、")
                                     appendAssistant("「\(unmatched)」未能识别，已忽略。", provider: settings.selectedAIProvider)
-                                    showMealConfirmation(.addMeal(partialMeal), originalText: text, isLocal: true)
+                                    beginMealReview(.addMeal(partialMeal), originalText: text, isLocal: true)
                                 }
                             }
                         } else {
@@ -94,16 +98,16 @@ final class AIChatViewModel {
                                 let partialMeal = AIParsedMeal(mealType: meal.mealType, items: matched, note: meal.note)
                                 let unmatched = meal.items.filter { $0.calories == 0 }.map(\.name).joined(separator: "、")
                                 appendAssistant("「\(unmatched)」不在我的食物库中，需配置 AI 或手动添加。", provider: settings.selectedAIProvider)
-                                showMealConfirmation(.addMeal(partialMeal), originalText: text, isLocal: true)
+                                beginMealReview(.addMeal(partialMeal), originalText: text, isLocal: true)
                             }
                         }
                     } else {
-                        showMealConfirmation(libraryAwareResult, originalText: text, isLocal: true)
+                        beginMealReview(libraryAwareResult, originalText: text, isLocal: true)
                     }
                 } else {
                     if case .addWater = localResult,
                        let drinkMeal = AIChatDrinkLibraryResolver.makeMealIntent(originalText: text, modelContext: modelContext) {
-                        showMealConfirmation(drinkMeal, originalText: text, isLocal: true)
+                        beginMealReview(drinkMeal, originalText: text, isLocal: true)
                         isLoading = false
                         return
                     }
@@ -115,7 +119,7 @@ final class AIChatViewModel {
 
             if AIChatDrinkLibraryResolver.shouldPreferLibraryOnlyIntent(originalText: text),
                let drinkMeal = AIChatDrinkLibraryResolver.makeMealIntent(originalText: text, modelContext: modelContext) {
-                showMealConfirmation(drinkMeal, originalText: text, isLocal: true)
+                beginMealReview(drinkMeal, originalText: text, isLocal: true)
                 isLoading = false
                 return
             }
@@ -137,9 +141,8 @@ final class AIChatViewModel {
                 context: context,
                 settings: settings
             ) {
-                if case .addMeal = intentResult {
-                    let validated = validatedMealIntent(intentResult, localResult: nil)
-                    showMealConfirmation(validated, originalText: text, isLocal: false)
+                if intentResult.isMealResult {
+                    beginMealReview(validatedMealIntent(intentResult, localResult: nil), originalText: text, isLocal: false)
                 } else if case .chat = intentResult {
                     let reply = try await service.sendMessage(text, history: chatHistory(), context: context)
                     appendAssistant(reply, provider: settings.selectedAIProvider)
@@ -236,33 +239,29 @@ final class AIChatViewModel {
         }
     }
 
-    private func showMealConfirmation(_ result: AIChatIntentResult, originalText: String, isLocal: Bool) {
+    /// Presents the review card for one or many parsed meals.
+    func beginMealReview(_ result: AIChatIntentResult, originalText: String, isLocal: Bool) {
+        let meals: [AIParsedMeal]
         switch result {
         case .addMeal(let meal):
-            pendingConfirmation = MealIdentificationConfirmation(
-                originalText: originalText,
-                identificationType: .meal(meal),
-                isFromLocalParser: isLocal
-            )
-            pendingMealResult = meal
-        case .addMeals(let meals):
-            pendingConfirmation = MealIdentificationConfirmation(
-                originalText: originalText,
-                identificationType: .meals(meals),
-                isFromLocalParser: isLocal
-            )
-            if let first = meals.first { pendingMealResult = first }
-            pendingMealsResult = meals
+            meals = [meal]
+        case .addMeals(let parsedMeals):
+            meals = parsedMeals
         default:
-            break
+            return
         }
+        guard !meals.isEmpty else { return }
+        pendingMeals = meals
+        pendingConfirmation = MealIdentificationConfirmation(
+            originalText: originalText,
+            identificationType: meals.count == 1 ? .meal(meals[0]) : .meals(meals),
+            isFromLocalParser: isLocal
+        )
     }
 
     func reidentifyWithAI() async {
         guard let settings, settings.isAIConfigured else { return }
-        pendingConfirmation = nil
-        pendingMealResult = nil
-        pendingMealsResult = nil
+        clearPendingMealReview()
         isLoading = true
 
         do {
@@ -284,7 +283,7 @@ final class AIChatViewModel {
                     let normalizedResult = AIChatMealValidation.normalizePhotoMealResult(result)
                     if normalizedResult.isMealResult {
                         let validated = validatedMealIntent(normalizedResult, localResult: nil)
-                        showMealConfirmation(validated, originalText: displayContent, isLocal: false)
+                        beginMealReview(validated, originalText: displayContent, isLocal: false)
                     } else {
                         handleIntentResult(normalizedResult, provider: settings.selectedAIProvider)
                     }
@@ -293,7 +292,7 @@ final class AIChatViewModel {
                 }
             } else if let result = try await service.parseStructuredIntent(from: lastInputText, history: chatHistory(), context: context) {
                 let validated = validatedMealIntent(result, localResult: nil)
-                showMealConfirmation(validated, originalText: lastInputText, isLocal: false)
+                beginMealReview(validated, originalText: lastInputText, isLocal: false)
             } else {
                 let reply = try await service.sendMessage(lastInputText, history: chatHistory(), context: context)
                 appendAssistant(reply, provider: settings.selectedAIProvider)
@@ -358,7 +357,7 @@ final class AIChatViewModel {
                 let normalizedResult = AIChatMealValidation.normalizePhotoMealResult(result)
                 if normalizedResult.isMealResult {
                     let validated = validatedMealIntent(normalizedResult, localResult: nil)
-                    showMealConfirmation(validated, originalText: displayContent, isLocal: false)
+                    beginMealReview(validated, originalText: displayContent, isLocal: false)
                 } else {
                     handleIntentResult(normalizedResult, provider: settings.selectedAIProvider)
                 }
@@ -373,34 +372,44 @@ final class AIChatViewModel {
         isLoading = false
     }
 
-    func confirmMeal(_ parsed: AIParsedMeal) {
-        guard let modelContext else { return }
-        if parsed.items.contains(where: \.isLazyNutritionEstimate) {
+    func confirmPendingMeals() {
+        guard let modelContext, !pendingMeals.isEmpty else { return }
+        if let blocked = pendingMeals.first(where: { $0.items.contains(where: \.isLazyNutritionEstimate) }) {
             HapticEngine.warning()
-            let missing = parsed.items
-                .filter(\.isLazyNutritionEstimate)
-                .map { item in
-                    let fields = item.missingCoreNutrientKeys.map(\.displayName).joined(separator: "、")
-                    return "\(item.name)：\(fields.isEmpty ? "热量" : fields)"
-                }
-                .joined(separator: "；")
-            appendAssistant("这次识别缺少关键营养字段：\(missing)。请手动编辑后再保存。", provider: settings?.selectedAIProvider ?? .claude)
+            appendAssistant(missingNutritionMessage(for: blocked), provider: settings?.selectedAIProvider ?? .claude)
             return
         }
+
         let mealDate = mealDateForPendingConfirmation()
         let provider = settings?.selectedAIProvider ?? .claude
-        let toolMsg = AIChatMealRecorder.record(
-            parsed: parsed,
-            mealDate: mealDate,
-            provider: provider,
-            modelContext: modelContext
-        )
-        messages.append(toolMsg)
+        for parsed in pendingMeals {
+            let toolMsg = AIChatMealRecorder.record(
+                parsed: parsed,
+                mealDate: mealDate,
+                provider: provider,
+                modelContext: modelContext
+            )
+            messages.append(toolMsg)
+        }
         persist(reason: "confirm AI meal")
-
-        pendingConfirmation = nil
-        pendingMealResult = nil
+        clearPendingMealReview()
         HapticEngine.success()
+    }
+
+    private func missingNutritionMessage(for parsed: AIParsedMeal) -> String {
+        let missing = parsed.items
+            .filter(\.isLazyNutritionEstimate)
+            .map { item in
+                let fields = item.missingCoreNutrientKeys.map(\.displayName).joined(separator: "、")
+                return "\(item.name)：\(fields.isEmpty ? "热量" : fields)"
+            }
+            .joined(separator: "；")
+        return "这次识别缺少关键营养字段：\(missing)。请手动编辑后再保存。"
+    }
+
+    private func clearPendingMealReview() {
+        pendingConfirmation = nil
+        pendingMeals = []
     }
 
     func saveAsTemplate(_ parsed: AIParsedMeal, name: String) {
@@ -412,32 +421,28 @@ final class AIChatViewModel {
     }
 
     func cancelMeal() {
-        pendingConfirmation = nil
-        pendingMealResult = nil
-        pendingMealsResult = nil
+        clearPendingMealReview()
     }
 
     func applyManualMealEdit(_ meal: AIParsedMeal) {
-        pendingMealResult = meal
-        if var meals = pendingMealsResult, !meals.isEmpty {
-            meals[0] = meal
-            pendingMealsResult = meals
+        if pendingMeals.isEmpty {
+            pendingMeals = [meal]
+        } else {
+            pendingMeals[0] = meal
         }
-        pendingConfirmation = nil
+        pendingConfirmation = MealIdentificationConfirmation(
+            originalText: pendingConfirmation?.originalText ?? lastInputText,
+            identificationType: pendingMeals.count == 1 ? .meal(meal) : .meals(pendingMeals),
+            isFromLocalParser: pendingConfirmation?.isFromLocalParser ?? true
+        )
     }
 
     // MARK: - Private
 
     private func handleIntentResult(_ result: AIChatIntentResult, provider: AIProvider) {
         switch result {
-        case .addMeal(let meal):
-            pendingMealResult = meal
-        case .addMeals(let meals):
-            if meals.count == 1 {
-                pendingMealResult = meals[0]
-            } else {
-                pendingMealsResult = meals
-            }
+        case .addMeal, .addMeals:
+            beginMealReview(result, originalText: lastInputText, isLocal: false)
         case .createTemplate(let name, let meal):
             createTemplateFromIntent(name: name, meal: meal, provider: provider)
         case .addWater(let amount):

@@ -108,7 +108,7 @@ struct AIChatView: View {
                 }
             }
             .sheet(isPresented: $isShowingPendingMealEditor) {
-                if let meal = viewModel.pendingMealResult {
+                if let meal = viewModel.pendingMealForEditing {
                     MealManualEditSheet(meal: meal) { updatedMeal in
                         viewModel.applyManualMealEdit(updatedMeal)
                     }
@@ -202,9 +202,7 @@ struct AIChatView: View {
             AIMealIdentificationConfirmationView(
                 confirmation: confirmation,
                 onAccept: {
-                    if let meal = viewModel.pendingMealResult {
-                        viewModel.confirmMeal(meal)
-                    }
+                    viewModel.confirmPendingMeals()
                 },
                 onReidentifyWithAI: {
                     Task { await viewModel.reidentifyWithAI() }
@@ -214,13 +212,6 @@ struct AIChatView: View {
                 },
                 onCancel: { viewModel.cancelMeal() },
                 onSaveAsTemplate: {}
-            )
-        } else if let meal = viewModel.pendingMealResult {
-            MealConfirmationCard(
-                meal: meal,
-                onConfirm: { viewModel.confirmMeal($0) },
-                onCancel: { viewModel.cancelMeal() },
-                onSaveAsTemplate: nil
             )
         }
     }
