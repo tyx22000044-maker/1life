@@ -155,9 +155,12 @@ final class AIChatPendingMealReviewTests: XCTestCase {
         let water = try container.mainContext.fetch(FetchDescriptor<WaterLog>())
         XCTAssertEqual(meals.count, 1)
         XCTAssertEqual(water.map(\.amount), [473])
-        XCTAssertEqual(water.first?.sourceMealID, meals.first?.id)
 
-        guard let toolMessage = viewModel.messages.last else { return XCTFail("expected a tool message") }
+        guard let toolMessage = viewModel.messages.last, let payload = toolMessage.decodedBubblePayload else {
+            return XCTFail("expected a tool message carrying its bubble payload")
+        }
+        XCTAssertEqual(payload.linkedWaterLogIDs, water.map(\.id), "自动饮水必须记下关联 id")
+
         viewModel.undoMeal(message: toolMessage)
 
         XCTAssertEqual(try container.mainContext.fetch(FetchDescriptor<Meal>()).count, 0)

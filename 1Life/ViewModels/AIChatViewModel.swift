@@ -317,12 +317,13 @@ final class AIChatViewModel {
             (meal.foodItems ?? []).forEach { modelContext.delete($0) }
             modelContext.delete(meal)
         }
-        // A drink from the knowledge base also wrote hydration for this meal; revoke it
-        // through the stored link instead of guessing by timestamp, which would catch
-        // water the user logged themselves.
-        let linkedMealID: UUID? = mealID
-        let waterDescriptor = FetchDescriptor<WaterLog>(predicate: #Predicate { $0.sourceMealID == linkedMealID })
-        if let linkedWater = try? modelContext.fetch(waterDescriptor) {
+        // A drink from the knowledge base also wrote hydration for this meal; revoke exactly
+        // those rows through the ids stored on the bubble, never by timestamp, which would
+        // catch water the user logged themselves.
+        let linkedWaterIDs = Set(message.decodedBubblePayload?.linkedWaterLogIDs ?? [])
+        if !linkedWaterIDs.isEmpty {
+            let linkedWater = ((try? modelContext.fetch(FetchDescriptor<WaterLog>())) ?? [])
+                .filter { linkedWaterIDs.contains($0.id) }
             linkedWater.forEach { modelContext.delete($0) }
         }
         if var payload = message.decodedBubblePayload {
@@ -395,7 +396,6 @@ final class AIChatViewModel {
             appendAssistant(missingNutritionMessage(for: blocked), provider: settings?.selectedAIProvider ?? .claude)
             return
         }
-
         let mealDate = mealDateForPendingConfirmation()
         let provider = settings?.selectedAIProvider ?? .claude
         for parsed in pendingMeals {

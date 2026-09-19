@@ -578,18 +578,16 @@ nonisolated struct WaterRecord: Codable {
     let id: UUID
     let date: Date
     let amount: Double
-    let sourceMealID: UUID?
 
     init(_ log: WaterLog) {
         id = log.id
         date = log.date
         amount = log.amount
-        sourceMealID = log.sourceMealID
     }
 
     @MainActor
     func model() -> WaterLog {
-        let log = WaterLog(date: date, amount: amount, sourceMealID: sourceMealID)
+        let log = WaterLog(date: date, amount: amount)
         log.id = id
         return log
     }

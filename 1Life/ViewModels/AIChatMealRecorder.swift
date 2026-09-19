@@ -18,15 +18,19 @@ struct AIChatMealRecorder {
             modelContext.insert(foodItem)
         }
 
+        var linkedWaterLogIDs: [UUID] = []
         let drinkWaterAmount = AIChatDrinkLibraryResolver.waterAmount(from: parsed.items)
         if drinkWaterAmount > 0 {
-            modelContext.insert(WaterLog(date: mealDate, amount: drinkWaterAmount, sourceMealID: meal.id))
+            let hydration = WaterLog(date: mealDate, amount: drinkWaterAmount)
+            modelContext.insert(hydration)
+            linkedWaterLogIDs.append(hydration.id)
         }
 
         let payload = AIChatBubblePayload(
             mealType: parsed.mealType.rawValue,
             totalCalories: parsed.items.reduce(0) { $0 + $1.calories },
-            items: parsed.items.map { .init(name: $0.name, amount: $0.amount, unit: $0.unit, calories: $0.calories) }
+            items: parsed.items.map { .init(name: $0.name, amount: $0.amount, unit: $0.unit, calories: $0.calories) },
+            linkedWaterLogIDs: linkedWaterLogIDs
         )
 
         let toolMsg = AIChatMessage(

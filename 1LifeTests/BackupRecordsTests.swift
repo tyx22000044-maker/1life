@@ -82,8 +82,7 @@ final class BackupRecordsTests: XCTestCase {
     // MARK: - WaterLog
 
     func testWaterRecordRoundTrip() throws {
-        let parentMeal = Meal(mealType: .snack).id
-        let log = WaterLog(amount: 300, sourceMealID: parentMeal)
+        let log = WaterLog(amount: 300)
         let record = WaterRecord(log)
 
         let data = try JSONEncoder().encode(record)
@@ -92,7 +91,6 @@ final class BackupRecordsTests: XCTestCase {
 
         XCTAssertEqual(rebuilt.id, log.id)
         XCTAssertEqual(rebuilt.amount, 300)
-        XCTAssertEqual(rebuilt.sourceMealID, parentMeal, "撤销关联必须能随备份一起恢复")
     }
 
     // MARK: - BackupFile envelope

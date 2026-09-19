@@ -255,6 +255,11 @@ nonisolated struct AIChatBubblePayload: Codable {
     let totalCalories: Double
     let items: [BubbleItem]
     var isRevoked: Bool? = nil
+    /// Hydration rows this meal auto-created. Revoking the message deletes exactly these,
+    /// which is why the ids live in the payload rather than in a new WaterLog column:
+    /// adding a column changes the declared schema and every existing store then fails
+    /// to open under the versioned migration plan.
+    var linkedWaterLogIDs: [UUID] = []
 
     nonisolated struct BubbleItem: Codable {
         let name: String
