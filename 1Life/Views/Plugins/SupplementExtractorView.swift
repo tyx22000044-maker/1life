@@ -443,7 +443,7 @@ struct SupplementNutritionRecognitionPluginView: View {
                 SystemPanel(title: "当前补剂库", detail: "\(records.count) 条已确认记录") {
                     AppSettingsRow(
                         icon: "pills.fill",
-                        iconColor: .orange,
+                        iconColor: FamilyUI.accent,
                         title: "保存目标",
                         subtitle: "识别完成后写入食物库中的补剂库",
                         value: "\(records.count) 条"
@@ -628,14 +628,14 @@ private struct SupplementRecordGroupSection: View {
                             } label: {
                                 Image(systemName: "trash")
                                     .font(.caption.weight(.bold))
-                                    .foregroundStyle(.red)
+                                    .foregroundStyle(FamilyUI.danger)
                                     .frame(width: 34, height: 34)
                                     .background(FamilyUI.panelMutedBackground)
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 6)
+                                        RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                             .stroke(FamilyUI.panelBorder, lineWidth: 1)
                                     )
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                    .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                             }
                             .accessibilityLabel("删除这条补剂记录")
                         }
@@ -652,10 +652,10 @@ private struct SupplementRecordGroupSection: View {
                         .padding(.vertical, 9)
                         .background(FamilyUI.panelMutedBackground)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 6)
+                            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                     }
                     .buttonStyle(.plain)
                 }
@@ -671,17 +671,17 @@ private struct SupplementRecordGroupHeader: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: "pills.fill")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundStyle(.orange)
+                        .font(FamilyTypography.text(size: 14, weight: .bold))
+                        .foregroundStyle(FamilyUI.accent)
                 )
 
             VStack(alignment: .leading, spacing: 3) {
@@ -734,17 +734,17 @@ private struct SupplementRecordRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: "pills.fill")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
-                        .foregroundStyle(.orange)
+                        .font(FamilyTypography.text(size: 14, weight: .bold))
+                        .foregroundStyle(FamilyUI.accent)
                 )
 
             VStack(alignment: .leading, spacing: 3) {
@@ -939,7 +939,7 @@ private struct SupplementExtractSheet: View {
                                         .resizable()
                                         .scaledToFill()
                                         .frame(width: 72, height: 72)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                                         .overlay(alignment: .topTrailing) {
                                             Button {
                                                 imageDataList.remove(at: index)
@@ -985,7 +985,7 @@ private struct SupplementExtractSheet: View {
             if let errorMessage {
                 Text(errorMessage)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(FamilyUI.danger)
             }
 
             Button(action: startExtraction) {
@@ -1087,7 +1087,7 @@ private struct SupplementExtractSheet: View {
             if let errorMessage {
                 Text(errorMessage)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(FamilyUI.danger)
             }
 
             HStack(spacing: 10) {
@@ -1165,7 +1165,7 @@ private struct SupplementExtractSheet: View {
             if let errorMessage {
                 Text(errorMessage)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(FamilyUI.danger)
             }
 
             HStack(spacing: 10) {
@@ -1412,7 +1412,7 @@ private struct SupplementCandidateEditor: View {
                 .padding(.vertical, 7)
                 .background(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 6)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
         }
@@ -1506,7 +1506,7 @@ private struct SupplementDraftEditor: View {
                         .padding(.vertical, 7)
                         .background(FamilyUI.panelMutedBackground)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 6)
+                            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                         )
                 }
@@ -1544,7 +1544,7 @@ private struct SupplementDraftEditor: View {
                 .padding(.vertical, 7)
                 .background(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 6)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
         }
@@ -1570,7 +1570,7 @@ private struct SupplementDraftEditor: View {
             .padding(.vertical, 7)
             .background(FamilyUI.panelMutedBackground)
             .overlay(
-                RoundedRectangle(cornerRadius: 6)
+                RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                     .stroke(FamilyUI.panelBorder, lineWidth: 1)
             )
         }
@@ -1603,7 +1603,7 @@ private struct SupplementRecordEditorSheet: View {
                     if let duplicateWarning {
                         Text(duplicateWarning)
                             .font(.caption.weight(.semibold))
-                            .foregroundStyle(.red)
+                            .foregroundStyle(FamilyUI.danger)
                     }
                     SupplementDraftEditor(draft: $draft, onDelete: isNewVersion ? nil : {
                         modelContext.delete(record)
@@ -1897,10 +1897,10 @@ private struct SupplementPDFExportSheet: View {
             .padding(10)
             .background(FamilyUI.panelMutedBackground)
             .overlay(
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                     .stroke(isSelected ? FamilyUI.accent.opacity(0.5) : FamilyUI.panelBorder, lineWidth: 1)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
         }
         .buttonStyle(.plain)
     }
@@ -1914,10 +1914,10 @@ private struct SupplementPDFExportSheet: View {
                 .padding(.vertical, 8)
                 .background(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 6)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
         }
         .buttonStyle(.plain)
     }

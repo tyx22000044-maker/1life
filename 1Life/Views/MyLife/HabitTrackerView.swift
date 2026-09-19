@@ -109,10 +109,10 @@ private struct HabitRow: View {
                     .frame(width: 28, height: 28)
                     .background(FamilyUI.panelMutedBackground)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                             .stroke(FamilyUI.panelBorder, lineWidth: 1)
                     )
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(habit.name)
@@ -154,8 +154,8 @@ private struct HabitRow: View {
     private func stateColor(for state: HabitState) -> Color {
         switch state {
         case .none: return .secondary
-        case .half: return .orange
-        case .done: return .green
+        case .half: return FamilyUI.accent
+        case .done: return FamilyUI.success
         }
     }
 
@@ -231,7 +231,7 @@ struct AddHabitSheet: View {
                                             .frame(width: 34, height: 34)
                                             .background(Color(hex: preset.colorHex).opacity(0.14))
                                             .foregroundStyle(Color(hex: preset.colorHex))
-                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                                         Text(preset.name)
                                             .font(.caption)
                                             .foregroundStyle(.primary)
@@ -276,10 +276,10 @@ struct AddHabitSheet: View {
                                         .background(iconSymbol == icon ? Color(hex: colorHex) : FamilyUI.panelMutedBackground)
                                         .foregroundStyle(iconSymbol == icon ? .white : .primary)
                                         .overlay(
-                                            RoundedRectangle(cornerRadius: 10)
+                                            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                                         )
-                                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                                 }
                             }
                         }
@@ -291,11 +291,11 @@ struct AddHabitSheet: View {
                                     Button {
                                         colorHex = hex
                                     } label: {
-                                        RoundedRectangle(cornerRadius: 8)
+                                        RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                             .fill(Color(hex: hex))
                                             .frame(width: 30, height: 30)
                                             .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
+                                                RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                                     .stroke(colorHex == hex ? Color.primary : FamilyUI.panelBorder, lineWidth: colorHex == hex ? 2 : 1)
                                             )
                                     }

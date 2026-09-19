@@ -301,7 +301,7 @@ struct MealNutritionExtractSheet: View {
                                         .resizable()
                                         .scaledToFill()
                                         .frame(width: 72, height: 72)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                                         .overlay(alignment: .topTrailing) {
                                             Button {
                                                 imageDataList.remove(at: index)
@@ -364,7 +364,7 @@ struct MealNutritionExtractSheet: View {
                             .padding(.horizontal, 9)
                             .padding(.vertical, 6)
                             .background(FamilyUI.accent.opacity(0.1))
-                            .clipShape(Capsule())
+                            .clipShape(RoundedRectangle(cornerRadius: FamilyUI.badgeCornerRadius))
                         }
                         .disabled(!UIPasteboard.general.hasStrings)
                     }
@@ -385,7 +385,7 @@ struct MealNutritionExtractSheet: View {
             if let errorMessage {
                 Text(errorMessage)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(FamilyUI.danger)
             }
 
             Button(action: startExtraction) {
@@ -489,7 +489,7 @@ struct MealNutritionExtractSheet: View {
             if let errorMessage {
                 Text(errorMessage)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(FamilyUI.danger)
             }
 
             HStack(spacing: 10) {
@@ -567,7 +567,7 @@ struct MealNutritionExtractSheet: View {
             if let errorMessage {
                 Text(errorMessage)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(FamilyUI.danger)
             }
 
             HStack(spacing: 10) {
@@ -812,7 +812,7 @@ private struct MealNutritionCandidateEditor: View {
                 .padding(.vertical, 7)
                 .background(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 6)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
         }
@@ -935,7 +935,7 @@ private struct MealNutritionDraftEditor: View {
                 .padding(.vertical, 7)
                 .background(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 6)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
         }
@@ -961,7 +961,7 @@ private struct MealNutritionDraftEditor: View {
             .padding(.vertical, 7)
             .background(FamilyUI.panelMutedBackground)
             .overlay(
-                RoundedRectangle(cornerRadius: 6)
+                RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                     .stroke(FamilyUI.panelBorder, lineWidth: 1)
             )
         }

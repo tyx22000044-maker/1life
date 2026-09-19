@@ -227,7 +227,7 @@ struct WorkoutTimelineView: View {
                 } else {
                     Text(weekly.isTargetMet ? "已达标" : "进行中")
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(weekly.isTargetMet ? .green : .orange)
+                        .foregroundStyle(weekly.isTargetMet ? FamilyUI.success : FamilyUI.accent)
                 }
                 Button {
                     withAnimation { showGoalSettings.toggle() }
@@ -268,7 +268,7 @@ struct WorkoutTimelineView: View {
                     if let goalInputError {
                         Text(goalInputError)
                             .font(.caption.weight(.semibold))
-                            .foregroundStyle(.red)
+                            .foregroundStyle(FamilyUI.danger)
                     }
 
                     Toggle("周目标提醒", isOn: Binding(
@@ -428,10 +428,10 @@ struct WorkoutTimelineView: View {
                         .frame(width: 28, height: 28)
                         .background(FamilyUI.panelBackground)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
+                            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                 }
                 .buttonStyle(.plain)
                 Spacer()
@@ -446,10 +446,10 @@ struct WorkoutTimelineView: View {
                         .frame(width: 28, height: 28)
                         .background(FamilyUI.panelBackground)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
+                            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                 }
                 .buttonStyle(.plain)
             }
@@ -546,10 +546,10 @@ private struct WorkoutRow: View {
                 .frame(width: 32, height: 32)
                 .background(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(workout.isRestDay ? "休息日" : workout.workoutType.displayName)
@@ -605,10 +605,10 @@ private struct WorkoutDetailView: View {
                             .frame(width: 44, height: 44)
                             .background(FamilyUI.panelMutedBackground)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 12)
+                                RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                     .stroke(FamilyUI.panelBorder, lineWidth: 1)
                             )
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
 
                         VStack(alignment: .leading, spacing: 4) {
                             SystemStatusBadge(text: workout.isRestDay ? "REST DAY" : "TRAINING", tone: workout.isRestDay ? .accent : .success)

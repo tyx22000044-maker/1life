@@ -30,10 +30,10 @@ struct HabitDetailView: View {
                         .frame(width: 44, height: 44)
                         .background(FamilyUI.panelMutedBackground)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12)
+                            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                     VStack(alignment: .leading, spacing: 4) {
                         SystemStatusBadge(text: "ACTIVE HABIT", tone: .accent)
                         Text(habit.name).font(.headline)
@@ -84,7 +84,7 @@ struct HabitDetailView: View {
                         }
                     }
                     .font(.caption.weight(.bold))
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(FamilyUI.accent)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 11)
                     .background(FamilyUI.panelMutedBackground)
@@ -191,8 +191,8 @@ struct HabitDetailView: View {
     }
 
     private var trendColor: Color {
-        if trendDelta > 0 { return .green }
-        if trendDelta < 0 { return .orange }
+        if trendDelta > 0 { return FamilyUI.success }
+        if trendDelta < 0 { return FamilyUI.accent }
         return .secondary
     }
 
@@ -318,10 +318,10 @@ struct EditHabitSheet: View {
                                             .background(iconSymbol == icon ? Color(hex: colorHex) : FamilyUI.panelMutedBackground)
                                             .foregroundStyle(iconSymbol == icon ? .white : .primary)
                                             .overlay(
-                                                RoundedRectangle(cornerRadius: 10)
+                                                RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                                     .stroke(FamilyUI.panelBorder, lineWidth: 1)
                                             )
-                                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                                            .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                                     }
                                 }
                             }
@@ -333,11 +333,11 @@ struct EditHabitSheet: View {
                                     Button {
                                         colorHex = hex
                                     } label: {
-                                        RoundedRectangle(cornerRadius: 8)
+                                        RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                             .fill(Color(hex: hex))
                                             .frame(width: 30, height: 30)
                                             .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
+                                                RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                                     .stroke(colorHex == hex ? Color.primary : FamilyUI.panelBorder, lineWidth: colorHex == hex ? 2 : 1)
                                             )
                                     }

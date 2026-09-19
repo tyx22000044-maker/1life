@@ -14,16 +14,16 @@ struct AIConfigurationHeader: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: isConfigured ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(FamilyTypography.text(size: 14, weight: .bold))
                         .foregroundStyle(isConfigured ? FamilyUI.success : FamilyUI.warning)
                 )
             VStack(alignment: .leading, spacing: 2) {
@@ -185,16 +185,16 @@ struct AIEmptyStateContent: View {
         VStack(alignment: .leading, spacing: 16) {
             SystemPanel {
                 HStack(alignment: .top, spacing: 14) {
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .fill(FamilyUI.panelMutedBackground)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 10)
+                            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                         )
                         .frame(width: 54, height: 54)
                         .overlay(
                             Image(systemName: "sparkles")
-                                .font(.system(size: 22, weight: .black, design: .rounded))
+                                .font(FamilyTypography.text(size: 22, weight: .black))
                                 .foregroundStyle(FamilyUI.accent)
                         )
 
@@ -242,7 +242,7 @@ private struct AISetupNoticeCard: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(Color.orange)
+                    .foregroundStyle(FamilyUI.accent)
                 Text(title)
                     .font(.subheadline.weight(.semibold))
                 Spacer()
@@ -278,16 +278,16 @@ private struct FeatureCard: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: icon)
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(FamilyTypography.text(size: 14, weight: .bold))
                         .foregroundStyle(FamilyUI.accent)
                 )
             VStack(alignment: .leading, spacing: 2) {
@@ -387,7 +387,7 @@ private struct MealBubbleCard: View {
             if isRevoked {
                 Text("已撤销")
                     .font(.caption2)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(FamilyUI.danger)
             } else {
                 Button {
                     onUndo()

@@ -77,15 +77,15 @@ struct MealConfirmationCard: View {
 
                             HStack {
                                 Text("\(Int(baseRangedCalories * 0.5)) kcal")
-                                    .font(.system(size: 10, design: .rounded))
+                                    .font(FamilyTypography.text(size: 10))
                                     .foregroundStyle(.secondary)
                                 Spacer()
                                 Text("×\(String(format: "%.1f", pow(2.0, 2.0 * overallLocalScale - 1.0)))")
-                                    .font(.system(size: 10, design: .rounded))
-                                    .foregroundStyle(.orange)
+                                    .font(FamilyTypography.text(size: 10))
+                                    .foregroundStyle(FamilyUI.accent)
                                 Spacer()
                                 Text("\(Int(baseRangedCalories * 2.0)) kcal")
-                                    .font(.system(size: 10, design: .rounded))
+                                    .font(FamilyTypography.text(size: 10))
                                     .foregroundStyle(.secondary)
                             }
 
@@ -115,12 +115,12 @@ struct MealConfirmationCard: View {
                     if totalCalories <= 0 {
                         Text("热量数据缺失，无法记录。请用 AI 重新识别或手动添加。")
                             .font(.caption2)
-                            .foregroundStyle(.red)
+                            .foregroundStyle(FamilyUI.danger)
                     }
                     if hasLazyNutritionEstimate {
                         Text("当前结果缺少热量或三大宏量素。请点“手动编辑”补齐后再记录。")
                             .font(.caption2.weight(.medium))
-                            .foregroundStyle(.red)
+                            .foregroundStyle(FamilyUI.danger)
                     }
                 }
             }
@@ -140,7 +140,7 @@ struct MealConfirmationCard: View {
                         .padding(.horizontal, 10)
                         .padding(.vertical, 8)
                         .background(hasLazyNutritionEstimate ? FamilyUI.warning.opacity(0.14) : FamilyUI.panelMutedBackground)
-                        .foregroundStyle(hasLazyNutritionEstimate ? Color.orange : Color.primary)
+                        .foregroundStyle(hasLazyNutritionEstimate ? FamilyUI.accent : Color.primary)
                         .overlay(
                             RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
@@ -222,7 +222,7 @@ struct MealConfirmationCard: View {
                 Text(item.name).font(.caption)
                 if let conf = item.confidence {
                     Text(confidenceLabel(conf))
-                        .font(.system(size: 9, design: .rounded))
+                        .font(FamilyTypography.text(size: 9))
                         .padding(.horizontal, 5)
                         .padding(.vertical, 2)
                         .background(confidenceColor(conf).opacity(0.12))
@@ -265,14 +265,14 @@ struct MealConfirmationCard: View {
             if let missingSummary = item.missingNutrientSummary {
                 Text(missingSummary)
                     .font(.caption2)
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(FamilyUI.accent)
                     .lineLimit(2)
             }
 
             if item.isLazyNutritionEstimate {
                 Label("缺少关键字段：\(criticalMissingText(for: item))", systemImage: "exclamationmark.triangle.fill")
                     .font(.caption2)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(FamilyUI.danger)
             }
         }
     }
@@ -324,9 +324,9 @@ struct MealConfirmationCard: View {
 
     private func confidenceColor(_ conf: String) -> Color {
         switch conf {
-        case "high": return .green
-        case "medium": return .orange
-        default: return .red
+        case "high": return FamilyUI.success
+        case "medium": return FamilyUI.accent
+        default: return FamilyUI.danger
         }
     }
 
@@ -390,15 +390,15 @@ private struct FoodItemSliderView: View {
 
             HStack {
                 Text("\(Int(leftAmount))g")
-                    .font(.system(size: 9, design: .rounded))
+                    .font(FamilyTypography.text(size: 9))
                     .foregroundStyle(.secondary)
                 Spacer()
                 Text("\(Int(clampedAmount))g")
-                    .font(.system(size: 9, design: .rounded))
-                    .foregroundStyle(.orange)
+                    .font(FamilyTypography.text(size: 9))
+                    .foregroundStyle(FamilyUI.accent)
                 Spacer()
                 Text("\(Int(rightAmount))g")
-                    .font(.system(size: 9, design: .rounded))
+                    .font(FamilyTypography.text(size: 9))
                     .foregroundStyle(.secondary)
             }
         }
@@ -431,22 +431,22 @@ struct AIMealIdentificationConfirmationView: View {
     let onSaveAsTemplate: () -> Void
 
     private var sourceColor: Color {
-        confirmation.isFromLocalParser ? .orange : .cyan
+        confirmation.isFromLocalParser ? FamilyUI.accent : FamilyUI.info
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top, spacing: 12) {
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                     .fill(FamilyUI.panelMutedBackground)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                             .stroke(FamilyUI.panelBorder, lineWidth: 1)
                     )
                     .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                     .overlay(
                         Image(systemName: confirmation.isFromLocalParser ? "wand.and.stars.inverse" : "sparkles")
-                            .font(.system(size: 14, weight: .black, design: .rounded))
+                            .font(FamilyTypography.text(size: 14, weight: .black))
                             .foregroundStyle(sourceColor)
                     )
 
@@ -626,7 +626,7 @@ struct AIMealIdentificationConfirmationView: View {
                         .foregroundStyle(.secondary)
                     Text(item.calories > 0 ? "\(Int(item.calories)) kcal" : "未知")
                         .font(.caption)
-                        .foregroundStyle(item.calories > 0 ? Color.primary : Color.orange)
+                        .foregroundStyle(item.calories > 0 ? Color.primary : FamilyUI.accent)
                 }
             }
 
@@ -634,7 +634,7 @@ struct AIMealIdentificationConfirmationView: View {
                 HStack(spacing: 4) {
                     ForEach(Array(Set(meal.items.compactMap(\.nutritionDataNote))).prefix(2), id: \.self) { note in
                         Text(note)
-                            .font(.system(size: 10, design: .rounded))
+                            .font(FamilyTypography.text(size: 10))
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(FamilyUI.panelMutedBackground)

@@ -206,12 +206,12 @@ struct ProfileStep: View {
                             PhotosPicker(selection: $selectedItem, matching: .images) {
                                 ZStack(alignment: .bottomTrailing) {
                                     UserAvatarView(avatarData: avatarData, name: nickname, size: 96)
-                                    RoundedRectangle(cornerRadius: 8)
+                                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                         .fill(Color.black)
                                         .frame(width: 30, height: 30)
                                         .overlay(
                                             Image(systemName: "camera.fill")
-                                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                                .font(FamilyTypography.text(size: 12, weight: .bold))
                                                 .foregroundStyle(.white)
                                         )
                                 }
@@ -433,10 +433,10 @@ struct CalorieTargetStep: View {
                     SystemPanel(title: "DAILY CALORIES", detail: "之后可以在设置中随时调整") {
                         HStack(alignment: .firstTextBaseline, spacing: 4) {
                             TextField("\(Int(recommendedCalories))", text: $calorieText)
-                                .font(.system(size: 46, weight: .black, design: .rounded))
+                                .font(FamilyTypography.text(size: 46, weight: .black))
                                 .keyboardType(.numberPad)
                             Text("kcal")
-                                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                                .font(FamilyTypography.text(size: 20, weight: .semibold))
                                 .foregroundStyle(.secondary)
                         }
                         .padding(.horizontal, 12)
@@ -458,11 +458,11 @@ struct CalorieTargetStep: View {
                         proteinTargetMultiplier: proteinTargetMultiplier
                     )
                     SystemPanel(title: "MACRO TARGETS") {
-                        MacroRow(name: "蛋白质", grams: macros.protein, color: .blue)
+                        MacroRow(name: "蛋白质", grams: macros.protein, color: FamilyUI.info)
                         SystemPanelDivider()
-                        MacroRow(name: "碳水化合物", grams: macros.carbs, color: .orange)
+                        MacroRow(name: "碳水化合物", grams: macros.carbs, color: FamilyUI.accent)
                         SystemPanelDivider()
-                        MacroRow(name: "脂肪", grams: macros.fat, color: .yellow)
+                        MacroRow(name: "脂肪", grams: macros.fat, color: FamilyUI.warning)
                     }
                 }
                 .padding(.horizontal, AppSpacing.pageHorizontal)
@@ -572,7 +572,7 @@ private struct ReminderRow: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            OnboardingIconBox(icon: icon, tone: .orange)
+            OnboardingIconBox(icon: icon, tone: FamilyUI.accent)
             Text(name)
                 .font(.subheadline.weight(.semibold))
             Spacer()

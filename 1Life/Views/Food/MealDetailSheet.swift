@@ -46,17 +46,17 @@ struct MealDetailSheet: View {
     private var summaryCard: some View {
         VStack(spacing: 12) {
             HStack {
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                     .fill(FamilyUI.panelMutedBackground)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                             .stroke(FamilyUI.panelBorder, lineWidth: 1)
                     )
                     .frame(width: 40, height: 40)
                     .overlay(
                         Image(systemName: meal.mealType.icon)
-                            .font(.system(size: 16, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.orange)
+                            .font(FamilyTypography.text(size: 16, weight: .semibold))
+                            .foregroundStyle(FamilyUI.accent)
                     )
                 VStack(alignment: .leading, spacing: 2) {
                     Text(meal.mealType.displayName)
@@ -67,7 +67,7 @@ struct MealDetailSheet: View {
                 }
                 Spacer()
                 Text("\(Int(totalCalories))")
-                    .font(.system(size: 30, weight: .black, design: .rounded))
+                    .font(FamilyTypography.text(size: 30, weight: .black))
                     .foregroundStyle(FamilyUI.accent)
                     .monospacedDigit()
                 + Text(" kcal")
@@ -76,11 +76,11 @@ struct MealDetailSheet: View {
             }
 
             HStack(spacing: 0) {
-                macroCell(label: "蛋白质", value: totalProtein, unit: "g", color: .red)
+                macroCell(label: "蛋白质", value: totalProtein, unit: "g", color: FamilyUI.danger)
                 Spacer()
-                macroCell(label: "碳水", value: totalCarbs, unit: "g", color: .orange)
+                macroCell(label: "碳水", value: totalCarbs, unit: "g", color: FamilyUI.accent)
                 Spacer()
-                macroCell(label: "脂肪", value: totalFat, unit: "g", color: .yellow)
+                macroCell(label: "脂肪", value: totalFat, unit: "g", color: FamilyUI.warning)
             }
         }
         .padding(AppSpacing.cardPadding)

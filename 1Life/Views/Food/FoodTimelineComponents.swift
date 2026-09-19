@@ -45,17 +45,17 @@ struct MealTypeSection: View {
 
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                     .fill(FamilyUI.panelBackground)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                             .stroke(FamilyUI.panelBorder, lineWidth: 1)
                     )
                     .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                     .overlay(
                         Image(systemName: type.icon)
-                            .font(.system(size: 15, weight: .bold, design: .rounded))
-                            .foregroundStyle(.orange)
+                            .font(FamilyTypography.text(size: 15, weight: .bold))
+                            .foregroundStyle(FamilyUI.accent)
                     )
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -80,10 +80,10 @@ struct MealTypeSection: View {
                         .frame(width: 32, height: 32)
                         .background(FamilyUI.panelMutedBackground)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
+                            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                         )
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                 }
                 .buttonStyle(.plain)
             }
@@ -139,22 +139,22 @@ private struct MacroRatioBar: View {
             GeometryReader { proxy in
                 HStack(spacing: 2) {
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.blue)
+                        .fill(FamilyUI.info)
                         .frame(width: width(for: proteinCalories, totalWidth: proxy.size.width))
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.green)
+                        .fill(FamilyUI.success)
                         .frame(width: width(for: carbsCalories, totalWidth: proxy.size.width))
                     RoundedRectangle(cornerRadius: 3)
-                        .fill(Color.orange)
+                        .fill(FamilyUI.accent)
                         .frame(width: width(for: fatCalories, totalWidth: proxy.size.width))
                 }
             }
             .frame(height: 8)
 
             HStack(spacing: 8) {
-                ratioLabel("蛋白", value: proteinCalories, color: .blue)
-                ratioLabel("碳水", value: carbsCalories, color: .green)
-                ratioLabel("脂肪", value: fatCalories, color: .orange)
+                ratioLabel("蛋白", value: proteinCalories, color: FamilyUI.info)
+                ratioLabel("碳水", value: carbsCalories, color: FamilyUI.success)
+                ratioLabel("脂肪", value: fatCalories, color: FamilyUI.accent)
             }
         }
     }
@@ -170,7 +170,7 @@ private struct MacroRatioBar: View {
                 .fill(color)
                 .frame(width: 6, height: 6)
             Text("\(title) \(percent(value))%")
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .font(FamilyTypography.text(size: 10, weight: .semibold))
                 .foregroundStyle(.secondary)
         }
     }
@@ -206,7 +206,7 @@ struct MacroSummaryTile: View {
             ProgressView(value: progress)
                 .tint(color)
             Text("目标 \(Int(target))\(unit)")
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .font(FamilyTypography.text(size: 10, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
@@ -229,7 +229,7 @@ struct QuickFoodChip: View {
 
     var body: some View {
         HStack(spacing: 9) {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                 .fill(color.opacity(0.12))
                 .frame(width: 34, height: 34)
                 .overlay(

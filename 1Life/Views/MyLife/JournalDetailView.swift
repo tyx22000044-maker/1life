@@ -69,7 +69,7 @@ struct JournalDetailView: View {
                                     .resizable()
                                     .scaledToFill()
                                     .frame(height: 112)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                             }
                         }
                     }

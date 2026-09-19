@@ -131,9 +131,9 @@ struct JournalEditorView: View {
                                             Image(uiImage: img)
                                                 .resizable().scaledToFill()
                                                 .frame(width: 72, height: 72)
-                                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                                .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                                                 .overlay(
-                                                    RoundedRectangle(cornerRadius: 8)
+                                                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                                                 )
 
@@ -163,10 +163,10 @@ struct JournalEditorView: View {
                                         .frame(width: 72, height: 72)
                                         .background(FamilyUI.panelMutedBackground)
                                         .overlay(
-                                            RoundedRectangle(cornerRadius: 8)
+                                            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                                         )
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                                     }
                                     .onChange(of: selectedPhotos) { _, items in
                                         Task {

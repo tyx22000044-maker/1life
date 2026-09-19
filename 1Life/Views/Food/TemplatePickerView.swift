@@ -198,17 +198,17 @@ struct TemplatePickerView: View {
 
     private func templateRow(_ template: MealTemplate) -> some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: iconName(for: template.mealType))
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundStyle(.orange)
+                        .font(FamilyTypography.text(size: 15, weight: .bold))
+                        .foregroundStyle(FamilyUI.accent)
                 )
 
             VStack(alignment: .leading, spacing: 5) {
@@ -243,17 +243,17 @@ struct TemplatePickerView: View {
 
     private func userFoodRow(_ food: UserFood) -> some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: "fork.knife")
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundStyle(.orange)
+                        .font(FamilyTypography.text(size: 15, weight: .bold))
+                        .foregroundStyle(FamilyUI.accent)
                 )
 
             VStack(alignment: .leading, spacing: 5) {
@@ -285,17 +285,17 @@ struct TemplatePickerView: View {
 
     private func drinkRecordRow(_ record: DrinkRecord, showsBrandName: Bool = true) -> some View {
         HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                 .fill(FamilyUI.panelMutedBackground)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                 .overlay(
                     Image(systemName: "cup.and.saucer.fill")
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundStyle(.teal)
+                        .font(FamilyTypography.text(size: 15, weight: .bold))
+                        .foregroundStyle(FamilyUI.success)
                 )
 
             VStack(alignment: .leading, spacing: 5) {
@@ -380,17 +380,17 @@ private struct TemplatePickerDrinkBrandGroupSection: View {
                 }
             } label: {
                 HStack(spacing: 12) {
-                    RoundedRectangle(cornerRadius: 8)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .fill(FamilyUI.panelMutedBackground)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 8)
+                            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                                 .stroke(FamilyUI.panelBorder, lineWidth: 1)
                         )
                         .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                         .overlay(
                             Image(systemName: "building.2.fill")
-                                .font(.system(size: 14, weight: .bold, design: .rounded))
-                                .foregroundStyle(.teal)
+                                .font(FamilyTypography.text(size: 14, weight: .bold))
+                                .foregroundStyle(FamilyUI.success)
                         )
 
                     VStack(alignment: .leading, spacing: 3) {

@@ -50,11 +50,11 @@ struct OnboardingPageHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(eyebrow)
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .font(FamilyTypography.text(size: 11, weight: .semibold))
                 .tracking(1.2)
                 .foregroundStyle(.secondary)
             Text(title)
-                .font(.system(size: 32, weight: .black, design: .rounded))
+                .font(FamilyTypography.text(size: 32, weight: .black))
                 .foregroundStyle(.primary)
             Text(detail)
                 .font(.subheadline)
@@ -102,7 +102,7 @@ struct OnboardingIconBox: View {
             .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
             .overlay(
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(FamilyTypography.text(size: 14, weight: .semibold))
                     .foregroundStyle(tone)
             )
     }

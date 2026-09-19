@@ -290,7 +290,7 @@ struct FoodTimelineView: View {
                         .foregroundStyle(.secondary)
                         .frame(width: 26, height: 26)
                         .background(FamilyUI.panelMutedBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: 7))
+                        .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                 }
                 .buttonStyle(.plain)
             }
@@ -321,7 +321,7 @@ struct FoodTimelineView: View {
             HStack(alignment: .bottom, spacing: 14) {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("总摄入")
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .font(FamilyTypography.text(size: 11, weight: .semibold))
                         .tracking(1.2)
                         .foregroundStyle(.secondary)
                     Text("\(Int(snapshot.totalCalories))")
@@ -421,7 +421,7 @@ struct FoodTimelineView: View {
                                 title: template.name,
                                 subtitle: "\(template.mealType.displayName) · \(Int(template.totalCalories)) kcal",
                                 icon: template.mealType.icon,
-                                color: .orange
+                                color: FamilyUI.accent
                             )
                         }
                         .buttonStyle(.plain)
@@ -486,9 +486,9 @@ struct FoodTimelineView: View {
     private func macroSummaryPanel(snapshot: FoodDaySnapshot) -> some View {
         SystemPanel(title: "营养摘要", detail: "三大营养素、目标差距和风险提醒") {
             HStack(spacing: 12) {
-                MacroSummaryTile(title: "蛋白质", value: snapshot.totalProtein, target: effectiveTarget.protein, unit: "g", color: .blue)
-                MacroSummaryTile(title: "碳水", value: snapshot.totalCarbs, target: effectiveTarget.carbs, unit: "g", color: .green)
-                MacroSummaryTile(title: "脂肪", value: snapshot.totalFat, target: effectiveTarget.fat, unit: "g", color: .orange)
+                MacroSummaryTile(title: "蛋白质", value: snapshot.totalProtein, target: effectiveTarget.protein, unit: "g", color: FamilyUI.info)
+                MacroSummaryTile(title: "碳水", value: snapshot.totalCarbs, target: effectiveTarget.carbs, unit: "g", color: FamilyUI.success)
+                MacroSummaryTile(title: "脂肪", value: snapshot.totalFat, target: effectiveTarget.fat, unit: "g", color: FamilyUI.accent)
             }
 
             SystemPanelDivider()
@@ -708,7 +708,7 @@ struct FoodTimelineView: View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text("当天合计")
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .font(FamilyTypography.text(size: 10, weight: .semibold))
                     .tracking(1)
                     .foregroundStyle(.secondary)
                 Text("\(Int(snapshot.totalCalories)) / \(Int(effectiveCalorieTarget)) kcal")
@@ -891,7 +891,7 @@ struct FoodTimelineView: View {
                 .foregroundStyle(color)
                 .frame(width: 28, height: 28)
                 .background(color.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 7))
+                .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)

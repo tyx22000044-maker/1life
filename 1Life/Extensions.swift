@@ -17,6 +17,21 @@ enum FamilyTypography {
     static let actionIcon = Font.system(.caption, weight: .black)
     static let badge = Font.custom("Archivo-Bold", size: 9.5)
     static let button = Font.custom("Archivo-Bold", size: 15)
+
+    /// Size-specific text roles keep small labels and data figures on the same
+    /// Archivo grotesk as the rest of the Swiss Ledger interface.
+    static func text(size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        let face: String
+        switch weight {
+        case .black: face = "Archivo-Black"
+        case .heavy: face = "Archivo-ExtraBold"
+        case .bold: face = "Archivo-Bold"
+        case .semibold: face = "Archivo-SemiBold"
+        case .medium: face = "Archivo-Medium"
+        default: face = "Archivo-Regular"
+        }
+        return Font.custom(face, size: size)
+    }
 }
 
 enum AppTypography {
@@ -364,6 +379,9 @@ enum FamilyUI {
             ? UIColor(red: 0.882, green: 0.294, blue: 0.212, alpha: 1)   // #E14B36
             : UIColor(red: 0.769, green: 0.196, blue: 0.122, alpha: 1)   // #C4321F
     })
+    /// Muted informational color for small nutrient/chart marks; never used as
+    /// a large surface or primary action.
+    static let info = Color(hex: "4A5F7E")
     static let success = Color(UIColor { t in
         t.userInterfaceStyle == .dark
             ? UIColor(red: 0.322, green: 0.541, blue: 0.451, alpha: 1)   // #528A73

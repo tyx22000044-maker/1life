@@ -810,10 +810,10 @@ private struct ReviewRhythmCell: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            RoundedRectangle(cornerRadius: 5)
+            RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                 .fill(cellFill)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 5)
+                    RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                         .stroke(FamilyUI.panelBorder.opacity(0.7), lineWidth: 1)
                 )
 

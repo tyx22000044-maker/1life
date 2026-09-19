@@ -108,17 +108,17 @@ struct MealCardView: View {
             withAnimation { isExpanded.toggle() }
         } label: {
             HStack(spacing: 12) {
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                     .fill(FamilyUI.panelMutedBackground)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
+                        RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                             .stroke(FamilyUI.panelBorder, lineWidth: 1)
                     )
                     .frame(width: 36, height: 36)
                     .overlay(
                         Image(systemName: mealIcon)
-                            .font(.system(size: 15, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.orange)
+                            .font(FamilyTypography.text(size: 15, weight: .semibold))
+                            .foregroundStyle(FamilyUI.accent)
                     )
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -141,7 +141,7 @@ struct MealCardView: View {
                 Spacer()
 
                 Text("\(Int(meal.totalCalories)) kcal")
-                    .font(.system(size: 18, weight: .black, design: .rounded))
+                    .font(FamilyTypography.text(size: 18, weight: .black))
                     .foregroundStyle(FamilyUI.accent)
                     .monospacedDigit()
 

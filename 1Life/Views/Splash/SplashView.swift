@@ -33,18 +33,17 @@ struct SplashView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 92, height: 92)
-                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius, style: .continuous))
                             .scaleEffect(logoScale)
                             .opacity(logoOpacity)
                     }
-                    .shadow(color: Color.black.opacity(0.08), radius: 18, x: 0, y: 12)
 
                 VStack(spacing: 6) {
                     Text(appName)
                         .font(FamilyTypography.hero)
                         .monospacedDigit()
                     Text("营养、习惯与身体回顾")
-                        .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                        .font(FamilyTypography.text(size: 15, weight: .semibold))
                         .foregroundStyle(.secondary)
                 }
                 .opacity(textOpacity)

@@ -171,7 +171,7 @@ private struct JournalRow: View {
                     .resizable()
                     .scaledToFill()
                     .frame(width: 54, height: 54)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
                     .overlay(alignment: .bottomTrailing) {
                         if entry.photoCount > 1 {
                             Text("+\(entry.photoCount - 1)")

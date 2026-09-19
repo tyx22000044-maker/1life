@@ -70,7 +70,7 @@ struct MealManualEditSheet: View {
                                         if item.isLazyNutritionEstimate {
                                             Text("营养素仍不完整，建议手动补充并改为直接录入")
                                                 .font(.caption2)
-                                                .foregroundStyle(.orange)
+                                                .foregroundStyle(FamilyUI.accent)
                                         }
                                     }
                                     .padding(.vertical, 9)

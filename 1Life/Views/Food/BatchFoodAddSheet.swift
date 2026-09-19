@@ -136,7 +136,7 @@ private struct BatchSelectableRow: View {
     var body: some View {
         Button(action: onToggle) {
             HStack(spacing: 10) {
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
                     .fill(color.opacity(0.12))
                     .frame(width: 34, height: 34)
                     .overlay(
@@ -159,7 +159,7 @@ private struct BatchSelectableRow: View {
                 Spacer()
 
                 Image(systemName: isSelected ? "checkmark.square.fill" : "square")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .font(FamilyTypography.text(size: 18, weight: .bold))
                     .foregroundStyle(isSelected ? FamilyUI.accent : .secondary)
             }
             .padding(.vertical, 8)
