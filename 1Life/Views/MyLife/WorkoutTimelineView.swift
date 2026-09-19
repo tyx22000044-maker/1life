@@ -395,6 +395,7 @@ struct WorkoutTimelineView: View {
     private func importHealthWorkouts() async {
         do {
             try await HealthKitService.shared.requestAuthorization()
+            try? await HealthKitService.shared.requestActivityDetailAuthorization()
             var imported: [WorkoutLog] = []
             for offset in 0..<30 {
                 if let date = Calendar.current.date(byAdding: .day, value: -offset, to: .now) {

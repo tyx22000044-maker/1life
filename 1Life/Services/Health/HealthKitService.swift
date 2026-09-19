@@ -93,6 +93,10 @@ final class HealthKitService {
         store.disableBackgroundDelivery(for: activeType) { _, _ in }
     }
 
+    /// Energy and body metrics: everything the TDEE and body-record features need.
+    /// Sleep, workouts, heart rate, distance and daylight are requested separately, by the
+    /// screens that actually show them, so connecting Apple Health never asks for the
+    /// whole set at once. `Settings → Apple Health` lists the purpose of each group.
     func requestAuthorization(needsWriteAccess: Bool = false) async throws {
         guard isAvailable else { throw HealthKitServiceError.unavailable }
         guard let activeEnergy = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned),
@@ -104,16 +108,19 @@ final class HealthKitService {
             throw HealthKitServiceError.unsupportedType
         }
 
-        var readTypes: Set<HKObjectType> = [
-            activeEnergy,
-            basalEnergy,
-            bodyMass,
-            bodyFat,
-            height,
-            stepCount,
-            HKObjectType.workoutType(),
-            HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
-        ]
+        let readTypes: Set<HKObjectType> = [activeEnergy, basalEnergy, bodyMass, bodyFat, height, stepCount]
+        let shareTypes: Set<HKSampleType> = needsWriteAccess ? [bodyMass, bodyFat] : []
+        try await store.requestAuthorization(toShare: shareTypes, read: readTypes)
+    }
+
+    /// Additional read types for the training timeline and the Dashboard health metrics.
+    /// A rejection here must not disable the core energy/step features.
+    func requestActivityDetailAuthorization() async throws {
+        guard isAvailable else { throw HealthKitServiceError.unavailable }
+        var readTypes: Set<HKObjectType> = [HKObjectType.workoutType()]
+        if let sleep = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) {
+            readTypes.insert(sleep)
+        }
         if let heartRate = HKObjectType.quantityType(forIdentifier: .heartRate) {
             readTypes.insert(heartRate)
         }
@@ -123,9 +130,7 @@ final class HealthKitService {
         if let daylight = HKObjectType.quantityType(forIdentifier: .timeInDaylight) {
             readTypes.insert(daylight)
         }
-
-        let shareTypes: Set<HKSampleType> = needsWriteAccess ? [bodyMass, bodyFat] : []
-        try await store.requestAuthorization(toShare: shareTypes, read: readTypes)
+        try await store.requestAuthorization(toShare: [], read: readTypes)
     }
 
     func energySummary(for date: Date, settings: UserSettings?) async throws -> HealthEnergySummary {

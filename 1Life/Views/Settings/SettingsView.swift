@@ -157,7 +157,7 @@ struct SettingsView: View {
     }
 
     private var appleHealthSection: some View {
-        SystemPanel(title: "Apple Health", detail: "动态 TDEE、消耗读取与健康数据联动") {
+        SystemPanel(title: "Apple Health", detail: "能量与身体：活动热量、静息热量、步数、身高、体重、体脂，用于动态 TDEE 和身体记录。训练与作息（训练、平均心率、距离、睡眠、日照）只在你进入训练时间线或回顾页时单独申请；任何一类被拒绝只会让该项显示为破折号，本机记录不受影响。") {
             if let s = currentSettings {
                 Toggle(isOn: Binding(
                     get: { s.useHealthKitForDynamicTDEE },
@@ -236,6 +236,9 @@ struct SettingsView: View {
 
         do {
             try await HealthKitService.shared.requestAuthorization()
+            // Sleep, workouts, heart rate, distance and daylight are requested by the
+            // screens that show them; a refusal there must not break the TDEE feature.
+            try? await HealthKitService.shared.requestActivityDetailAuthorization()
             HealthKitService.shared.enableEnergyBackgroundDelivery()
             let summary = try await HealthKitService.shared.energySummary(for: .now, settings: settings)
             healthSummary = summary

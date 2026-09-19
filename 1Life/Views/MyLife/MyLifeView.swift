@@ -1295,6 +1295,7 @@ private struct BodyMetricsCard: View {
     private func importFromHealth() async {
         do {
             try await HealthKitService.shared.requestAuthorization()
+            try? await HealthKitService.shared.requestActivityDetailAuthorization()
             guard let snapshot = try await HealthKitService.shared.latestBodyMeasurement() else {
                 bannerCenter.show(title: "暂无可导入数据", message: "Apple Health 中暂无体重或体脂记录。", tone: .warning)
                 return

@@ -681,6 +681,10 @@ struct DashboardView: View {
         isRefreshingHealth = true
         defer { isRefreshingHealth = false }
         let hs = HealthKitService.shared
+        // Sleep and daylight are only read on this card, so their read types are asked
+        // for here rather than during the initial Apple Health connection. A refusal just
+        // leaves those metrics as em dashes.
+        try? await hs.requestActivityDetailAuthorization()
         async let energySummary = try? await hs.energySummary(for: selectedDate, settings: currentSettings)
         async let activitySummary = try? await hs.activitySummary(for: selectedDate)
         async let sleepHours = try? await hs.sleepHours(for: selectedDate)
