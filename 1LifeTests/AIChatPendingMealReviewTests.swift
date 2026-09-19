@@ -130,4 +130,19 @@ final class AIChatPendingMealReviewTests: XCTestCase {
         XCTAssertEqual(viewModel.pendingMeals.count, 1, "被拦下的餐食必须留在确认卡片上")
         XCTAssertTrue(viewModel.messages.last?.content.contains("缺少关键营养字段") ?? false)
     }
+
+    func testBatchResultsFlattenEveryMeal() {
+        let workout = AIChatIntentResult.addWorkout(AIParsedWorkout(
+            workoutType: .running, durationMinutes: 30, caloriesBurned: nil, intensity: .moderate, note: ""
+        ))
+        let results: [AIChatIntentResult] = [
+            workout,
+            .addMeal(meal(.lunch, calories: 620)),
+            .addMeals([meal(.breakfast, calories: 150), meal(.dinner, calories: 800)])
+        ]
+
+        let meals = AIChatViewModel.meals(in: results)
+
+        XCTAssertEqual(meals.map(\.mealType), [.lunch, .breakfast, .dinner], "batch 内的每一餐都要进入确认")
+    }
 }

@@ -211,4 +211,35 @@ final class LocalAIIntentParserTests: XCTestCase {
         XCTAssertEqual(content, "有点累")
         XCTAssertEqual(mood, .tired)
     }
+
+    func testCompoundSentenceWithConnectorProducesBatch() throws {
+        let parser = LocalAIIntentParser()
+        let result = try XCTUnwrap(parser.parse("今天记录了跑步30分钟，然后喝了500ml水"))
+        guard case .batch(let results) = result else {
+            return XCTFail("expected batch, got \(result)")
+        }
+        XCTAssertEqual(results.count, 2)
+        XCTAssertTrue(results.contains { if case .addWorkout = $0 { return true }; return false })
+        XCTAssertTrue(results.contains { if case .addWater(let amount) = $0 { return amount == 500 }; return false })
+    }
+
+    func testDurationFollowedByHouProducesBatch() throws {
+        let parser = LocalAIIntentParser()
+        let result = try XCTUnwrap(parser.parse("记录跑步30分钟后喝了500ml水"))
+        guard case .batch(let results) = result else {
+            return XCTFail("expected batch, got \(result)")
+        }
+        XCTAssertEqual(results.count, 2)
+    }
+
+    func testTrailingDetailFragmentDoesNotSplitTheAction() throws {
+        // “，消耗300千卡” is not an action of its own: the sentence must stay one
+        // workout carrying its calories.
+        let parser = LocalAIIntentParser()
+        let result = try XCTUnwrap(parser.parse("今天跑步跑了35分钟，消耗300千卡"))
+        guard case .addWorkout(let workout) = result else {
+            return XCTFail("expected single addWorkout, got \(result)")
+        }
+        XCTAssertEqual(workout.caloriesBurned, 300)
+    }
 }

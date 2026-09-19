@@ -13,19 +13,58 @@ struct LocalAIIntentParser {
         let input = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !input.isEmpty else { return nil }
 
-        if let workout = parseWorkout(input) { return workout }
-        if let bowel = parseBowelLog(input) { return bowel }
-        if let bodyMeasurement = parseBodyMeasurement(input) { return bodyMeasurement }
-        if let fitnessQuery = parseFitnessQuery(input) { return fitnessQuery }
-        if let water = parseWater(input) { return water }
-        if let journal = parseJournal(input) { return journal }
+        let segments = actionSegments(of: input)
+        if segments.count > 1 {
+            var results: [AIChatIntentResult] = []
+            for segment in segments {
+                guard let result = parseSingle(segment) else {
+                    results = []
+                    break
+                }
+                results.append(result)
+            }
+            if results.count > 1 { return .batch(results) }
+            if results.count == 1 { return results[0] }
+        }
+
+        return parseSingle(input)
+    }
+
+    /// “今天跑步30分钟，然后喝了500ml水” used to return only the workout and drop the
+    /// water. Splitting is all-or-nothing: if any fragment fails to parse on its own the
+    /// whole sentence is parsed as before, so “跑了35分钟，消耗300千卡” keeps its calories.
+    private func actionSegments(of text: String) -> [String] {
+        var normalized = text
+        for connector in ["然后", "之後", "之后", "接着", "接著", "顺便", "順便", "另外", "并且", "並且", "同时", "同時"] {
+            normalized = normalized.replacingOccurrences(of: connector, with: "，")
+        }
+        // A duration followed by 后 opens the next action: “跑步30分钟后喝水”.
+        normalized = normalized.replacingOccurrences(
+            of: #"([0-9]+(?:\s*(?:分钟|小时|秒))?)\s*后"#,
+            with: "$1，",
+            options: .regularExpression
+        )
+
+        return normalized
+            .components(separatedBy: CharacterSet(charactersIn: "，,。；;"))
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+    }
+
+    private func parseSingle(_ text: String) -> AIChatIntentResult? {
+        if let workout = parseWorkout(text) { return workout }
+        if let bowel = parseBowelLog(text) { return bowel }
+        if let bodyMeasurement = parseBodyMeasurement(text) { return bodyMeasurement }
+        if let fitnessQuery = parseFitnessQuery(text) { return fitnessQuery }
+        if let water = parseWater(text) { return water }
+        if let journal = parseJournal(text) { return journal }
         // 创建模板的请求交给 AI 解析（create_template 意图），本地不拦截
-        if mentionsTemplate(input), expressesTemplateCreation(input) { return nil }
-        if let templateMeal = parseMealTemplate(input) { return templateMeal }
-        if mentionsTemplate(input) {
+        if mentionsTemplate(text), expressesTemplateCreation(text) { return nil }
+        if let templateMeal = parseMealTemplate(text) { return templateMeal }
+        if mentionsTemplate(text) {
             return .chat("没有在模板库找到这个模板。你可以先在模板库创建、或让我帮你生成模板（例如“帮我建一个早餐模板：鸡蛋2个+牛奶250ml”），也可以直接描述这次记录。")
         }
-        if let meal = parseMeal(input) { return meal }
+        if let meal = parseMeal(text) { return meal }
         return nil
     }
 

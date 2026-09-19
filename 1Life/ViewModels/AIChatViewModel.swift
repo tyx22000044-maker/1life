@@ -112,7 +112,7 @@ final class AIChatViewModel {
                         isLoading = false
                         return
                     }
-                    handleIntentResult(libraryAwareResult, provider: settings.selectedAIProvider)
+                    handleIntentResult(libraryAwareResult, provider: settings.selectedAIProvider, isLocal: true)
                 }
                 isLoading = false
                 return
@@ -440,10 +440,10 @@ final class AIChatViewModel {
 
     // MARK: - Private
 
-    private func handleIntentResult(_ result: AIChatIntentResult, provider: AIProvider) {
+    private func handleIntentResult(_ result: AIChatIntentResult, provider: AIProvider, isLocal: Bool = false) {
         switch result {
         case .addMeal, .addMeals:
-            beginMealReview(result, originalText: lastInputText, isLocal: false)
+            beginMealReview(result, originalText: lastInputText, isLocal: isLocal)
         case .createTemplate(let name, let meal):
             createTemplateFromIntent(name: name, meal: meal, provider: provider)
         case .addWater(let amount):
@@ -503,9 +503,7 @@ final class AIChatViewModel {
             let recorded = AIChatIntentRecorder.recordBowelLog(log, date: recordDateForCurrentInput(), modelContext: modelContext)
             completeRecordedIntent(recorded, provider: provider)
         case .batch(let results):
-            for result in results {
-                handleIntentResult(result, provider: provider)
-            }
+            handleBatch(results, provider: provider, isLocal: isLocal)
         case .fitnessSummary:
             appendAssistant(AIChatInsightReplyBuilder.fitnessSummary(modelContext: modelContext, settings: settings), provider: provider)
             persist(reason: "fitness summary")
@@ -517,6 +515,30 @@ final class AIChatViewModel {
             persist(reason: "post workout nutrition")
         case .chat(let reply):
             appendAssistant(reply, provider: provider)
+        }
+    }
+
+    /// Records the immediate actions of a batch and gathers its meals into one review,
+    /// so “跑步30分钟，然后午餐吃了鸡胸肉和米饭” no longer overwrites the first meal
+    /// with the second.
+    private func handleBatch(_ results: [AIChatIntentResult], provider: AIProvider, isLocal: Bool) {
+        for result in results where !result.isMealResult {
+            handleIntentResult(result, provider: provider, isLocal: isLocal)
+        }
+        let meals = Self.meals(in: results)
+        if !meals.isEmpty {
+            beginMealReview(.addMeals(meals), originalText: lastInputText, isLocal: isLocal)
+        }
+    }
+
+    static func meals(in results: [AIChatIntentResult]) -> [AIParsedMeal] {
+        results.flatMap { result -> [AIParsedMeal] in
+            switch result {
+            case .addMeal(let meal): return [meal]
+            case .addMeals(let meals): return meals
+            case .batch(let nested): return meals(in: nested)
+            default: return []
+            }
         }
     }
 
