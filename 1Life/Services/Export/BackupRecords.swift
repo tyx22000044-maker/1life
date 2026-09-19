@@ -416,6 +416,9 @@ nonisolated struct GoalRecord: Codable {
     let dailyFolate: Double
     let dailyVitaminB12: Double
 
+    let createdAt: Date?
+    let updatedAt: Date?
+
     init(_ goal: NutritionGoal) {
         id = goal.id
         effectiveDate = goal.effectiveDate
@@ -444,12 +447,16 @@ nonisolated struct GoalRecord: Codable {
         dailyVitaminB6 = goal.dailyVitaminB6
         dailyFolate = goal.dailyFolate
         dailyVitaminB12 = goal.dailyVitaminB12
+        createdAt = goal.createdAt
+        updatedAt = goal.updatedAt
     }
 
     @MainActor
     func model() -> NutritionGoal {
         let goal = NutritionGoal(effectiveDate: effectiveDate, dailyCalories: dailyCalories, dailyProtein: dailyProtein, dailyCarbs: dailyCarbs, dailyFat: dailyFat, dailyFiber: dailyFiber, dailySodium: dailySodium, dailySugar: dailySugar, dailyCholesterol: dailyCholesterol, dailyCaffeine: dailyCaffeine ?? 400, dailyTeaPolyphenols: dailyTeaPolyphenols ?? 500, dailyCalcium: dailyCalcium, dailyMagnesium: dailyMagnesium, dailyPotassium: dailyPotassium, dailyIron: dailyIron, dailyZinc: dailyZinc, dailyVitaminA: dailyVitaminA, dailyVitaminC: dailyVitaminC, dailyVitaminD: dailyVitaminD, dailyVitaminE: dailyVitaminE, dailyVitaminB1: dailyVitaminB1, dailyVitaminB2: dailyVitaminB2, dailyNiacin: dailyNiacin, dailyVitaminB6: dailyVitaminB6, dailyFolate: dailyFolate, dailyVitaminB12: dailyVitaminB12)
         goal.id = id
+        goal.createdAt = createdAt ?? goal.createdAt
+        goal.updatedAt = updatedAt ?? goal.updatedAt
         return goal
     }
 }
@@ -464,6 +471,8 @@ nonisolated struct MealRecord: Codable {
     let sourceRaw: String
     let foodItems: [FoodItemRecord]
 
+    let createdAt: Date?
+
     init(_ meal: Meal) {
         id = meal.id
         date = meal.date
@@ -473,12 +482,14 @@ nonisolated struct MealRecord: Codable {
         note = meal.note
         sourceRaw = meal.sourceRaw
         foodItems = (meal.foodItems ?? []).map(FoodItemRecord.init)
+        createdAt = meal.createdAt
     }
 
     @MainActor
     func model() -> Meal {
         let meal = Meal(date: date, mealType: MealType(rawValue: mealTypeRaw) ?? .lunch, photoData: photoData, photoThumbnail: photoThumbnail, note: note, source: MealSource(rawValue: sourceRaw) ?? .manual)
         meal.id = id
+        meal.createdAt = createdAt ?? meal.createdAt
         return meal
     }
 }
@@ -524,6 +535,8 @@ nonisolated struct FoodItemRecord: Codable {
     let nutritionDataNote: String?
     let sourceRaw: String
 
+    let createdAt: Date?
+
     init(_ item: FoodItem) {
         id = item.id
         name = item.name
@@ -564,12 +577,14 @@ nonisolated struct FoodItemRecord: Codable {
         consumedUnit = item.consumedUnit
         nutritionDataNote = item.nutritionDataNote
         sourceRaw = item.sourceRaw
+        createdAt = item.createdAt
     }
 
     @MainActor
     func model() -> FoodItem {
         let item = FoodItem(name: name, amount: amount, unit: unit, servingGrams: servingGrams, calories: calories, protein: protein, carbs: carbs, fat: fat, fiber: fiber, sodium: sodium, sugar: sugar, cholesterol: cholesterol, caffeine: caffeine, teaPolyphenols: teaPolyphenols, calcium: calcium, magnesium: magnesium, potassium: potassium, iron: iron, zinc: zinc, vitaminA: vitaminA, vitaminC: vitaminC, vitaminD: vitaminD, vitaminE: vitaminE, vitaminB1: vitaminB1, vitaminB2: vitaminB2, niacin: niacin, vitaminB6: vitaminB6, folate: folate, vitaminB12: vitaminB12, nutritionDataBasis: NutritionDataBasis(rawValue: nutritionDataBasisRaw) ?? .direct, labelBaseAmount: labelBaseAmount, labelBaseUnit: labelBaseUnit, packageNetAmount: packageNetAmount, packageNetUnit: packageNetUnit, consumedAmount: consumedAmount, consumedUnit: consumedUnit, nutritionDataNote: nutritionDataNote, source: FoodSource(rawValue: sourceRaw) ?? .manual)
         item.id = id
+        item.createdAt = createdAt ?? item.createdAt
         return item
     }
 }
@@ -579,16 +594,20 @@ nonisolated struct WaterRecord: Codable {
     let date: Date
     let amount: Double
 
+    let createdAt: Date?
+
     init(_ log: WaterLog) {
         id = log.id
         date = log.date
         amount = log.amount
+        createdAt = log.createdAt
     }
 
     @MainActor
     func model() -> WaterLog {
         let log = WaterLog(date: date, amount: amount)
         log.id = id
+        log.createdAt = createdAt ?? log.createdAt
         return log
     }
 }
@@ -599,11 +618,14 @@ nonisolated struct BowelRecord: Codable {
     let bristolTypeRaw: String
     let note: String
 
+    let createdAt: Date?
+
     init(_ log: BowelLog) {
         id = log.id
         date = log.date
         bristolTypeRaw = log.bristolTypeRaw
         note = log.note
+        createdAt = log.createdAt
     }
 
     @MainActor
@@ -614,6 +636,7 @@ nonisolated struct BowelRecord: Codable {
             note: note
         )
         log.id = id
+        log.createdAt = createdAt ?? log.createdAt
         return log
     }
 }
@@ -632,6 +655,9 @@ nonisolated struct HabitRecord: Codable {
     let isArchived: Bool
     let logs: [HabitLogRecord]
 
+    let createdAt: Date?
+    let updatedAt: Date?
+
     init(_ habit: Habit) {
         id = habit.id
         name = habit.name
@@ -645,12 +671,16 @@ nonisolated struct HabitRecord: Codable {
         reminderMinute = habit.reminderMinute
         isArchived = habit.isArchived
         logs = (habit.logs ?? []).map(HabitLogRecord.init)
+        createdAt = habit.createdAt
+        updatedAt = habit.updatedAt
     }
 
     @MainActor
     func model() -> Habit {
         let habit = Habit(name: name, iconSymbol: iconSymbol, colorHex: colorHex, frequencyType: HabitFrequencyType(rawValue: frequencyTypeRaw) ?? .daily, frequencyCount: frequencyCount, targetCount: targetCount, unitName: unitName, reminderHour: reminderHour, reminderMinute: reminderMinute, isArchived: isArchived)
         habit.id = id
+        habit.createdAt = createdAt ?? habit.createdAt
+        habit.updatedAt = updatedAt ?? habit.updatedAt
         return habit
     }
 }
@@ -660,16 +690,20 @@ nonisolated struct HabitLogRecord: Codable {
     let date: Date
     let value: Double
 
+    let createdAt: Date?
+
     init(_ log: HabitLog) {
         id = log.id
         date = log.date
         value = log.value
+        createdAt = log.createdAt
     }
 
     @MainActor
     func model() -> HabitLog {
         let log = HabitLog(date: date, value: value)
         log.id = id
+        log.createdAt = createdAt ?? log.createdAt
         return log
     }
 }
@@ -682,6 +716,9 @@ nonisolated struct JournalRecord: Codable {
     let content: String
     let photos: [JournalPhotoRecord]
 
+    let createdAt: Date?
+    let updatedAt: Date?
+
     init(_ entry: JournalEntry) {
         id = entry.id
         date = entry.date
@@ -689,12 +726,16 @@ nonisolated struct JournalRecord: Codable {
         tags = entry.tags
         content = entry.content
         photos = (entry.photos ?? []).map(JournalPhotoRecord.init)
+        createdAt = entry.createdAt
+        updatedAt = entry.updatedAt
     }
 
     @MainActor
     func model() -> JournalEntry {
         let entry = JournalEntry(date: date, mood: moodRaw.flatMap { Mood(rawValue: $0) }, tags: tags, content: content)
         entry.id = id
+        entry.createdAt = createdAt ?? entry.createdAt
+        entry.updatedAt = updatedAt ?? entry.updatedAt
         return entry
     }
 }
@@ -705,17 +746,21 @@ nonisolated struct JournalPhotoRecord: Codable {
     let thumbnailData: Data
     let sortOrder: Int
 
+    let createdAt: Date?
+
     init(_ photo: JournalPhoto) {
         id = photo.id
         photoData = photo.photoData
         thumbnailData = photo.thumbnailData
         sortOrder = photo.sortOrder
+        createdAt = photo.createdAt
     }
 
     @MainActor
     func model() -> JournalPhoto {
         let photo = JournalPhoto(photoData: photoData, thumbnailData: thumbnailData, sortOrder: sortOrder)
         photo.id = id
+        photo.createdAt = createdAt ?? photo.createdAt
         return photo
     }
 }
@@ -732,6 +777,9 @@ nonisolated struct WorkoutRecord: Codable {
     let externalIdentifier: String?
     let note: String
 
+    let createdAt: Date?
+    let updatedAt: Date?
+
     init(_ workout: WorkoutLog) {
         id = workout.id
         workoutTypeRaw = workout.workoutTypeRaw
@@ -743,6 +791,8 @@ nonisolated struct WorkoutRecord: Codable {
         sourceRaw = workout.sourceRaw
         externalIdentifier = workout.externalIdentifier
         note = workout.note
+        createdAt = workout.createdAt
+        updatedAt = workout.updatedAt
     }
 
     @MainActor
@@ -759,6 +809,8 @@ nonisolated struct WorkoutRecord: Codable {
             note: note
         )
         workout.id = id
+        workout.createdAt = createdAt ?? workout.createdAt
+        workout.updatedAt = updatedAt ?? workout.updatedAt
         return workout
     }
 }
@@ -773,6 +825,9 @@ nonisolated struct BodyMeasurementRecord: Codable {
     let externalIdentifier: String?
     let note: String
 
+    let createdAt: Date?
+    let updatedAt: Date?
+
     init(_ measurement: BodyMeasurement) {
         id = measurement.id
         date = measurement.date
@@ -782,6 +837,8 @@ nonisolated struct BodyMeasurementRecord: Codable {
         syncedToAppleHealth = measurement.syncedToAppleHealth
         externalIdentifier = measurement.externalIdentifier
         note = measurement.note
+        createdAt = measurement.createdAt
+        updatedAt = measurement.updatedAt
     }
 
     @MainActor
@@ -796,6 +853,8 @@ nonisolated struct BodyMeasurementRecord: Codable {
             note: note
         )
         measurement.id = id
+        measurement.createdAt = createdAt ?? measurement.createdAt
+        measurement.updatedAt = updatedAt ?? measurement.updatedAt
         return measurement
     }
 }
@@ -836,6 +895,9 @@ nonisolated struct UserFoodRecord: Codable {
     let useCount: Int
     let lastUsedAt: Date?
 
+    let createdAt: Date?
+    let updatedAt: Date?
+
     init(_ food: UserFood) {
         id = food.id
         brand = food.brand
@@ -871,6 +933,8 @@ nonisolated struct UserFoodRecord: Codable {
         vitaminB12Per100g = food.vitaminB12Per100g
         useCount = food.useCount
         lastUsedAt = food.lastUsedAt
+        createdAt = food.createdAt
+        updatedAt = food.updatedAt
     }
 
     @MainActor
@@ -880,6 +944,8 @@ nonisolated struct UserFoodRecord: Codable {
         food.id = id
         food.useCount = useCount
         food.lastUsedAt = lastUsedAt
+        food.createdAt = createdAt ?? food.createdAt
+        food.updatedAt = updatedAt ?? food.updatedAt
         return food
     }
 }
@@ -892,6 +958,9 @@ nonisolated struct TemplateRecord: Codable {
     let useCount: Int
     let lastUsedAt: Date?
 
+    let createdAt: Date?
+    let updatedAt: Date?
+
     init(_ template: MealTemplate) {
         id = template.id
         name = template.name
@@ -899,6 +968,8 @@ nonisolated struct TemplateRecord: Codable {
         foodItemsJSON = template.foodItemsJSON
         useCount = template.useCount
         lastUsedAt = template.lastUsedAt
+        createdAt = template.createdAt
+        updatedAt = template.updatedAt
     }
 
     @MainActor
@@ -908,6 +979,8 @@ nonisolated struct TemplateRecord: Codable {
         template.foodItemsJSON = foodItemsJSON
         template.useCount = useCount
         template.lastUsedAt = lastUsedAt
+        template.createdAt = createdAt ?? template.createdAt
+        template.updatedAt = updatedAt ?? template.updatedAt
         return template
     }
 }

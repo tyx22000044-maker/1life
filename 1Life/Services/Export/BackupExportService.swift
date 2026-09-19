@@ -2,8 +2,8 @@ import Foundation
 import SwiftData
 
 nonisolated enum BackupExportService {
-    private static let supportedBackupVersion = 8
-    private static let importableBackupVersions: Set<Int> = [5, 6, 7, 8]
+    private static let supportedBackupVersion = 9
+    private static let importableBackupVersions: Set<Int> = [5, 6, 7, 8, 9]
 
     static func exportJSON(settings: UserSettings?,
                            nutritionGoals: [NutritionGoal],

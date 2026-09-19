@@ -138,6 +138,43 @@ final class BackupRecordsTests: XCTestCase {
         XCTAssertNil(decoded.settings)
     }
 
+    // MARK: - Timestamps
+
+    func testMealAndWorkoutRecordsPreserveTimestampsThroughRoundTrip() throws {
+        let meal = Meal(mealType: .lunch)
+        meal.createdAt = Date(timeIntervalSince1970: 1_600_000_000)
+        let record = MealRecord(meal)
+        let decodedMeal = try JSONDecoder().decode(MealRecord.self, from: try JSONEncoder().encode(record)).model()
+        XCTAssertEqual(decodedMeal.createdAt, meal.createdAt, "同日多条记录的排序依赖 createdAt，不能恢复时被刷新")
+
+        let workout = WorkoutLog(workoutType: .running, durationMinutes: 40)
+        workout.createdAt = Date(timeIntervalSince1970: 1_600_000_100)
+        workout.updatedAt = Date(timeIntervalSince1970: 1_600_000_900)
+        let workoutRecord = WorkoutRecord(workout)
+        let decodedWorkout = try JSONDecoder().decode(WorkoutRecord.self, from: try JSONEncoder().encode(workoutRecord)).model()
+        XCTAssertEqual(decodedWorkout.createdAt, workout.createdAt)
+        XCTAssertEqual(decodedWorkout.updatedAt, workout.updatedAt)
+    }
+
+    func testTimestampsFromOlderBackupsFallBackToModelDefaults() throws {
+        // v8 and earlier payloads have no createdAt/updatedAt keys at all.
+        let json = #"""
+        {
+          "id": "44444444-4444-4444-4444-444444444444",
+          "date": "2026-09-01T10:00:00Z",
+          "amount": 300
+        }
+        """#
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let decoded = try decoder.decode(WaterRecord.self, from: Data(json.utf8))
+
+        XCTAssertNil(decoded.createdAt)
+        let rebuilt = decoded.model()
+        XCTAssertEqual(rebuilt.amount, 300)
+        XCTAssertGreaterThan(rebuilt.createdAt, Date.distantPast, "缺时间戳时保留模型默认值，而不是写进 1970 年")
+    }
+
     // MARK: - DrinkRecord knowledge base
 
     func testDrinkRecordRoundTripPreservesLibraryFieldsAndTimestamps() throws {
