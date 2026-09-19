@@ -389,15 +389,18 @@ struct AIChatView: View {
 
             TextField(
                 isConfigured ? "描述饮食、训练、喝水或状态..." : "可记录喝水，完整 AI 需先配置",
-                text: $viewModel.inputText
+                text: $viewModel.inputText,
+                axis: .vertical
             )
             .textFieldStyle(.plain)
-            .lineLimit(1)
+            .lineLimit(1...6)
+            .fixedSize(horizontal: false, vertical: true)
             .font(.subheadline)
             .foregroundStyle(.primary)
             .tint(FamilyUI.accent)
             .padding(.horizontal, 14)
-            .frame(height: 38, alignment: .center)
+            .padding(.vertical, 9)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(FamilyUI.panelMutedBackground)
             .overlay(
                 RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
@@ -405,6 +408,7 @@ struct AIChatView: View {
             )
             .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
             .focused($messageFieldFocused)
+            .accessibilityLabel("输入要记录的内容")
 
             Button {
                 HapticEngine.tap()
