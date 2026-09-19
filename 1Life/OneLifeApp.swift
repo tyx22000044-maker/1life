@@ -9,6 +9,21 @@ struct OneLifeApp: App {
 
     private static let persistenceLogger = Logger(subsystem: "com.yunxuan.OneLife", category: "persistence")
 
+    /// Written when the on-disk store could not be opened or migrated and the app fell
+    /// back to an in-memory database. The UI reads it so the user is not silently left
+    /// recording into a store that dies with the process.
+    enum AppPersistence {
+        static let didFallBackToMemoryStoreKey = "OneLifeDidFallbackToMemoryStore"
+
+        static var didFallBackToMemoryStore: Bool {
+            UserDefaults.standard.bool(forKey: didFallBackToMemoryStoreKey)
+        }
+
+        static func record(_ didFallBack: Bool) {
+            UserDefaults.standard.set(didFallBack, forKey: didFallBackToMemoryStoreKey)
+        }
+    }
+
     init() {
         modelContainer = Self.makeModelContainer()
         AppTypography.configureGlobalAppearance()
@@ -23,13 +38,13 @@ struct OneLifeApp: App {
             let container = try ModelContainer(for: schema, migrationPlan: SettingsMigrationPlan.self)
             // 配置自动保存和合并策略
             container.mainContext.autosaveEnabled = true
-            UserDefaults.standard.set(false, forKey: "OneLifeDidFallbackToMemoryStore")
+            AppPersistence.record(false)
             return container
         } catch {
             persistenceLogger.error(
                 "ModelContainer 创建失败，降级为内存容器: \(error.localizedDescription, privacy: .public)"
             )
-            UserDefaults.standard.set(true, forKey: "OneLifeDidFallbackToMemoryStore")
+            AppPersistence.record(true)
 
             let inMemory = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             if let fallback = try? ModelContainer(for: schema, configurations: [inMemory]) {

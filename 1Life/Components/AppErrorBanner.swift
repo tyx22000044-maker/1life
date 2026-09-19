@@ -110,3 +110,37 @@ struct AppErrorBanner: View {
         }
     }
 }
+
+/// Non-dismissible warning shown while the app runs on the in-memory fallback store.
+/// Nothing typed in this session survives quitting, so the user must know before recording.
+struct MemoryStoreWarningBanner: View {
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(FamilyUI.danger)
+                .frame(width: 22)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("本机数据库打不开，现在是临时内存库")
+                    .font(FamilyTypography.text(size: 14, weight: .bold))
+                    .foregroundStyle(FamilyUI.ink)
+                Text("已有的记录还在原文件里，但本次新增和修改在退出后会丢失。可以先从 设置 → 从 JSON 备份恢复 载入最近的备份，或彻底关闭 App 后重新打开再试。")
+                    .font(FamilyTypography.text(size: 12))
+                    .foregroundStyle(FamilyUI.inkSoft)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(FamilyUI.panelBackground)
+        .overlay(
+            Rectangle()
+                .stroke(FamilyUI.danger, lineWidth: 1)
+        )
+        .padding(.horizontal, AppSpacing.pageHorizontal)
+        .padding(.top, 8)
+        .accessibilityElement(children: .combine)
+    }
+}

@@ -26,9 +26,15 @@ struct ContentView: View {
         .appSwitchStyle()
         .dismissKeyboardOnTap()
         .overlay(alignment: .top) {
-            if let banner = bannerCenter.currentBanner {
-                AppErrorBanner(title: banner.title, message: banner.message, tone: banner.tone) {
-                    bannerCenter.dismiss()
+            VStack(spacing: 0) {
+                if OneLifeApp.AppPersistence.didFallBackToMemoryStore {
+                    MemoryStoreWarningBanner()
+                }
+
+                if let banner = bannerCenter.currentBanner {
+                    AppErrorBanner(title: banner.title, message: banner.message, tone: banner.tone) {
+                        bannerCenter.dismiss()
+                    }
                 }
             }
         }
