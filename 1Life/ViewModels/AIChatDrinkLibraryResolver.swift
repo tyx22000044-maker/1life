@@ -115,7 +115,8 @@ struct AIChatDrinkLibraryResolver {
             consumedAmount: drink.sizeML,
             consumedUnit: drink.sizeML == nil ? nil : "ml",
             nutritionDataNote: noteParts.joined(separator: " | "),
-            confidence: drink.confidence == .high ? "high" : (drink.confidence == .medium ? "medium" : "low")
+            confidence: drink.confidence == .high ? "high" : (drink.confidence == .medium ? "medium" : "low"),
+            labelDataConfirmedByUser: true
         )
     }
 

@@ -94,7 +94,8 @@ struct AIChatSupplementLibraryResolver {
             consumedAmount: servings,
             consumedUnit: servingLabel,
             nutritionDataNote: noteParts.joined(separator: " | "),
-            confidence: supplement.confidence == .high ? "high" : (supplement.confidence == .medium ? "medium" : "low")
+            confidence: supplement.confidence == .high ? "high" : (supplement.confidence == .medium ? "medium" : "low"),
+            labelDataConfirmedByUser: true
         )
     }
 

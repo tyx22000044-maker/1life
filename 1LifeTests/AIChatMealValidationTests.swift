@@ -11,12 +11,16 @@ final class AIChatMealValidationTests: XCTestCase {
         confidence: String? = nil,
         nutritionDataBasis: NutritionDataBasis = .estimated,
         nutritionDataNote: String? = nil,
-        amount: Double = 100
+        amount: Double = 100,
+        labelBaseAmount: Double? = nil,
+        attestedByUser: Bool = false
     ) -> AIParsedFoodItem {
         var draft = AIParsedFoodItem(name: name, amount: amount, unit: "g", calories: calories, protein: protein, carbs: carbs, fat: fat)
         draft.confidence = confidence
         draft.nutritionDataBasis = nutritionDataBasis
         draft.nutritionDataNote = nutritionDataNote
+        draft.labelBaseAmount = labelBaseAmount
+        draft.labelDataConfirmedByUser = attestedByUser
         return draft
     }
 
@@ -77,10 +81,44 @@ final class AIChatMealValidationTests: XCTestCase {
         XCTAssertEqual(result.nutritionDataNote, originalNote)
     }
 
+    func testFabricatedOfficialClaimWithLabelFieldsIsStillDowngraded() {
+        let fabricated = item(
+            calories: 120,
+            confidence: "high",
+            nutritionDataBasis: .per100ml,
+            nutritionDataNote: "官方产品信息 | 每100ml数据",
+            labelBaseAmount: 100
+        )
+        let reviewed = AIChatMealValidation.applySanityReview(
+            to: AIParsedMeal(mealType: .snack, items: [fabricated], note: "")
+        )
+        let result = reviewed.items[0]
+        XCTAssertEqual(result.nutritionDataBasis, .estimated)
+        XCTAssertFalse(result.nutritionDataNote?.contains("官方产品信息") ?? true)
+        XCTAssertTrue(result.nutritionDataNote?.contains("数据来源：AI估算") == true)
+    }
+
+    func testUserAttestedLabelFieldsKeepTheirProvenance() {
+        let attested = item(
+            calories: 120,
+            confidence: "high",
+            nutritionDataBasis: .per100ml,
+            nutritionDataNote: "官方产品信息 | 每100ml数据",
+            labelBaseAmount: 100,
+            attestedByUser: true
+        )
+        let reviewed = AIChatMealValidation.applySanityReview(
+            to: AIParsedMeal(mealType: .snack, items: [attested], note: "")
+        )
+        let result = reviewed.items[0]
+        XCTAssertEqual(result.nutritionDataBasis, .per100ml)
+        XCTAssertEqual(result.nutritionDataNote, "官方产品信息 | 每100ml数据")
+    }
+
     // MARK: - normalizePhotoMealResult
 
     func testVerifiedHighConfidencePhotoItemIsLeftAsIs() {
-        let verifiedItem = item(calories: 200, confidence: "high", nutritionDataBasis: .direct, amount: 100)
+        let verifiedItem = item(calories: 200, confidence: "high", nutritionDataBasis: .direct, amount: 100, attestedByUser: true)
         let result = AIChatIntentResult.addMeal(AIParsedMeal(mealType: .lunch, items: [verifiedItem], note: "已核实"))
         guard case .addMeal(let meal) = AIChatMealValidation.normalizePhotoMealResult(result) else {
             return XCTFail("expected addMeal")
@@ -105,6 +143,24 @@ final class AIChatMealValidationTests: XCTestCase {
         XCTAssertEqual(normalized.amountMax ?? -1, 250, accuracy: 0.0001)
         XCTAssertEqual(normalized.caloriesMin ?? -1, 225, accuracy: 0.0001)
         XCTAssertEqual(normalized.caloriesMax ?? -1, 375, accuracy: 0.0001)
+        XCTAssertTrue(normalized.nutritionDataNote?.contains("份量未由图片证实") == true)
+    }
+
+    func testPhotoItemWithSelfReportedLabelFieldsIsStillTreatedAsEstimate() {
+        let selfReported = item(
+            calories: 200,
+            confidence: "high",
+            nutritionDataBasis: .direct,
+            amount: 100,
+            labelBaseAmount: 100
+        )
+        let result = AIChatIntentResult.addMeal(AIParsedMeal(mealType: .lunch, items: [selfReported], note: ""))
+        guard case .addMeal(let meal) = AIChatMealValidation.normalizePhotoMealResult(result) else {
+            return XCTFail("expected addMeal")
+        }
+        let normalized = meal.items[0]
+        XCTAssertEqual(normalized.confidence, "low")
+        XCTAssertEqual(normalized.nutritionDataBasis, .estimated)
         XCTAssertTrue(normalized.nutritionDataNote?.contains("份量未由图片证实") == true)
     }
 

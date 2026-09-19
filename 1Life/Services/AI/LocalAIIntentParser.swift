@@ -308,7 +308,8 @@ struct LocalAIIntentParser {
             consumedAmount: item.consumedAmount,
             consumedUnit: item.consumedUnit,
             nutritionDataNote: templateNutritionDataNote(item.nutritionDataNote),
-            confidence: "high"
+            confidence: "high",
+            labelDataConfirmedByUser: true
         )
         applyTemplateDrinkAdjustment(originalText: originalText, to: &parsed)
         return parsed
@@ -448,7 +449,8 @@ struct LocalAIIntentParser {
             calories: profile.calories,
             nutritionDataBasis: .direct,
             nutritionDataNote: "数据来源：我的食物",
-            confidence: "high"
+            confidence: "high",
+            labelDataConfirmedByUser: true
         )
         for (key, value) in profile.nutrients {
             if let path = key.parsedItemKeyPath {

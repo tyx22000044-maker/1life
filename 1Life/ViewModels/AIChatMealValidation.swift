@@ -85,7 +85,8 @@ struct AIChatMealValidation {
     }
 
     private nonisolated static func hasVerifiedNutritionLabelData(_ item: AIParsedFoodItem) -> Bool {
-        item.labelBaseAmount != nil
+        guard item.labelDataConfirmedByUser else { return false }
+        return item.labelBaseAmount != nil
             || item.labelBaseUnit != nil
             || item.packageNetAmount != nil
             || item.packageNetUnit != nil
@@ -246,6 +247,7 @@ struct AIChatMealValidation {
     }
 
     private nonisolated static func hasVerifiedPortionData(_ item: AIParsedFoodItem) -> Bool {
+        guard item.labelDataConfirmedByUser else { return false }
         if item.confidence == "high" {
             return item.nutritionDataBasis != .estimated
                 || item.labelBaseAmount != nil

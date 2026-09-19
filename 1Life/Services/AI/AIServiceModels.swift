@@ -45,6 +45,11 @@ struct AIParsedFoodItem: Identifiable {
     var caloriesMax: Double? = nil
     var confidence: String? = nil
 
+    /// Set only by in-app paths (饮品/补剂知识库、我的食物、模板库) once the numbers came
+    /// from something the user supplied. `AIIntentDecoder` never sets it, so a model
+    /// response cannot certify its own "官方产品信息" claim by also returning label fields.
+    var labelDataConfirmedByUser: Bool = false
+
     var isEstimatedRange: Bool {
         if let min = caloriesMin, let max = caloriesMax { return min != max }
         return false

@@ -261,6 +261,19 @@ final class AIIntentDecoderTests: XCTestCase {
         XCTAssertEqual(item.caffeine, 90)
     }
 
+    func testModelCannotAttestItsOwnLabelProvenance() throws {
+        let json = #"""
+        {"intent":"add_meal","meal_type":"snack","items":[{"name":"某饮料","amount":500,"unit":"ml",
+          "calories":120,"nutrition_data_basis":"per100ml","label_base_amount":100,"label_base_unit":"ml",
+          "nutrition_data_note":"官方产品信息","label_data_confirmed_by_user":true,"confidence":"high"}]}
+        """#
+        guard case .addMeal(let meal)? = decoder.decode(from: json), let item = meal.items.first else {
+            return XCTFail("expected addMeal")
+        }
+        XCTAssertEqual(item.labelBaseAmount, 100, "模型仍可返回标签字段本身")
+        XCTAssertFalse(item.labelDataConfirmedByUser, "但字段是否经用户确认只能由 App 本地路径写入")
+    }
+
     func testImpossibleBodyMeasurementIsRejected() {
         let json = #"{"intent":"add_body_measurement","weight_kg":-10,"body_fat_percentage":150}"#
         guard case .chat(let text)? = decoder.decode(from: json) else {
