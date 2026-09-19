@@ -1,6 +1,13 @@
 import SwiftUI
 import SwiftData
 
+/// Apple Health can import a session shorter than a minute; rendering that as
+/// "0 分钟" would erase the record the user just imported.
+private func workoutDurationText(_ minutes: Double) -> String {
+    if minutes < 1 { return "不足 1 分钟" }
+    return "\(Int(minutes.rounded())) 分钟"
+}
+
 struct WorkoutTimelineView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var settings: [UserSettings]
@@ -581,7 +588,7 @@ private struct WorkoutRow: View {
     private var rowSubtitle: String {
         if workout.isRestDay { return workout.note.isEmpty ? "恢复日" : workout.note }
         let calories = workout.caloriesBurned.map { " · \(Int($0)) kcal" } ?? ""
-        return "\(workout.startDate.timeDisplay) · \(Int(workout.durationMinutes)) 分钟 · \(workout.intensity.displayName)强度\(calories)"
+        return "\(workout.startDate.timeDisplay) · \(workoutDurationText(workout.durationMinutes)) · \(workout.intensity.displayName)强度\(calories)"
     }
 }
 
@@ -628,7 +635,7 @@ private struct WorkoutDetailView: View {
 
                 if !workout.isRestDay {
                     SystemPanel(title: "TRAINING DATA") {
-                        DetailMetricRow(title: "时长", value: "\(Int(workout.durationMinutes)) 分钟")
+                        DetailMetricRow(title: "时长", value: workoutDurationText(workout.durationMinutes))
                         SystemPanelDivider()
                         DetailMetricRow(title: "强度", value: workout.intensity.displayName)
                         SystemPanelDivider()

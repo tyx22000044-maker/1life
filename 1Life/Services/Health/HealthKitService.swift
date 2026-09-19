@@ -191,7 +191,7 @@ final class HealthKitService {
             return WorkoutLog(
                 workoutType: workoutType(for: sample.workoutActivityType),
                 startDate: sample.startDate,
-                durationMinutes: max(sample.duration / 60, 1),
+                durationMinutes: Self.durationMinutes(fromSeconds: sample.duration),
                 caloriesBurned: sample.totalEnergyBurned?.doubleValue(for: .kilocalorie()),
                 intensity: .moderate,
                 isRestDay: false,
@@ -202,6 +202,14 @@ final class HealthKitService {
                 distanceMeters: distanceMeters
             )
         }
+    }
+
+    /// Minutes for an imported session. A 40-second walk used to be stored as a full
+    /// minute because the display layer wanted an integer; the stored value keeps the
+    /// real length to 0.1-minute precision and the UI decides how to render it.
+    nonisolated static func durationMinutes(fromSeconds seconds: TimeInterval) -> Double {
+        guard seconds > 0 else { return 0 }
+        return max((seconds / 6).rounded() / 10, 0.1)
     }
 
     /// The night the user means when they ask about sleep on `date`: bedtime the
