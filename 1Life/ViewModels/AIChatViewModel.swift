@@ -396,6 +396,13 @@ final class AIChatViewModel {
             appendAssistant(missingNutritionMessage(for: blocked), provider: settings?.selectedAIProvider ?? .claude)
             return
         }
+        if let conflicting = pendingMeals.first(where: { meal in
+            meal.items.contains(where: AIChatMealValidation.hasBlockingMacroConflict)
+        }) {
+            HapticEngine.warning()
+            appendAssistant(macroConflictMessage(for: conflicting), provider: settings?.selectedAIProvider ?? .claude)
+            return
+        }
         let mealDate = mealDateForPendingConfirmation()
         let provider = settings?.selectedAIProvider ?? .claude
         for parsed in pendingMeals {
@@ -421,6 +428,16 @@ final class AIChatViewModel {
             }
             .joined(separator: "；")
         return "这次识别缺少关键营养字段：\(missing)。请手动编辑后再保存。"
+    }
+
+    private func macroConflictMessage(for parsed: AIParsedMeal) -> String {
+        let details = parsed.items.compactMap { item -> String? in
+            guard AIChatMealValidation.hasBlockingMacroConflict(item),
+                  let protein = item.protein, let carbs = item.carbs, let fat = item.fat else { return nil }
+            let fromMacros = protein * 4 + carbs * 4 + fat * 9
+            return "\(item.name)：标注 \(Int(item.calories)) kcal，但蛋白/碳水/脂肪换算约 \(Int(fromMacros)) kcal"
+        }.joined(separator: "；")
+        return "热量与三大营养素互相矛盾（\(details)），一键确认已停用。请用「手动编辑」确定口径——采用标签热量，或按宏量重算——之后再保存。"
     }
 
     private func clearPendingMealReview() {

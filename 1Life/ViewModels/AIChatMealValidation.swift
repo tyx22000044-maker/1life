@@ -1,10 +1,29 @@
 import Foundation
 
 struct AIChatMealValidation {
+    /// Ratio above which the stated calories and the three macros cannot both be right.
+    static let macroConflictThreshold = 0.35
+
     nonisolated static func applySanityReview(to meal: AIParsedMeal) -> AIParsedMeal {
         var reviewed = meal
         reviewed.items = reviewed.items.map(applySanityReview)
         return reviewed
+    }
+
+    /// `|热量 − 宏量换算| / 两者较大值`. Nil when there is nothing to compare.
+    nonisolated static func macroCalorieConflictRatio(for item: AIParsedFoodItem) -> Double? {
+        guard let protein = item.protein, let carbs = item.carbs, let fat = item.fat, item.calories > 0 else {
+            return nil
+        }
+        let macroCalories = protein * 4 + carbs * 4 + fat * 9
+        guard macroCalories > 0 else { return nil }
+        return abs(macroCalories - item.calories) / max(item.calories, macroCalories)
+    }
+
+    /// A contradiction this large is not a rounding difference: letting it through the
+    /// one-tap confirm would lock a wrong energy figure into the user's history.
+    nonisolated static func hasBlockingMacroConflict(_ item: AIParsedFoodItem) -> Bool {
+        (macroCalorieConflictRatio(for: item) ?? 0) > macroConflictThreshold
     }
 
     nonisolated static func normalizePhotoMealResult(_ result: AIChatIntentResult) -> AIChatIntentResult {
@@ -20,18 +39,14 @@ struct AIChatMealValidation {
 
     private nonisolated static func applySanityReview(to item: AIParsedFoodItem) -> AIParsedFoodItem {
         var reviewed = sanitizeUnverifiedSourceNote(item)
-        guard let protein = item.protein,
+        guard hasBlockingMacroConflict(item),
+              let protein = item.protein,
               let carbs = item.carbs,
-              let fat = item.fat,
-              item.calories > 0 else {
+              let fat = item.fat else {
             return reviewed
         }
 
         let macroCalories = protein * 4 + carbs * 4 + fat * 9
-        guard macroCalories > 0 else { return reviewed }
-        let deltaRatio = abs(macroCalories - item.calories) / max(item.calories, macroCalories)
-        guard deltaRatio > 0.35 else { return reviewed }
-
         reviewed.confidence = "low"
         reviewed.caloriesMin = min(item.caloriesMin ?? item.calories, macroCalories, item.calories)
         reviewed.caloriesMax = max(item.caloriesMax ?? item.calories, macroCalories, item.calories)

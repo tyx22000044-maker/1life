@@ -115,4 +115,39 @@ final class AIChatMealValidationTests: XCTestCase {
         }
         XCTAssertEqual(text, "你好")
     }
+
+    // MARK: - Macro/calorie contradiction
+
+    private func item(calories: Double, protein: Double, carbs: Double, fat: Double) -> AIParsedFoodItem {
+        AIParsedFoodItem(
+            name: "测试食物",
+            amount: 100,
+            unit: "g",
+            calories: calories,
+            protein: protein,
+            carbs: carbs,
+            fat: fat,
+            nutritionDataBasis: .direct
+        )
+    }
+
+    func testMacroCalorieConflictRatioMatchesTheStatedNumbers() {
+        // 30/30/30 g of macros is 510 kcal, claimed calories 100 → ratio 410/510.
+        let ratio = AIChatMealValidation.macroCalorieConflictRatio(for: item(calories: 100, protein: 30, carbs: 30, fat: 30))
+        XCTAssertEqual(ratio ?? -1, 410.0 / 510.0, accuracy: 0.0001)
+    }
+
+    func testSevereContradictionBlocksOneTapConfirmation() {
+        XCTAssertTrue(AIChatMealValidation.hasBlockingMacroConflict(item(calories: 100, protein: 30, carbs: 30, fat: 30)))
+    }
+
+    func testConsistentMacrosAreNotBlocked() {
+        XCTAssertFalse(AIChatMealValidation.hasBlockingMacroConflict(item(calories: 500, protein: 30, carbs: 50, fat: 17)))
+    }
+
+    func testMissingMacroDataCannotBeJudgedAndStaysConfirmable() {
+        let partial = AIParsedFoodItem(name: "苹果", amount: 200, unit: "g", calories: 104, protein: 0.5, nutritionDataBasis: .direct)
+        XCTAssertNil(AIChatMealValidation.macroCalorieConflictRatio(for: partial))
+        XCTAssertFalse(AIChatMealValidation.hasBlockingMacroConflict(partial))
+    }
 }

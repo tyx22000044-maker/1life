@@ -184,6 +184,35 @@ final class AIChatPendingMealReviewTests: XCTestCase {
                        "没有关联到该餐的手动饮水不能被误删")
     }
 
+    func testConfirmIsBlockedWhenCaloriesAndMacrosContradict() throws {
+        let (container, viewModel) = try makeViewModel()
+        let conflicting = AIParsedFoodItem(
+            name: "鸡胸肉", amount: 100, unit: "g", calories: 100,
+            protein: 30, carbs: 30, fat: 30, nutritionDataBasis: .direct
+        )
+        viewModel.beginMealReview(
+            .addMeal(AIParsedMeal(mealType: .lunch, items: [conflicting], note: "")),
+            originalText: "午餐吃了鸡胸肉",
+            isLocal: false
+        )
+
+        viewModel.confirmPendingMeals()
+
+        XCTAssertEqual(try container.mainContext.fetch(FetchDescriptor<Meal>()).count, 0,
+                       "热量与宏量互相矛盾时不允许一键确认入库")
+        XCTAssertEqual(viewModel.pendingMeals.count, 1, "被拦下后必须留在确认卡片上")
+        XCTAssertTrue(viewModel.messages.last?.content.contains("手动编辑") ?? false)
+
+        let corrected = AIParsedFoodItem(
+            name: "鸡胸肉", amount: 100, unit: "g", calories: 100,
+            protein: 20, carbs: 3, fat: 1.5, nutritionDataBasis: .direct
+        )
+        viewModel.applyManualMealEdit(AIParsedMeal(mealType: .lunch, items: [corrected], note: ""))
+        viewModel.confirmPendingMeals()
+
+        XCTAssertEqual(try container.mainContext.fetch(FetchDescriptor<Meal>()).count, 1)
+    }
+
     func testBatchResultsFlattenEveryMeal() {
         let workout = AIChatIntentResult.addWorkout(AIParsedWorkout(
             workoutType: .running, durationMinutes: 30, caloriesBurned: nil, intensity: .moderate, note: ""
