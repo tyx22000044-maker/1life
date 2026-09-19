@@ -317,10 +317,20 @@ final class AIChatViewModel {
             (meal.foodItems ?? []).forEach { modelContext.delete($0) }
             modelContext.delete(meal)
         }
+        // A drink from the knowledge base also wrote hydration for this meal; revoke it
+        // through the stored link instead of guessing by timestamp, which would catch
+        // water the user logged themselves.
+        let linkedMealID: UUID? = mealID
+        let waterDescriptor = FetchDescriptor<WaterLog>(predicate: #Predicate { $0.sourceMealID == linkedMealID })
+        if let linkedWater = try? modelContext.fetch(waterDescriptor) {
+            linkedWater.forEach { modelContext.delete($0) }
+        }
         if var payload = message.decodedBubblePayload {
             payload.isRevoked = true
             message.toolPayloadJSON = (try? String(data: JSONEncoder().encode(payload), encoding: .utf8))
         }
+        message.isLinkedDataDeleted = true
+        persist(reason: "undo AI meal")
         HapticEngine.warning()
     }
 

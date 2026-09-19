@@ -131,6 +131,56 @@ final class AIChatPendingMealReviewTests: XCTestCase {
         XCTAssertTrue(viewModel.messages.last?.content.contains("缺少关键营养字段") ?? false)
     }
 
+    func testRevokingADrinkMealAlsoRevokesItsHydration() throws {
+        let (container, viewModel) = try makeViewModel()
+        let drinkItem = AIParsedFoodItem(
+            name: "Manner 冰美式（473ml）",
+            amount: 473,
+            unit: "ml",
+            calories: 15,
+            protein: 0,
+            carbs: 0,
+            fat: 0,
+            nutritionDataBasis: .direct,
+            nutritionDataNote: "数据来源：饮品知识库精确命中"
+        )
+        viewModel.beginMealReview(
+            .addMeal(AIParsedMeal(mealType: .snack, items: [drinkItem], note: "")),
+            originalText: "喝了杯冰美式",
+            isLocal: true
+        )
+        viewModel.confirmPendingMeals()
+
+        let meals = try container.mainContext.fetch(FetchDescriptor<Meal>())
+        let water = try container.mainContext.fetch(FetchDescriptor<WaterLog>())
+        XCTAssertEqual(meals.count, 1)
+        XCTAssertEqual(water.map(\.amount), [473])
+        XCTAssertEqual(water.first?.sourceMealID, meals.first?.id)
+
+        guard let toolMessage = viewModel.messages.last else { return XCTFail("expected a tool message") }
+        viewModel.undoMeal(message: toolMessage)
+
+        XCTAssertEqual(try container.mainContext.fetch(FetchDescriptor<Meal>()).count, 0)
+        XCTAssertEqual(try container.mainContext.fetch(FetchDescriptor<WaterLog>()).count, 0,
+                       "撤销饮品餐食必须连带撤销自动生成的饮水")
+        XCTAssertTrue(toolMessage.isLinkedDataDeleted)
+    }
+
+    func testRevokingAMealLeavesManuallyLoggedWaterAlone() throws {
+        let (container, viewModel) = try makeViewModel()
+        viewModel.beginMealReview(.addMeal(meal(.lunch, calories: 620)), originalText: "午餐", isLocal: true)
+        viewModel.confirmPendingMeals()
+        let unrelated = WaterLog(amount: 300)
+        container.mainContext.insert(unrelated)
+        try container.mainContext.save()
+
+        guard let toolMessage = viewModel.messages.last else { return XCTFail("expected a tool message") }
+        viewModel.undoMeal(message: toolMessage)
+
+        XCTAssertEqual(try container.mainContext.fetch(FetchDescriptor<WaterLog>()).map(\.id), [unrelated.id],
+                       "没有关联到该餐的手动饮水不能被误删")
+    }
+
     func testBatchResultsFlattenEveryMeal() {
         let workout = AIChatIntentResult.addWorkout(AIParsedWorkout(
             workoutType: .running, durationMinutes: 30, caloriesBurned: nil, intensity: .moderate, note: ""

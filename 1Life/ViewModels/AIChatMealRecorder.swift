@@ -20,7 +20,7 @@ struct AIChatMealRecorder {
 
         let drinkWaterAmount = AIChatDrinkLibraryResolver.waterAmount(from: parsed.items)
         if drinkWaterAmount > 0 {
-            modelContext.insert(WaterLog(date: mealDate, amount: drinkWaterAmount))
+            modelContext.insert(WaterLog(date: mealDate, amount: drinkWaterAmount, sourceMealID: meal.id))
         }
 
         let payload = AIChatBubblePayload(
