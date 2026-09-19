@@ -209,4 +209,80 @@ final class AIIntentDecoderTests: XCTestCase {
         """#
         XCTAssertNil(decoder.decode(from: json))
     }
+
+    // MARK: - Numeric sanity (model output is untrusted input)
+
+    func testNegativeWaterAmountIsRejected() {
+        let json = #"{"intent":"add_water","amount":-500}"#
+        guard case .chat(let text)? = decoder.decode(from: json) else {
+            return XCTFail("负数水量不得成为饮水记录")
+        }
+        XCTAssertTrue(text.contains("不合理"), text)
+    }
+
+    func testAbsurdWaterAmountIsRejected() {
+        let json = #"{"intent":"add_water","amount":99999}"#
+        guard case .chat = decoder.decode(from: json) else {
+            return XCTFail("超大水量不得成为饮水记录")
+        }
+    }
+
+    func testOutOfRangeWorkoutValuesFallBackInsteadOfStoringNegatives() throws {
+        let json = #"{"intent":"add_workout","workout_type":"running","duration_minutes":-30,"calories_burned":-100}"#
+        guard case .addWorkout(let workout)? = decoder.decode(from: json) else {
+            return XCTFail("expected addWorkout")
+        }
+        XCTAssertEqual(workout.durationMinutes, 30)
+        XCTAssertNil(workout.caloriesBurned)
+    }
+
+    func testImpossibleWorkoutDurationIsIgnored() throws {
+        let json = #"{"intent":"add_workout","workout_type":"running","duration_minutes":999999,"calories_burned":400}"#
+        guard case .addWorkout(let workout)? = decoder.decode(from: json) else {
+            return XCTFail("expected addWorkout")
+        }
+        XCTAssertEqual(workout.durationMinutes, 30)
+        XCTAssertEqual(workout.caloriesBurned, 400)
+    }
+
+    func testNegativeAndAbsurdNutrientsAreDroppedButSaneOnesSurvive() throws {
+        let json = #"""
+        {"intent":"add_meal","meal_type":"lunch","items":[{"name":"米饭","amount":200,"unit":"g",
+          "calories":-50,"protein":-5,"carbs":45,"fat":8,"sodium":1000000000,"caffeine":90}]}
+        """#
+        guard case .addMeal(let meal)? = decoder.decode(from: json), let item = meal.items.first else {
+            return XCTFail("expected addMeal")
+        }
+        XCTAssertEqual(item.calories, 0, "负热量按未提供处理")
+        XCTAssertNil(item.protein)
+        XCTAssertEqual(item.carbs, 45)
+        XCTAssertEqual(item.fat, 8)
+        XCTAssertNil(item.sodium)
+        XCTAssertEqual(item.caffeine, 90)
+    }
+
+    func testImpossibleBodyMeasurementIsRejected() {
+        let json = #"{"intent":"add_body_measurement","weight_kg":-10,"body_fat_percentage":150}"#
+        guard case .chat(let text)? = decoder.decode(from: json) else {
+            return XCTFail("不可能的身体数据不得入库")
+        }
+        XCTAssertTrue(text.contains("超出合理范围"), text)
+    }
+
+    func testPartiallyValidBodyMeasurementKeepsTheValidField() throws {
+        let json = #"{"intent":"add_body_measurement","weight_kg":62.5,"body_fat_percentage":900}"#
+        guard case .addBodyMeasurement(let measurement)? = decoder.decode(from: json) else {
+            return XCTFail("expected addBodyMeasurement")
+        }
+        XCTAssertEqual(measurement.weightKg, 62.5)
+        XCTAssertNil(measurement.bodyFatPercentage)
+    }
+
+    func testOutOfRangeHabitValueFallsBackToOne() throws {
+        let json = #"{"intent":"add_habit_log","habit_name":"喝水","value":-3}"#
+        guard case .addHabitLog(_, let value)? = decoder.decode(from: json) else {
+            return XCTFail("expected addHabitLog")
+        }
+        XCTAssertEqual(value, 1)
+    }
 }
