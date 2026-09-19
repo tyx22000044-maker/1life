@@ -15,7 +15,8 @@ nonisolated enum ExportService {
         var errorDescription: String? {
             switch self {
             case .invalidVersion(let version):
-                return "不支持的备份版本：\(version)"
+                let readable = ExportSchema.readableBackupVersions.sorted().map(String.init).joined(separator: "、")
+                return "不支持的备份版本：\(version)（本 App 可读取 \(readable)）"
             case .corruptPayload(let detail):
                 return "备份文件内容不完整或非法，原有数据未被修改（\(detail)）"
             case .unsupportedFileVersion(let kind, let version):

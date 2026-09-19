@@ -6,7 +6,7 @@ import SwiftData
 nonisolated enum SupplementLibraryExportService {
     static func exportJSON(_ records: [SupplementRecord]) throws -> Data {
         let file = SupplementLibraryBackupFile(
-            version: 1,
+            version: LibraryFileFormat.supportedVersion,
             exportedAt: .now,
             records: records.map(SupplementLibraryBackupRecord.init)
         )

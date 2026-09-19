@@ -1,8 +1,51 @@
 import Foundation
 
+/// One place that names every on-disk format this app writes. The main backup, the
+/// standalone library files and the SwiftData store used to keep private counters, so
+/// a release could move one of them and leave the other two behind without anything in
+/// the file saying which triple was current.
+nonisolated enum ExportSchema {
+    /// Version written into new backups.
+    static let backupVersion = 9
+    /// Payloads still readable. v5 predates `supplementRecords`, v6 predates the
+    /// per-record timestamps, v7 predates chat history being restorable, v8 adds
+    /// `drinkRecords`, v9 keeps the same shape and only adds `manifest`.
+    static let readableBackupVersions: Set<Int> = [5, 6, 7, 8, 9]
+    /// Version written into 模板库 / 饮品库 / 补剂库 / 训练数据 files.
+    static let libraryVersion = LibraryFileFormat.supportedVersion
+}
+
+/// What produced a backup file. Written on export, optional on import so files from
+/// before this struct existed still decode.
+nonisolated struct BackupManifest: Codable {
+    let appVersion: String
+    let buildVersion: String
+    let backupVersion: Int
+    let dataSchemaVersion: Int
+    let libraryFormatVersion: Int
+    let localeIdentifier: String
+    let timeZoneIdentifier: String
+    let entityCounts: [String: Int]
+
+    nonisolated static func current(dataSchemaVersion: Int, entityCounts: [String: Int]) -> BackupManifest {
+        let info = Bundle.main.infoDictionary
+        return BackupManifest(
+            appVersion: info?["CFBundleShortVersionString"] as? String ?? "unknown",
+            buildVersion: info?["CFBundleVersion"] as? String ?? "unknown",
+            backupVersion: ExportSchema.backupVersion,
+            dataSchemaVersion: dataSchemaVersion,
+            libraryFormatVersion: ExportSchema.libraryVersion,
+            localeIdentifier: Locale.current.identifier,
+            timeZoneIdentifier: TimeZone.current.identifier,
+            entityCounts: entityCounts
+        )
+    }
+}
+
 nonisolated struct BackupFile: Codable {
     let version: Int
     let exportedAt: Date
+    let manifest: BackupManifest?
     let settings: SettingsRecord?
     let nutritionGoals: [GoalRecord]
     let meals: [MealRecord]
@@ -20,6 +63,7 @@ nonisolated struct BackupFile: Codable {
 
     init(version: Int,
          exportedAt: Date,
+         manifest: BackupManifest? = nil,
          settings: SettingsRecord?,
          nutritionGoals: [GoalRecord],
          meals: [MealRecord],
@@ -36,6 +80,7 @@ nonisolated struct BackupFile: Codable {
          drinkRecords: [DrinkRecordBackupRecord] = []) {
         self.version = version
         self.exportedAt = exportedAt
+        self.manifest = manifest
         self.settings = settings
         self.nutritionGoals = nutritionGoals
         self.meals = meals
@@ -56,6 +101,7 @@ nonisolated struct BackupFile: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         version = try container.decode(Int.self, forKey: .version)
         exportedAt = try container.decode(Date.self, forKey: .exportedAt)
+        manifest = try container.decodeIfPresent(BackupManifest.self, forKey: .manifest)
         settings = try container.decodeIfPresent(SettingsRecord.self, forKey: .settings)
         nutritionGoals = try container.decodeIfPresent([GoalRecord].self, forKey: .nutritionGoals) ?? []
         meals = try container.decodeIfPresent([MealRecord].self, forKey: .meals) ?? []

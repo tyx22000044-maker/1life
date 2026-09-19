@@ -25,7 +25,7 @@ nonisolated enum WorkoutExportService {
 
     static func exportJSON(_ workouts: [WorkoutLog]) throws -> Data {
         let file = WorkoutBackupFile(
-            version: 1,
+            version: LibraryFileFormat.supportedVersion,
             exportedAt: .now,
             workouts: workouts.sorted(by: { $0.startDate < $1.startDate }).map { WorkoutBackupRecord($0) }
         )

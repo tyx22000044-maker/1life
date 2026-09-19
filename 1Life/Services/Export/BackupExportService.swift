@@ -2,9 +2,6 @@ import Foundation
 import SwiftData
 
 nonisolated enum BackupExportService {
-    private static let supportedBackupVersion = 9
-    private static let importableBackupVersions: Set<Int> = [5, 6, 7, 8, 9]
-
     static func exportJSON(settings: UserSettings?,
                            nutritionGoals: [NutritionGoal],
                            meals: [Meal],
@@ -19,10 +16,29 @@ nonisolated enum BackupExportService {
                            chatMessages: [AIChatMessage],
                            supplementRecords: [SupplementRecord] = [],
                            drinkRecords: [DrinkRecord] = []) throws -> Data {
+        let settingsRecord = settings.map(SettingsRecord.init)
         let backup = BackupFile(
-            version: supportedBackupVersion,
+            version: ExportSchema.backupVersion,
             exportedAt: .now,
-            settings: settings.map(SettingsRecord.init),
+            manifest: BackupManifest.current(
+                dataSchemaVersion: settingsRecord?.dataSchemaVersion ?? UserSettings.currentDataSchemaVersion,
+                entityCounts: [
+                    "nutritionGoals": nutritionGoals.count,
+                    "meals": meals.count,
+                    "waterLogs": waterLogs.count,
+                    "habits": habits.count,
+                    "journalEntries": journalEntries.count,
+                    "workouts": workouts.count,
+                    "bodyMeasurements": bodyMeasurements.count,
+                    "bowelLogs": bowelLogs.count,
+                    "userFoods": userFoods.count,
+                    "mealTemplates": mealTemplates.count,
+                    "chatMessages": chatMessages.count,
+                    "supplementRecords": supplementRecords.count,
+                    "drinkRecords": drinkRecords.count
+                ]
+            ),
+            settings: settingsRecord,
             nutritionGoals: nutritionGoals.map(GoalRecord.init),
             meals: meals.map(MealRecord.init),
             waterLogs: waterLogs.map(WaterRecord.init),
@@ -55,7 +71,7 @@ nonisolated enum BackupExportService {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let backup = try decoder.decode(BackupFile.self, from: data)
-        guard importableBackupVersions.contains(backup.version) else {
+        guard ExportSchema.readableBackupVersions.contains(backup.version) else {
             throw ExportService.BackupError.invalidVersion(backup.version)
         }
         try BackupPayloadValidator.validate(backup)

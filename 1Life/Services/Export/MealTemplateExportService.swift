@@ -4,7 +4,7 @@ import SwiftData
 nonisolated enum MealTemplateExportService {
     static func exportJSON(_ templates: [MealTemplate]) throws -> Data {
         let file = TemplateBackupFile(
-            version: 1,
+            version: LibraryFileFormat.supportedVersion,
             exportedAt: .now,
             templates: templates.map(TemplateRecord.init)
         )
@@ -55,7 +55,7 @@ nonisolated enum MealTemplateExportService {
 nonisolated enum DrinkLibraryExportService {
     static func exportJSON(_ records: [DrinkRecord]) throws -> Data {
         let file = DrinkLibraryBackupFile(
-            version: 1,
+            version: LibraryFileFormat.supportedVersion,
             exportedAt: .now,
             records: records.map(DrinkLibraryBackupRecord.init)
         )
