@@ -757,9 +757,9 @@ struct DashboardView: View {
                                 VStack(spacing: 2) {
                                     Image(systemName: habit.iconSymbol)
                                         .font(.caption2)
-                                        .foregroundStyle(done ? Color(hex: habit.colorHex) : Color(.systemGray4))
+                                        .foregroundStyle(done ? Color(hex: habit.colorHex) : FamilyUI.inkFaint)
                                         .frame(width: 26, height: 26)
-                                        .background(done ? Color(hex: habit.colorHex).opacity(0.12) : Color(.systemGray6))
+                                        .background(done ? Color(hex: habit.colorHex).opacity(0.12) : FamilyUI.panelMutedBackground)
                                     Text(String(habit.name.prefix(2)))
                                         .font(.custom("Archivo-Regular", size: 9))
                                         .foregroundStyle(.secondary)

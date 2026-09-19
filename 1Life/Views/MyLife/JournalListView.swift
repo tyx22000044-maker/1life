@@ -51,9 +51,9 @@ struct JournalListView: View {
                     Image(systemName: "plus")
                         .accessibilityLabel("新建日志")
                         .font(.caption.weight(.black))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(FamilyUI.buttonForeground)
                         .frame(width: 34, height: 34)
-                        .background(Color.black)
+                        .background(FamilyUI.buttonBackground)
                         .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
                 }
             }
@@ -179,10 +179,10 @@ private struct JournalRow: View {
                         if entry.photoCount > 1 {
                             Text("+\(entry.photoCount - 1)")
                                 .font(.caption2.weight(.bold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(FamilyUI.scrimForeground)
                                 .padding(.horizontal, 5)
                                 .padding(.vertical, 2)
-                                .background(.black.opacity(0.55))
+                                .background(FamilyUI.scrim)
                                 .clipShape(RoundedRectangle(cornerRadius: FamilyUI.badgeCornerRadius))
                         }
                     }

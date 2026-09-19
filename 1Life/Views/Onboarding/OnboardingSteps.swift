@@ -207,12 +207,12 @@ struct ProfileStep: View {
                                 ZStack(alignment: .bottomTrailing) {
                                     UserAvatarView(avatarData: avatarData, name: nickname, size: 96)
                                     RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
-                                        .fill(Color.black)
+                                        .fill(FamilyUI.buttonBackground)
                                         .frame(width: 30, height: 30)
                                         .overlay(
                                             Image(systemName: "camera.fill")
                                                 .font(FamilyTypography.text(size: 12, weight: .bold))
-                                                .foregroundStyle(.white)
+                                                .foregroundStyle(FamilyUI.buttonForeground)
                                         )
                                 }
                             }

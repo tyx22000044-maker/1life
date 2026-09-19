@@ -439,6 +439,42 @@ enum FamilyUI {
     static let danger = accent
     static let subtleText = inkSoft
 
+    // MARK: Solid-fill pair
+    //
+    // `Color.black` buttons and `Color.white` labels read correctly on paper but
+    // turn into a black hole in dark mode. These tokens keep the Swiss Ledger
+    // inversion: light mode stays paper/ink exactly as designed.
+
+    /// Ink-filled control surface: send button, primary CTA, user chat bubble.
+    static let buttonBackground = ink
+    /// Label for `buttonBackground` and for the signal fills (`accent`, `danger`).
+    static let buttonForeground = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor(red: 0.075, green: 0.075, blue: 0.067, alpha: 1)   // #131311
+            : UIColor.white
+    })
+    /// Sheen layered over a solid fill.
+    static let onSolidOverlay = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor.black.withAlphaComponent(0.14)
+            : UIColor.white.withAlphaComponent(0.16)
+    })
+    /// Hairline drawn over a solid fill.
+    static let onSolidHairline = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor.black.withAlphaComponent(0.20)
+            : UIColor.white.withAlphaComponent(0.22)
+    })
+
+    /// Translucent plate drawn over imagery (photo count badges). The plate stays
+    /// dark in both appearances, so its label keeps `scrimForeground`.
+    static let scrim = Color(UIColor { t in
+        t.userInterfaceStyle == .dark
+            ? UIColor(white: 0.04, alpha: 0.72)
+            : UIColor(white: 0, alpha: 0.55)
+    })
+    static let scrimForeground = Color.white
+
     /// Swiss Ledger is square: panels 0–4pt, controls/tags 0–2pt.
     static let panelCornerRadius: CGFloat = 2
     static let controlCornerRadius: CGFloat = 0

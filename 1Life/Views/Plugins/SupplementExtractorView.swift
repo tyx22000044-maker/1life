@@ -462,10 +462,10 @@ struct SupplementNutritionRecognitionPluginView: View {
                             .font(.headline.weight(.bold))
                         Spacer()
                     }
-                    .foregroundStyle(.white)
+                    .foregroundStyle(isConfigured ? FamilyUI.buttonForeground : FamilyUI.inkFaint)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 13)
-                    .background(isConfigured ? FamilyUI.accent : Color(.systemGray3))
+                    .background(isConfigured ? FamilyUI.accent : FamilyUI.panelMutedBackground)
                     .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
                 }
                 .buttonStyle(.plain)
@@ -496,7 +496,7 @@ struct SupplementNutritionRecognitionPluginView: View {
         HStack(alignment: .top, spacing: 10) {
             Text(index)
                 .font(.caption.weight(.bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(FamilyUI.buttonForeground)
                 .frame(width: 22, height: 22)
                 .background(Circle().fill(FamilyUI.accent))
             VStack(alignment: .leading, spacing: 2) {
@@ -1001,9 +1001,9 @@ private struct SupplementExtractSheet: View {
                     Spacer()
                 }
                 .font(.subheadline.weight(.bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(canExtract ? FamilyUI.buttonForeground : FamilyUI.inkSoft)
                 .padding(.vertical, 13)
-                .background(canExtract ? FamilyUI.accent : Color.gray.opacity(0.4))
+                .background(canExtract ? FamilyUI.accent : FamilyUI.panelMutedBackground)
                 .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
             }
             .disabled(!canExtract)
@@ -1116,9 +1116,9 @@ private struct SupplementExtractSheet: View {
                     Label("识别补剂", systemImage: "list.bullet.clipboard")
                         .frame(maxWidth: .infinity)
                         .font(.caption.weight(.bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(canParseConfirmedText ? FamilyUI.buttonForeground : FamilyUI.inkSoft)
                         .padding(.vertical, 11)
-                        .background(canParseConfirmedText ? FamilyUI.accent : Color.gray.opacity(0.4))
+                        .background(canParseConfirmedText ? FamilyUI.accent : FamilyUI.panelMutedBackground)
                         .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
                 }
                 .disabled(!canParseConfirmedText)
@@ -1194,9 +1194,9 @@ private struct SupplementExtractSheet: View {
                     Label("提取营养", systemImage: "leaf")
                         .frame(maxWidth: .infinity)
                         .font(.caption.weight(.bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(canParseCandidates ? FamilyUI.buttonForeground : FamilyUI.inkSoft)
                         .padding(.vertical, 11)
-                        .background(canParseCandidates ? FamilyUI.accent : Color.gray.opacity(0.4))
+                        .background(canParseCandidates ? FamilyUI.accent : FamilyUI.panelMutedBackground)
                         .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
                 }
                 .disabled(!canParseCandidates)

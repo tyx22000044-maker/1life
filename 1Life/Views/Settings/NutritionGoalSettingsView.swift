@@ -205,7 +205,7 @@ struct NutritionGoalSettingsView: View {
                                     .foregroundStyle(key.spotlightColor)
                             } else {
                                 Image(systemName: "circle")
-                                    .foregroundStyle(atLimit ? Color(.systemGray4) : Color(.systemGray2))
+                                    .foregroundStyle(atLimit ? FamilyUI.inkFaint : FamilyUI.inkSoft)
                             }
                         }
                         .padding(.vertical, 8)

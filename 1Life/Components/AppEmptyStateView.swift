@@ -43,7 +43,7 @@ struct AppEmptyStateView: View {
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
                         .background(FamilyUI.accent)
-                        .foregroundStyle(Color.white)
+                        .foregroundStyle(FamilyUI.buttonForeground)
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 4)

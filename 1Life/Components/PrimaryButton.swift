@@ -13,7 +13,7 @@ struct PrimaryButton: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .background(isEnabled ? FamilyUI.accent : FamilyUI.hairlineRegular)
-                .foregroundStyle(isEnabled ? Color.white : FamilyUI.inkSoft)
+                .foregroundStyle(isEnabled ? FamilyUI.buttonForeground : FamilyUI.inkSoft)
         }
         .disabled(!isEnabled)
         .buttonStyle(.plain)

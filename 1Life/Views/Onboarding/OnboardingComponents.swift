@@ -190,11 +190,11 @@ struct OnboardingNextButton: View {
                 .font(.subheadline.weight(.black))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .background(isEnabled ? FamilyUI.accent : Color(.systemGray4))
-                .foregroundStyle(Color.white)
+                .background(isEnabled ? FamilyUI.accent : FamilyUI.panelMutedBackground)
+                .foregroundStyle(isEnabled ? FamilyUI.buttonForeground : FamilyUI.inkFaint)
                 .overlay(
                     RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
-                        .stroke(Color.black.opacity(0.18), lineWidth: 1)
+                        .stroke(FamilyUI.hairlineStrong, lineWidth: 1)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
         }

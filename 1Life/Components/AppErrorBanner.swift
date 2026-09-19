@@ -6,7 +6,7 @@ enum AppBannerTone: Equatable {
     case success
 
     var foreground: Color {
-        .white
+        FamilyUI.buttonForeground
     }
 
     var background: Color {
@@ -45,7 +45,7 @@ struct AppErrorBanner: View {
             if isVisible {
                 HStack(alignment: .top, spacing: 12) {
                     Rectangle()
-                        .fill(Color.white.opacity(0.16))
+                        .fill(FamilyUI.onSolidOverlay)
                         .frame(width: FamilyUI.iconBoxSize, height: FamilyUI.iconBoxSize)
                         .overlay(
                             Image(systemName: tone.icon)

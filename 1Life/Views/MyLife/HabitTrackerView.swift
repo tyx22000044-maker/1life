@@ -30,9 +30,9 @@ struct HabitTrackerView: View {
                     Image(systemName: "plus")
                         .accessibilityLabel("新建习惯")
                         .font(.caption.weight(.black))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(FamilyUI.buttonForeground)
                         .frame(width: 34, height: 34)
-                        .background(Color.black)
+                        .background(FamilyUI.buttonBackground)
                         .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
                 }
             }

@@ -48,8 +48,8 @@ struct AddMealSheet: View {
                                     .font(.subheadline.weight(.semibold))
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 12)
-                                    .background(Color.black)
-                                    .foregroundStyle(.white)
+                                    .background(FamilyUI.buttonBackground)
+                                    .foregroundStyle(FamilyUI.buttonForeground)
                                     .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
                             }
                         }

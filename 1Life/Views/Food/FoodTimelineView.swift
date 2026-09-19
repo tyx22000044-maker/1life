@@ -651,8 +651,8 @@ struct FoodTimelineView: View {
                         .font(.subheadline.weight(.medium))
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
-                        .background(Color.black)
-                        .foregroundStyle(.white)
+                        .background(FamilyUI.buttonBackground)
+                        .foregroundStyle(FamilyUI.buttonForeground)
                         .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
                 }
 
@@ -726,8 +726,8 @@ struct FoodTimelineView: View {
                     .font(.subheadline.weight(.medium))
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
-                    .background(Color.black)
-                    .foregroundStyle(.white)
+                    .background(FamilyUI.buttonBackground)
+                    .foregroundStyle(FamilyUI.buttonForeground)
                     .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
             }
         }

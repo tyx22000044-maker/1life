@@ -763,7 +763,7 @@ private struct ReviewEnergyChart: View {
     }
 
     private func barColor(for bucket: ReviewBucketSummary) -> Color {
-        guard bucket.hasMeal else { return Color(.systemGray4).opacity(0.55) }
+        guard bucket.hasMeal else { return FamilyUI.inkFaint.opacity(0.55) }
         let delta = bucket.averageCaloriesPerDay - bucket.tdee
         if delta > 250 { return FamilyUI.warning }
         if abs(delta) < 120 { return FamilyUI.success }
@@ -957,7 +957,7 @@ private struct ReviewRecoveryTrendRow: View {
                 HStack(alignment: .bottom, spacing: 4) {
                     ForEach(Array(values.enumerated()), id: \.offset) { _, value in
                         RoundedRectangle(cornerRadius: 3)
-                            .fill(value > 0 ? color.opacity(0.78) : Color(.systemGray4).opacity(0.45))
+                            .fill(value > 0 ? color.opacity(0.78) : FamilyUI.inkFaint.opacity(0.45))
                             .frame(height: barHeight(value, chartHeight: proxy.size.height))
                             .frame(maxWidth: .infinity, alignment: .bottom)
                     }
@@ -1177,9 +1177,9 @@ private struct BodyMetricsCard: View {
                     Image(systemName: "plus")
                         .accessibilityLabel("新增身体测量")
                         .font(.caption.weight(.black))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(FamilyUI.buttonForeground)
                         .frame(width: 34, height: 34)
-                        .background(Color.black)
+                        .background(FamilyUI.buttonBackground)
                         .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
                 }
             }
@@ -1589,9 +1589,9 @@ private struct BowelTrackerCard: View {
                     Image(systemName: "plus")
                         .accessibilityLabel("新增排便记录")
                         .font(.caption.weight(.black))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(FamilyUI.buttonForeground)
                         .frame(width: 34, height: 34)
-                        .background(Color.black)
+                        .background(FamilyUI.buttonBackground)
                         .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
                 }
             }

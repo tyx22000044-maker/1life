@@ -128,10 +128,10 @@ struct AIMealIdentificationConfirmationView: View {
                 }
                 .buttonStyle(.plain)
                 .font(.caption.weight(.bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(FamilyUI.buttonForeground)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 9)
-                .background(Color.black)
+                .background(FamilyUI.buttonBackground)
                 .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
                 .frame(maxWidth: .infinity)
             }

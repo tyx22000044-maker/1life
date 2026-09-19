@@ -358,7 +358,7 @@ struct AIChatView: View {
                     .fontWeight(.semibold)
                     .frame(width: 38, height: 38)
                     .background(FamilyUI.panelMutedBackground)
-                    .foregroundStyle(canUseVision ? FamilyUI.accent : Color(.systemGray3))
+                    .foregroundStyle(canUseVision ? FamilyUI.accent : FamilyUI.inkFaint)
                     .overlay(
                         RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
                             .stroke(FamilyUI.panelBorder, lineWidth: 1)
@@ -377,7 +377,7 @@ struct AIChatView: View {
                     .fontWeight(.semibold)
                     .frame(width: 38, height: 38)
                     .background(speechInput.isRecording ? FamilyUI.danger : FamilyUI.panelMutedBackground)
-                    .foregroundStyle(speechInput.isRecording ? Color.white : Color.primary)
+                    .foregroundStyle(speechInput.isRecording ? FamilyUI.buttonForeground : Color.primary)
                     .overlay(
                         RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius)
                             .stroke(FamilyUI.panelBorder, lineWidth: 1)
@@ -419,8 +419,8 @@ struct AIChatView: View {
                     .accessibilityLabel(viewModel.isLoading ? "正在请求 AI" : "发送")
                     .fontWeight(.bold)
                     .frame(width: 38, height: 38)
-                    .background(Color.black)
-                    .foregroundStyle(.white)
+                    .background(FamilyUI.buttonBackground)
+                    .foregroundStyle(FamilyUI.buttonForeground)
                     .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
             }
             .disabled(viewModel.isLoading || (viewModel.inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && selectedImageDataList.isEmpty))

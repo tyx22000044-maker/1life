@@ -255,10 +255,10 @@ private struct AISetupNoticeCard: View {
 
             Button(actionTitle, action: onOpenSettings)
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(FamilyUI.buttonForeground)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 9)
-                .background(Color.black)
+                .background(FamilyUI.buttonBackground)
                 .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
         }
         .padding(14)
@@ -442,21 +442,21 @@ private struct ChatBubbleContent: View {
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 7)
-                .background(isUser ? Color.white.opacity(0.16) : FamilyUI.panelMutedBackground)
+                .background(isUser ? FamilyUI.onSolidOverlay : FamilyUI.panelMutedBackground)
                 .overlay(
                     RoundedRectangle(cornerRadius: FamilyUI.badgeCornerRadius)
-                        .stroke(isUser ? Color.white.opacity(0.22) : FamilyUI.panelBorder, lineWidth: 1)
+                        .stroke(isUser ? FamilyUI.onSolidHairline : FamilyUI.panelBorder, lineWidth: 1)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: FamilyUI.badgeCornerRadius))
             }
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(isUser ? Color.black : FamilyUI.panelBackground)
-        .foregroundStyle(isUser ? Color.white : Color.primary)
+        .background(isUser ? FamilyUI.buttonBackground : FamilyUI.panelBackground)
+        .foregroundStyle(isUser ? FamilyUI.buttonForeground : .primary)
         .overlay(
             RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius)
-                .stroke(isUser ? Color.black : FamilyUI.panelBorder, lineWidth: 1)
+                .stroke(isUser ? FamilyUI.buttonBackground : FamilyUI.panelBorder, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
     }

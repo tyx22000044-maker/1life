@@ -72,9 +72,9 @@ struct WorkoutTimelineView: View {
                     Image(systemName: "plus")
                         .accessibilityLabel("记录一次训练")
                         .font(.caption.weight(.black))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(FamilyUI.buttonForeground)
                         .frame(width: 34, height: 34)
-                        .background(Color.black)
+                        .background(FamilyUI.buttonBackground)
                         .clipShape(RoundedRectangle(cornerRadius: FamilyUI.controlCornerRadius))
                 }
             }
