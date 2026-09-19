@@ -22,6 +22,7 @@ nonisolated enum SupplementLibraryExportService {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let file = try decoder.decode(SupplementLibraryBackupFile.self, from: data)
+        try LibraryFileFormat.validate(kind: "补剂库", version: file.version)
         var existingKeys = Set(existingRecords.map(\.dedupeKey))
         var imported = 0
         var skipped = 0

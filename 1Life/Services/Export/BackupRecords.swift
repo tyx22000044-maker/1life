@@ -247,6 +247,19 @@ nonisolated struct DrinkRecordBackupRecord: Codable {
     }
 }
 
+/// Standalone library files (模板库 / 饮品库 / 补剂库 / 训练数据) each carry their own
+/// `version`. They were decoded and applied without checking it, so a future format
+/// change would silently fill missing fields with defaults instead of refusing the file.
+nonisolated enum LibraryFileFormat {
+    static let supportedVersion = 1
+
+    static func validate(kind: String, version: Int) throws {
+        guard version == supportedVersion else {
+            throw ExportService.BackupError.unsupportedFileVersion(kind: kind, version: version)
+        }
+    }
+}
+
 nonisolated struct TemplateBackupFile: Codable {
     let version: Int
     let exportedAt: Date

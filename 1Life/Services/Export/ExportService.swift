@@ -10,6 +10,7 @@ nonisolated enum ExportService {
     enum BackupError: LocalizedError {
         case invalidVersion(Int)
         case corruptPayload(String)
+        case unsupportedFileVersion(kind: String, version: Int)
 
         var errorDescription: String? {
             switch self {
@@ -17,6 +18,8 @@ nonisolated enum ExportService {
                 return "不支持的备份版本：\(version)"
             case .corruptPayload(let detail):
                 return "备份文件内容不完整或非法，原有数据未被修改（\(detail)）"
+            case .unsupportedFileVersion(let kind, let version):
+                return "这份\(kind)文件的版本是 \(version)，当前 App 只能读取版本 \(LibraryFileFormat.supportedVersion) 的文件。"
             }
         }
     }

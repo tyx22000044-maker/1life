@@ -19,6 +19,7 @@ nonisolated enum MealTemplateExportService {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let file = try decoder.decode(TemplateBackupFile.self, from: data)
+        try LibraryFileFormat.validate(kind: "模板库", version: file.version)
         var existingNames = Set(existingTemplates.map(\.name))
         var importedCount = 0
 
@@ -70,6 +71,7 @@ nonisolated enum DrinkLibraryExportService {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let file = try decoder.decode(DrinkLibraryBackupFile.self, from: data)
+        try LibraryFileFormat.validate(kind: "饮品库", version: file.version)
         var existingKeys = Set(existingRecords.map(\.dedupeKey))
         var imported = 0
         var skipped = 0
