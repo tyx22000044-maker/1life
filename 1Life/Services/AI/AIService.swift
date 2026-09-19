@@ -103,7 +103,7 @@ struct ConfiguredAIService: AIService {
             userMessage = "\(text)\n请结合以上描述识别这些照片中的食物。"
         }
         let timeout = 45.0 + Double(images.count) * 30.0
-        let request = AIVisionRequest(
+        let request = try AIVisionRequest(
             messages: [
                 AIClientMessage(role: .system, content: prompt),
                 AIClientMessage(role: .user, content: userMessage)

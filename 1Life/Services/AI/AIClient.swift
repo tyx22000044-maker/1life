@@ -72,36 +72,28 @@ struct AIVisionRequest {
     let timeoutInterval: TimeInterval
     let temperature: Double?
 
-    var image: AIImageAttachment { images[0] }
-
-    init(messages: [AIClientMessage],
-         image: AIImageAttachment,
-         model: String,
-         apiKey: String,
-         timeoutInterval: TimeInterval = 45,
-         temperature: Double? = nil) {
-        self.init(
-            messages: messages,
-            images: [image],
-            model: model,
-            apiKey: apiKey,
-            timeoutInterval: timeoutInterval,
-            temperature: temperature
-        )
-    }
-
     init(messages: [AIClientMessage],
          images: [AIImageAttachment],
          model: String,
          apiKey: String,
          timeoutInterval: TimeInterval = 45,
-         temperature: Double? = nil) {
+         temperature: Double? = nil) throws {
+        let capped = Array(images.prefix(6))
+        guard !capped.isEmpty else { throw AIVisionRequestError.noImages }
         self.messages = messages
-        self.images = Array(images.prefix(6))
+        self.images = capped
         self.model = model
         self.apiKey = apiKey
         self.timeoutInterval = timeoutInterval
         self.temperature = temperature
+    }
+}
+
+enum AIVisionRequestError: LocalizedError {
+    case noImages
+
+    var errorDescription: String? {
+        "视觉请求至少需要一张图片。"
     }
 }
 

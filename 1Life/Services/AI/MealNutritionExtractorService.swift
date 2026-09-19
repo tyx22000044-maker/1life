@@ -219,7 +219,7 @@ struct MealNutritionExtractorService {
         let images = imageDataList.prefix(6).map {
             AIImageAttachment(data: Self.prepareImageForVision($0), mediaType: "image/jpeg")
         }
-        let request = AIVisionRequest(
+        let request = try AIVisionRequest(
             messages: [
                 AIClientMessage(role: .system, content: Self.ocrPrompt),
                 AIClientMessage(role: .user, content: userMessage)
