@@ -196,14 +196,53 @@ final class HealthKitService {
         }
     }
 
+    /// The night the user means when they ask about sleep on `date`: bedtime the
+    /// previous evening through late the next morning, not a raw 24-hour block.
+    nonisolated static func sleepWindow(for date: Date, calendar: Calendar = .current) -> (start: Date, end: Date) {
+        let dayStart = calendar.startOfDay(for: date)
+        let previousEvening = calendar.date(byAdding: .hour, value: -6, to: dayStart) ?? dayStart
+        let nextNoon = calendar.date(byAdding: .hour, value: 12, to: dayStart) ?? dayStart
+        return (previousEvening, nextNoon)
+    }
+
+    /// Clips samples to the night window and merges overlaps before summing.
+    /// Staged sleep samples overlap each other, and multiple sources can report the
+    /// same period, so a naive sum double-counts the night.
+    nonisolated static func sleepSeconds(in window: (start: Date, end: Date), samples: [(start: Date, end: Date)]) -> Double {
+        let clipped: [(start: Date, end: Date)] = samples.compactMap { sample in
+            let start = max(sample.start, window.start)
+            let end = min(sample.end, window.end)
+            guard end > start else { return nil }
+            return (start, end)
+        }
+        let sorted = clipped.sorted { $0.start < $1.start }
+
+        var total: TimeInterval = 0
+        var runningStart: Date?
+        var runningEnd: Date?
+        for interval in sorted {
+            if let current = runningEnd, interval.start <= current {
+                runningEnd = max(current, interval.end)
+            } else {
+                if let start = runningStart, let end = runningEnd {
+                    total += end.timeIntervalSince(start)
+                }
+                runningStart = interval.start
+                runningEnd = interval.end
+            }
+        }
+        if let start = runningStart, let end = runningEnd {
+            total += end.timeIntervalSince(start)
+        }
+        return total
+    }
+
     func sleepHours(for date: Date) async throws -> Double? {
         guard isAvailable else { return nil }
         guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else { return nil }
 
-        let calendar = Calendar.current
-        let wakeEnd = calendar.startOfDay(for: date).addingTimeInterval(86400)
-        let sleepStart = wakeEnd.addingTimeInterval(-86400)
-        let predicate = HKQuery.predicateForSamples(withStart: sleepStart, end: wakeEnd, options: .strictStartDate)
+        let window = Self.sleepWindow(for: date)
+        let predicate = HKQuery.predicateForSamples(withStart: window.start, end: window.end, options: .strictStartDate)
 
         return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Double?, Error>) in
             let query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil) { _, samples, error in
@@ -217,9 +256,10 @@ final class HealthKitService {
                     HKCategoryValueSleepAnalysis.asleepDeep.rawValue,
                     HKCategoryValueSleepAnalysis.asleepREM.rawValue
                 ]
-                let totalSeconds = (samples as? [HKCategorySample] ?? [])
+                let intervals = (samples as? [HKCategorySample] ?? [])
                     .filter { asleepValues.contains($0.value) }
-                    .reduce(0.0) { $0 + $1.endDate.timeIntervalSince($1.startDate) }
+                    .map { (start: $0.startDate, end: $0.endDate) }
+                let totalSeconds = Self.sleepSeconds(in: window, samples: intervals)
                 continuation.resume(returning: totalSeconds > 0 ? totalSeconds / 3600 : nil)
             }
             store.execute(query)
