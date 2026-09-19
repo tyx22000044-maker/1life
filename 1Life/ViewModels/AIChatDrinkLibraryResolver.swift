@@ -103,7 +103,7 @@ struct AIChatDrinkLibraryResolver {
             unit: drink.sizeML == nil ? "杯" : "ml",
             calories: calories,
             protein: drink.protein,
-            carbs: drink.carbs,
+            carbs: adjustedCarbs(drink.carbs, adjustment: adjustment),
             fat: drink.fat,
             sodium: drink.sodium,
             sugar: adjustedSugar(drink.sugar, adjustment: adjustment),
@@ -185,5 +185,14 @@ struct AIChatDrinkLibraryResolver {
     private static func adjustedSugar(_ sugar: Double?, adjustment: DrinkCalorieAdjustment) -> Double? {
         guard let sugarDelta = adjustment.sugarDelta else { return sugar }
         return (sugar ?? 0) + sugarDelta
+    }
+
+    /// Syrup is carbohydrate: adding its calories and its sugar while leaving `carbs` at
+    /// the no-sugar baseline made the row internally contradictory, and the confirmation
+    /// gate now (correctly) refuses to save that. Ice adjustments stay calorie-only and
+    /// are disclosed as estimates in the note.
+    private static func adjustedCarbs(_ carbs: Double?, adjustment: DrinkCalorieAdjustment) -> Double? {
+        guard let sugarDelta = adjustment.sugarDelta else { return carbs }
+        return (carbs ?? 0) + sugarDelta
     }
 }
