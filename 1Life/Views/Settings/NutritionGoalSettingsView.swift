@@ -118,6 +118,9 @@ struct NutritionGoalSettingsView: View {
                 readoutRow(label: "动态 TDEE", value: healthTDEE.map { "\(Int($0)) kcal" } ?? "读取中...")
             }
 
+            SystemPanelDivider()
+            readoutRow(label: "目标来源", value: settings.effectiveTarget(healthTDEE: healthTDEE, goal: goal).caloriesProvenance.displayName)
+
             Button {
                 restoreRecommended()
                 HapticEngine.tap()

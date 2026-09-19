@@ -175,9 +175,16 @@ struct DashboardView: View {
         let calorieTarget = effectiveCalorieTarget
         let progress = calorieTarget > 0 ? snapshot.nutrition.totalCalories / calorieTarget : 0
         let remainingCalories = Int((calorieTarget - snapshot.nutrition.totalCalories).rounded())
-        let targetLabel = isBalancedMode ? "参考目标" : "\(selectedDateScopeLabel)目标"
+        let caloriesProvenance = effectiveTarget.caloriesProvenance
+        let targetLabel = caloriesProvenance.isGenericReference
+            ? "通用参考目标"
+            : (isBalancedMode ? "参考目标" : "\(selectedDateScopeLabel)目标")
 
-        return SystemPanel(title: "\(selectedDateScopeLabel)摄入", detail: "\(selectedDateTitle)摄入、目标差值与宏量营养执行情况") {
+        let heroDetail = caloriesProvenance.isGenericReference
+            ? "\(selectedDateTitle)摄入与目标差值。当前热量目标是通用参考值（2000 kcal），补齐身高、体重、年龄和活动等级后会改为按个人估算。"
+            : "\(selectedDateTitle)摄入、目标差值与宏量营养执行情况（\(caloriesProvenance.displayName)）"
+
+        return SystemPanel(title: "\(selectedDateScopeLabel)摄入", detail: heroDetail) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text("总摄入")

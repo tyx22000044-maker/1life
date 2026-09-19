@@ -439,10 +439,21 @@ final class UserSettings {
 
     func effectiveTarget(healthTDEE: Double?, goal: NutritionGoal?) -> EffectiveNutritionTarget {
         let calories: Double
+        let provenance: CalorieTargetProvenance
         if useHealthKitForDynamicTDEE, let healthTDEE {
             calories = calorieTarget(from: healthTDEE)
-        } else {
+            provenance = .healthKitDynamic
+        } else if !hasBodyParameters {
+            // Without body parameters nothing here is personalised: 2000 kcal is a generic
+            // reference and the UI must say so.
             calories = goal?.dailyCalories ?? recommendedCalories
+            provenance = .genericReference
+        } else if let goal {
+            calories = goal.dailyCalories
+            provenance = .savedGoal
+        } else {
+            calories = recommendedCalories
+            provenance = .bodyParameterEstimate
         }
 
         let isDynamic = useHealthKitForDynamicTDEE && healthTDEE != nil
@@ -480,7 +491,8 @@ final class UserSettings {
             vitaminB6: goal?.dailyVitaminB6 ?? 1.4,
             folate: goal?.dailyFolate ?? 400,
             vitaminB12: goal?.dailyVitaminB12 ?? 2.4,
-            isDynamic: isDynamic
+            isDynamic: isDynamic,
+            caloriesProvenance: provenance
         )
     }
 
@@ -514,6 +526,26 @@ final class UserSettings {
     }
 }
 
+/// Where the calorie target came from. A 2000 kcal generic reference must never be
+/// presented like a personalised estimate.
+enum CalorieTargetProvenance {
+    case healthKitDynamic
+    case savedGoal
+    case bodyParameterEstimate
+    case genericReference
+
+    var displayName: String {
+        switch self {
+        case .healthKitDynamic: return "Apple Health 实测"
+        case .savedGoal: return "已保存目标"
+        case .bodyParameterEstimate: return "按身体参数估算"
+        case .genericReference: return "通用参考值"
+        }
+    }
+
+    var isGenericReference: Bool { self == .genericReference }
+}
+
 struct EffectiveNutritionTarget {
     let calories: Double
     let protein: Double
@@ -541,6 +573,7 @@ struct EffectiveNutritionTarget {
     let folate: Double
     let vitaminB12: Double
     let isDynamic: Bool
+    let caloriesProvenance: CalorieTargetProvenance
 
     static let fallback = EffectiveNutritionTarget(
         calories: 2000, protein: 75, carbs: 300, fat: 56,
@@ -549,7 +582,7 @@ struct EffectiveNutritionTarget {
         calcium: 800, magnesium: 330, potassium: 2000, iron: 12, zinc: 12,
         vitaminA: 800, vitaminC: 100, vitaminD: 10, vitaminE: 14,
         vitaminB1: 1.4, vitaminB2: 1.4, niacin: 14, vitaminB6: 1.4,
-        folate: 400, vitaminB12: 2.4, isDynamic: false
+        folate: 400, vitaminB12: 2.4, isDynamic: false, caloriesProvenance: .genericReference
     )
 
     func value(for key: NutrientKey) -> Double {

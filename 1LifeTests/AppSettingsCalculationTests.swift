@@ -128,4 +128,57 @@ final class AppSettingsCalculationTests: XCTestCase {
         XCTAssertEqual(target.value(for: .protein), target.protein)
         XCTAssertEqual(target.value(for: .vitaminC), target.vitaminC)
     }
+
+    // MARK: - Calorie target provenance
+
+    func testTargetWithoutBodyParametersIsLabelledGenericReference() {
+        let settings = UserSettings(hasCompletedOnboarding: true)
+        let target = settings.effectiveTarget(healthTDEE: nil, goal: NutritionGoal())
+
+        XCTAssertEqual(target.calories, 2000, accuracy: 0.0001)
+        XCTAssertEqual(target.caloriesProvenance, .genericReference)
+        XCTAssertTrue(target.caloriesProvenance.isGenericReference)
+    }
+
+    func testStoredGoalIsReportedAndMissingGoalFallsBackToTheEstimate() {
+        let settings = UserSettings(
+            genderRaw: Gender.male.rawValue, age: 30, heightCm: 175, weightKg: 75,
+            activityLevelRaw: ActivityLevel.moderatelyActive.rawValue
+        )
+
+        let withGoal = settings.effectiveTarget(healthTDEE: nil, goal: NutritionGoal(dailyCalories: 2000))
+        XCTAssertEqual(withGoal.caloriesProvenance, .savedGoal)
+        XCTAssertEqual(withGoal.calories, 2000, accuracy: 0.0001)
+
+        let withoutGoal = settings.effectiveTarget(healthTDEE: nil, goal: nil)
+        XCTAssertEqual(withoutGoal.caloriesProvenance, .bodyParameterEstimate)
+        XCTAssertEqual(withoutGoal.calories, settings.recommendedCalories, accuracy: 0.0001)
+    }
+
+    func testExplicitlyEditedGoalIsReportedAsSavedGoal() {
+        let settings = UserSettings(
+            genderRaw: Gender.male.rawValue, age: 30, heightCm: 175, weightKg: 75,
+            activityLevelRaw: ActivityLevel.moderatelyActive.rawValue
+        )
+        let goal = NutritionGoal(dailyCalories: 3200)
+        let target = settings.effectiveTarget(healthTDEE: nil, goal: goal)
+
+        XCTAssertEqual(target.caloriesProvenance, .savedGoal)
+        XCTAssertEqual(target.calories, 3200, accuracy: 0.0001)
+    }
+
+    func testHealthKitDynamicTdeeWinsAndIsLabelled() {
+        let settings = UserSettings(
+            genderRaw: Gender.male.rawValue, age: 30, heightCm: 175, weightKg: 75,
+            activityLevelRaw: ActivityLevel.moderatelyActive.rawValue
+        )
+        settings.useCustomCalorieMultiplier = false
+        let target = settings.effectiveTarget(healthTDEE: 2600, goal: NutritionGoal())
+        _ = target
+        settings.useHealthKitForDynamicTDEE = true
+        let dynamic = settings.effectiveTarget(healthTDEE: 2600, goal: NutritionGoal())
+
+        XCTAssertEqual(dynamic.caloriesProvenance, .healthKitDynamic)
+        XCTAssertTrue(dynamic.isDynamic)
+    }
 }
