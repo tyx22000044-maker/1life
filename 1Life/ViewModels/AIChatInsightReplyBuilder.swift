@@ -23,11 +23,24 @@ struct AIChatInsightReplyBuilder {
         let today = Date.now
         let nutrition = NutritionService.dailySummary(meals: meals, waterLogs: waterLogs, for: today)
         let workout = WorkoutService.dailySummary(workouts: workouts, for: today)
-        let effectiveTarget = settings?.effectiveTarget(healthTDEE: nil, goal: goals.first) ?? EffectiveNutritionTarget.fallback
-        let expenditure = effectiveTarget.calories + workout.totalCaloriesBurned
-        let balance = nutrition.totalCalories - expenditure
+        let intakeTarget = settings?.effectiveTarget(healthTDEE: nil, goal: goals.first) ?? EffectiveNutritionTarget.fallback
+        let trainingBurn = workout.totalCaloriesBurned
+        let trainingText = "训练 \(Int(workout.totalDurationMinutes)) 分钟、额外 \(Int(trainingBurn)) kcal。"
+
+        // The intake target is not an expenditure: with a fat-loss multiplier it sits far
+        // below maintenance, so using it as the baseline inverted the sign of the "balance".
+        guard let maintenance = settings?.estimatedTDEE else {
+            let differenceFromTarget = nutrition.totalCalories - intakeTarget.calories
+            return "今天摄入 \(Int(nutrition.totalCalories)) kcal，摄入目标 \(Int(intakeTarget.calories)) kcal（估算参考值），"
+                + "相对目标差值 \(Int(differenceFromTarget)) kcal。补齐身高、体重、年龄和活动等级后才能估算消耗。"
+                + trainingText
+        }
+
+        let balance = nutrition.totalCalories - maintenance
         let status = balance < -150 ? "热量缺口" : (balance > 150 ? "热量盈余" : "接近维持")
-        return "今天摄入 \(Int(nutrition.totalCalories)) kcal，估算消耗 \(Int(expenditure)) kcal，差值 \(Int(balance)) kcal，属于\(status)。训练 \(Int(workout.totalDurationMinutes)) 分钟。"
+        return "今天摄入 \(Int(nutrition.totalCalories)) kcal，消耗估算 \(Int(maintenance)) kcal（按身体参数推算，非医疗测量），"
+            + "差值 \(Int(balance)) kcal，属于\(status)。\(trainingText)"
+            + "训练消耗已含在活动水平里，不重复叠加。"
     }
 
     static func postWorkoutNutrition(modelContext: ModelContext?, settings: UserSettings?) -> String {
