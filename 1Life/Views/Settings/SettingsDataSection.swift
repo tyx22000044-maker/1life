@@ -33,7 +33,7 @@ struct SettingsDataSection: View {
                 AppSettingsRow(
                     icon: "square.and.arrow.up",
                     title: "导出数据",
-                    subtitle: "支持 PDF、CSV 与完整 JSON 备份",
+                    subtitle: "PDF 与 CSV 是分析产物：日期时间为本机时区、数值统一用 en_US_POSIX 小数点；只有完整备份 (JSON) 能恢复数据",
                     value: "\(mealCount) 餐 · \(workoutCount) 次",
                     emphasizesValue: true
                 )

@@ -88,4 +88,28 @@ final class CSVExportServiceTests: XCTestCase {
 
         XCTAssertTrue(csv.contains("\"\"\"特级\"\"苹果\""))
     }
+
+    // MARK: - Machine-readable formatting
+
+    func testNumericCSVFieldsDoNotFollowTheDeviceLocale() {
+        let localized = String(format: "%.2f", locale: Locale(identifier: "de_DE"), arguments: [1234.5])
+        XCTAssertNotEqual(localized, CSVExportService.formatNumber(1234.5), "对照样本：区域格式会写成 1.234,50")
+        XCTAssertEqual(CSVExportService.formatNumber(1234.5), "1234.50")
+        XCTAssertEqual(CSVExportService.formatDecimal(1234.5), "1234.5")
+        XCTAssertFalse(CSVExportService.formatNumber(1234.5).contains(","))
+    }
+
+    func testDayKeysRoundTripInsideTheLocalTimeZone() {
+        let date = Date(timeIntervalSince1970: 1_700_000_000)
+        let key = CSVExportService.formatISODate(date)
+
+        XCTAssertFalse(key.contains(","))
+        XCTAssertEqual(CSVExportService.parseISODate(key), Calendar.current.startOfDay(for: date))
+    }
+
+    func testTimeUsesLocalWallClockWithoutLocaleSeparators() {
+        let formatted = CSVExportService.formatTime(Date(timeIntervalSince1970: 1_700_000_000))
+
+        XCTAssertTrue(formatted.range(of: #"^[0-2][0-9]:[0-5][0-9]$"#, options: .regularExpression) != nil, formatted)
+    }
 }

@@ -167,27 +167,36 @@ nonisolated enum CSVExportService {
         return weightKg / (heightM * heightM)
     }
 
-    private static func formatDecimal(_ value: Double) -> String {
-        String(format: "%.1f", value)
+    /// Machine-readable fields never follow the device locale: a locale that writes
+    /// decimals with a comma would otherwise inject the CSV separator into a number.
+    static let machineLocale = Locale(identifier: "en_US_POSIX")
+
+    static func formatDecimal(_ value: Double) -> String {
+        String(format: "%.1f", locale: machineLocale, arguments: [value])
     }
 
-    private static func formatTime(_ date: Date) -> String {
+    /// Local wall-clock time; the export copy in Settings states the timezone meaning.
+    static func formatTime(_ date: Date) -> String {
         let formatter = DateFormatter()
+        formatter.locale = machineLocale
+        formatter.timeZone = .current
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: date)
     }
 
-    private static func formatISODate(_ date: Date) -> String {
+    static func formatISODate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.locale = machineLocale
+        formatter.timeZone = .current
         return formatter.string(from: date)
     }
 
-    private static func parseISODate(_ value: String) -> Date? {
+    static func parseISODate(_ value: String) -> Date? {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.locale = machineLocale
+        formatter.timeZone = .current
         return formatter.date(from: value)
     }
 
@@ -237,11 +246,11 @@ nonisolated enum CSVExportService {
         return "\"\(value.replacingOccurrences(of: "\"", with: "\"\""))\""
     }
 
-    private static func formatNumber(_ value: Double) -> String {
+    static func formatNumber(_ value: Double) -> String {
         if abs(value.rounded() - value) < 0.005 {
             return "\(Int(value.rounded()))"
         }
-        return String(format: "%.2f", value)
+        return String(format: "%.2f", locale: machineLocale, arguments: [value])
     }
 
     nonisolated private static func bristolDisplayName(rawValue: String) -> String {
