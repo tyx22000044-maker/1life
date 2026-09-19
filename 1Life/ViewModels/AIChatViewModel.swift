@@ -43,6 +43,7 @@ final class AIChatViewModel {
         isLoading = true
         errorMessage = nil
 
+        let historyForThisTurn = chatHistory()
         let userMsg = AIChatMessage(role: "user", content: text, provider: settings.selectedAIProvider)
         modelContext.insert(userMsg)
         messages.append(userMsg)
@@ -76,7 +77,7 @@ final class AIChatViewModel {
                     let hasUnmatched = meal.items.contains { $0.calories == 0 }
                     if hasUnmatched {
                         if settings.isAIConfigured {
-                            if let aiResult = try await aiParseMeal(text: text, settings: settings) {
+                            if let aiResult = try await aiParseMeal(text: text, settings: settings, history: historyForThisTurn) {
                                 let validated = validatedMealIntent(aiResult, localResult: libraryAwareResult)
                                 beginMealReview(validated, originalText: text, isLocal: false)
                             } else {
@@ -137,20 +138,20 @@ final class AIChatViewModel {
             if let intentResult = try await parseStructuredIntentWithStableMealCache(
                 service: service,
                 text: text,
-                history: chatHistory(),
+                history: historyForThisTurn,
                 context: context,
                 settings: settings
             ) {
                 if intentResult.isMealResult {
                     beginMealReview(validatedMealIntent(intentResult, localResult: nil), originalText: text, isLocal: false)
                 } else if case .chat = intentResult {
-                    let reply = try await service.sendMessage(text, history: chatHistory(), context: context)
+                    let reply = try await service.sendMessage(text, history: historyForThisTurn, context: context)
                     appendAssistant(reply, provider: settings.selectedAIProvider)
                 } else {
                     handleIntentResult(intentResult, provider: settings.selectedAIProvider)
                 }
             } else {
-                let reply = try await service.sendMessage(text, history: chatHistory(), context: context)
+                let reply = try await service.sendMessage(text, history: historyForThisTurn, context: context)
                 appendAssistant(reply, provider: settings.selectedAIProvider)
             }
         } catch {
@@ -177,13 +178,13 @@ final class AIChatViewModel {
         return markers.contains { normalized.contains($0) }
     }
 
-    private func aiParseMeal(text: String, settings: UserSettings) async throws -> AIChatIntentResult? {
+    private func aiParseMeal(text: String, settings: UserSettings, history: [AIChatHistoryItem]) async throws -> AIChatIntentResult? {
         let service = ConfiguredAIService(settings: settings)
         let context = await buildDataContext()
         return try await parseStructuredIntentWithStableMealCache(
             service: service,
             text: text,
-            history: chatHistory(),
+            history: history,
             context: context,
             settings: settings
         )
@@ -584,6 +585,9 @@ final class AIChatViewModel {
         }
     }
 
+    /// History for the turn in flight. Callers snapshot this **before** inserting the
+    /// current user message, otherwise the same text reaches the provider twice:
+    /// once inside `history` and once as the request text.
     private func chatHistory() -> [AIChatHistoryItem] {
         messages.suffix(20).map { AIChatHistoryItem(role: $0.role, content: $0.content) }
     }
