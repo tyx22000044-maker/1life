@@ -63,9 +63,11 @@ enum HabitService {
         weekStart = cal.date(byAdding: .weekOfYear, value: -1, to: weekStart)!
 
         while true {
-            let weekEnd = cal.date(byAdding: .day, value: 6, to: weekStart)!
+            // Exclusive upper bound: `weekStart + 6 days` is midnight, so an inclusive
+            // `<=` silently dropped every log recorded later on the week's last day.
+            let nextWeekStart = cal.date(byAdding: .weekOfYear, value: 1, to: weekStart)!
             let weekLogs = logs.filter { log in
-                log.date >= weekStart && log.date <= weekEnd
+                log.date >= weekStart && log.date < nextWeekStart
             }
 
             var daysCompleted = 0

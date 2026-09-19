@@ -89,6 +89,37 @@ final class HabitServiceTests: XCTestCase {
         XCTAssertEqual(HabitService.currentStreak(habit: habit, asOf: now), 0)
     }
 
+    func testWeeklyStreakCountsLogLateOnTheLastDayOfWeek() {
+        let now = referenceDate()
+        let habit = makeHabit(frequency: .weekly, frequencyCount: 1)
+        let thisWeekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now))!
+        let lastWeekStart = calendar.date(byAdding: .weekOfYear, value: -1, to: thisWeekStart)!
+        let lastDayOfPriorWeek = calendar.date(byAdding: .day, value: 6, to: lastWeekStart)!
+        let lateNight = calendar.date(bySettingHour: 23, minute: 30, second: 0, of: lastDayOfPriorWeek)!
+
+        habit.logs = [HabitLog(date: lateNight, value: 1)]
+        XCTAssertEqual(HabitService.currentStreak(habit: habit, asOf: now), 1)
+    }
+
+    func testWeeklyStreakCountsLogExactlyAtWeekStartMidnight() {
+        let now = referenceDate()
+        let habit = makeHabit(frequency: .weekly, frequencyCount: 1)
+        let thisWeekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now))!
+        let lastWeekStart = calendar.date(byAdding: .weekOfYear, value: -1, to: thisWeekStart)!
+
+        habit.logs = [HabitLog(date: lastWeekStart, value: 1)]
+        XCTAssertEqual(HabitService.currentStreak(habit: habit, asOf: now), 1)
+    }
+
+    func testWeeklyStreakExcludesLogFromTheFollowingWeek() {
+        let now = referenceDate()
+        let habit = makeHabit(frequency: .weekly, frequencyCount: 1)
+        let thisWeekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now))!
+
+        habit.logs = [HabitLog(date: thisWeekStart, value: 1)]
+        XCTAssertEqual(HabitService.currentStreak(habit: habit, asOf: now), 0)
+    }
+
     func testCompletionRateOverWindow() {
         let now = referenceDate()
         let habit = makeHabit()
