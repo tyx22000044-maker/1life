@@ -18,6 +18,8 @@ final class AIChatPendingMealReviewTests: XCTestCase {
         return (container, viewModel)
     }
 
+    /// Macro split derived from the calorie figure so these fixtures stay self-consistent
+    /// and never trip the macro-conflict gate on purpose.
     private func meal(_ type: MealType, calories: Double) -> AIParsedMeal {
         AIParsedMeal(
             mealType: type,
@@ -26,9 +28,9 @@ final class AIChatPendingMealReviewTests: XCTestCase {
                 amount: 1,
                 unit: "个",
                 calories: calories,
-                protein: 12,
-                carbs: 2,
-                fat: 8,
+                protein: calories * 0.3 / 4,
+                carbs: calories * 0.4 / 4,
+                fat: calories * 0.3 / 9,
                 nutritionDataBasis: .direct
             )],
             note: ""
