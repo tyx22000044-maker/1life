@@ -79,23 +79,32 @@ struct LocalAIIntentParser {
     }
 
     private func extractMinutes(_ text: String) -> Double? {
-        if let match = text.range(of: #"(\d+)\s*(分钟|min)"#, options: .regularExpression) {
-            let numStr = text[match].filter(\.isNumber)
-            return Double(numStr)
+        if let value = firstCapture(#"(\d+(?:\.\d+)?)\s*(?:分钟|min)"#, in: text) {
+            return value
         }
-        if let match = text.range(of: #"(\d+)\s*(小时|h)"#, options: .regularExpression) {
-            let numStr = text[match].filter(\.isNumber)
-            return Double(numStr).map { $0 * 60 }
+        if let value = firstCapture(#"(\d+(?:\.\d+)?)\s*(?:小时|h)"#, in: text) {
+            return value * 60
         }
         return nil
     }
 
     private func extractCalories(_ text: String) -> Double? {
-        if let match = text.range(of: #"(\d+)\s*(kcal|千卡|大卡)"#, options: .regularExpression) {
-            let numStr = text[match].filter(\.isNumber)
-            return Double(numStr)
-        }
-        return nil
+        firstCapture(#"(\d+(?:\.\d+)?)\s*(?:kcal|千卡|大卡|卡)"#, in: text)
+    }
+
+    /// Reads the first capture group through `NSRegularExpression`.
+    ///
+    /// Two silent failure modes lived here before: `String.range(of:options:.regularExpression)`
+    /// returns nil for patterns containing an optional group (`(\d+(?:\.\d+)?)…千克` matches
+    /// under `NSRegularExpression` but not through that API), and `filter(\.isNumber)` kept the
+    /// CJK unit characters 千/克, turning "300千卡" into "300千".
+    private func firstCapture(_ pattern: String, in text: String) -> Double? {
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
+        let range = NSRange(text.startIndex..<text.endIndex, in: text)
+        guard let match = regex.firstMatch(in: text, range: range) else { return nil }
+        let group = match.numberOfRanges > 1 ? 1 : 0
+        guard let matched = Range(match.range(at: group), in: text) else { return nil }
+        return Double(text[matched])
     }
 
     // MARK: - Body Measurement
@@ -124,20 +133,13 @@ struct LocalAIIntentParser {
         guard keywords.contains(where: { text.localizedCaseInsensitiveContains($0) }) else { return nil }
         guard ["记录", "今天", "刚刚", "现在", "测了", "称了", "是", "为"].contains(where: { text.contains($0) }) else { return nil }
 
-        let weight = extractFirstNumber(text, pattern: #"(\d+(?:\.\d+)?)\s*(kg|公斤|千克)"#)
+        let weight = firstCapture(#"(\d+(?:\.\d+)?)\s*(?:kg|公斤|千克)"#, in: text)
             ?? (text.contains("体重") ? extractNumber(after: "体重", in: text) : nil)
-        let bodyFat = extractFirstNumber(text, pattern: #"(\d+(?:\.\d+)?)\s*%"#)
+        let bodyFat = firstCapture(#"(\d+(?:\.\d+)?)\s*%"#, in: text)
             ?? (text.contains("体脂") ? extractNumber(after: "体脂", in: text) : nil)
 
         guard weight != nil || bodyFat != nil else { return nil }
         return .addBodyMeasurement(AIParsedBodyMeasurement(weightKg: weight, bodyFatPercentage: bodyFat, note: text))
-    }
-
-    private func extractFirstNumber(_ text: String, pattern: String) -> Double? {
-        guard let range = text.range(of: pattern, options: .regularExpression) else { return nil }
-        let matched = String(text[range])
-        let number = matched.filter { $0.isNumber || $0 == "." }
-        return Double(number)
     }
 
     private func extractNumber(after keyword: String, in text: String) -> Double? {

@@ -155,4 +155,31 @@ final class LocalAIIntentParserTests: XCTestCase {
         let parser = LocalAIIntentParser()
         XCTAssertNil(parser.parse("   "))
     }
+
+    func testParsesWorkoutCaloriesInDaKa() throws {
+        let parser = LocalAIIntentParser()
+        let result = parser.parse("记录了跑步40分钟，消耗420大卡")
+        guard case .addWorkout(let workout) = try XCTUnwrap(result) else {
+            return XCTFail("expected addWorkout")
+        }
+        XCTAssertEqual(workout.caloriesBurned, 420)
+    }
+
+    func testParsesBodyWeightInChineseKilogramUnit() throws {
+        let parser = LocalAIIntentParser()
+        let result = parser.parse("今天称了体重62千克")
+        guard case .addBodyMeasurement(let measurement) = try XCTUnwrap(result) else {
+            return XCTFail("expected addBodyMeasurement")
+        }
+        XCTAssertEqual(measurement.weightKg, 62)
+    }
+
+    func testParsesWorkoutDurationInHours() throws {
+        let parser = LocalAIIntentParser()
+        let result = parser.parse("记录了骑行1.5小时")
+        guard case .addWorkout(let workout) = try XCTUnwrap(result) else {
+            return XCTFail("expected addWorkout")
+        }
+        XCTAssertEqual(workout.durationMinutes, 90, accuracy: 0.0001)
+    }
 }
