@@ -144,3 +144,68 @@ enum NutrientDefinitions {
         NutrientGroupDefinition(group: .vitamin, keys: [.vitaminA, .vitaminC, .vitaminD, .vitaminE, .vitaminB1, .vitaminB2, .niacin, .vitaminB6, .folate, .vitaminB12])
     ]
 }
+
+// MARK: - Nutrient key → persisted field
+//
+// Entry points (饮食页手动添加、AI 会话、模板/库导入) all write the same 24 columns.
+// Mapping the key once keeps those paths from disagreeing about which field a nutrient is.
+
+extension NutrientKey {
+    var foodItemKeyPath: ReferenceWritableKeyPath<FoodItem, Double?>? {
+        switch self {
+        case .protein: return \FoodItem.protein
+        case .carbs: return \FoodItem.carbs
+        case .fat: return \FoodItem.fat
+        case .fiber: return \FoodItem.fiber
+        case .sodium: return \FoodItem.sodium
+        case .sugar: return \FoodItem.sugar
+        case .cholesterol: return \FoodItem.cholesterol
+        case .caffeine: return \FoodItem.caffeine
+        case .teaPolyphenols: return \FoodItem.teaPolyphenols
+        case .calcium: return \FoodItem.calcium
+        case .magnesium: return \FoodItem.magnesium
+        case .potassium: return \FoodItem.potassium
+        case .iron: return \FoodItem.iron
+        case .zinc: return \FoodItem.zinc
+        case .vitaminA: return \FoodItem.vitaminA
+        case .vitaminC: return \FoodItem.vitaminC
+        case .vitaminD: return \FoodItem.vitaminD
+        case .vitaminE: return \FoodItem.vitaminE
+        case .vitaminB1: return \FoodItem.vitaminB1
+        case .vitaminB2: return \FoodItem.vitaminB2
+        case .niacin: return \FoodItem.niacin
+        case .vitaminB6: return \FoodItem.vitaminB6
+        case .folate: return \FoodItem.folate
+        case .vitaminB12: return \FoodItem.vitaminB12
+        }
+    }
+
+    var parsedItemKeyPath: WritableKeyPath<AIParsedFoodItem, Double?>? {
+        switch self {
+        case .protein: return \AIParsedFoodItem.protein
+        case .carbs: return \AIParsedFoodItem.carbs
+        case .fat: return \AIParsedFoodItem.fat
+        case .fiber: return \AIParsedFoodItem.fiber
+        case .sodium: return \AIParsedFoodItem.sodium
+        case .sugar: return \AIParsedFoodItem.sugar
+        case .cholesterol: return \AIParsedFoodItem.cholesterol
+        case .caffeine: return \AIParsedFoodItem.caffeine
+        case .teaPolyphenols: return \AIParsedFoodItem.teaPolyphenols
+        case .calcium: return \AIParsedFoodItem.calcium
+        case .magnesium: return \AIParsedFoodItem.magnesium
+        case .potassium: return \AIParsedFoodItem.potassium
+        case .iron: return \AIParsedFoodItem.iron
+        case .zinc: return \AIParsedFoodItem.zinc
+        case .vitaminA: return \AIParsedFoodItem.vitaminA
+        case .vitaminC: return \AIParsedFoodItem.vitaminC
+        case .vitaminD: return \AIParsedFoodItem.vitaminD
+        case .vitaminE: return \AIParsedFoodItem.vitaminE
+        case .vitaminB1: return \AIParsedFoodItem.vitaminB1
+        case .vitaminB2: return \AIParsedFoodItem.vitaminB2
+        case .niacin: return \AIParsedFoodItem.niacin
+        case .vitaminB6: return \AIParsedFoodItem.vitaminB6
+        case .folate: return \AIParsedFoodItem.folate
+        case .vitaminB12: return \AIParsedFoodItem.vitaminB12
+        }
+    }
+}

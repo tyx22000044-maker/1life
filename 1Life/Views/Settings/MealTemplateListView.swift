@@ -1251,7 +1251,7 @@ private struct MealTemplateEditorView: View {
 
 
     private func searchFoodRow(_ food: UserFood) -> some View {
-        let caloriesPerServing = food.servingNutrition["calories"] ?? food.caloriesPer100g
+        let caloriesPerServing = food.servingProfile().calories
         return HStack(spacing: 10) {
             Text(food.name)
                 .font(.subheadline.weight(.semibold))
@@ -1269,27 +1269,38 @@ private struct MealTemplateEditorView: View {
     }
 
     private func addFood(from uf: UserFood) {
-        let serving = uf.servingNutrition
-        let legacyScale = uf.defaultAmount * uf.defaultServingGrams / 100
-        func nutrient(_ key: String, legacy: Double?) -> Double? {
-            if let value = serving[key] { return value * uf.defaultAmount }
-            return legacy.map { $0 * legacyScale }
-        }
+        let profile = uf.servingProfile()
+        func nutrient(_ key: NutrientKey) -> Double? { profile.nutrients[key] }
         let item = TemplateFoodItem(
             name: uf.name,
-            amount: uf.defaultAmount,
-            unit: uf.defaultUnit,
-            servingGrams: uf.defaultServingGrams,
-            calories: (serving["calories"] ?? uf.caloriesPer100g * legacyScale) * (serving["calories"] == nil ? 1 : uf.defaultAmount),
-            protein: nutrient("protein", legacy: uf.proteinPer100g),
-            carbs: nutrient("carbs", legacy: uf.carbsPer100g),
-            fat: nutrient("fat", legacy: uf.fatPer100g),
-            fiber: nutrient("fiber", legacy: uf.fiberPer100g),
-            sodium: nutrient("sodium", legacy: uf.sodiumPer100g),
-            sugar: nutrient("sugar", legacy: uf.sugarPer100g),
-            cholesterol: nutrient("cholesterol", legacy: uf.cholesterolPer100g),
-            caffeine: nutrient("caffeine", legacy: uf.caffeinePer100g),
-            teaPolyphenols: nutrient("teaPolyphenols", legacy: uf.teaPolyphenolsPer100g)
+            amount: profile.amount,
+            unit: profile.unit,
+            servingGrams: profile.servingGrams,
+            calories: profile.calories,
+            protein: nutrient(.protein),
+            carbs: nutrient(.carbs),
+            fat: nutrient(.fat),
+            fiber: nutrient(.fiber),
+            sodium: nutrient(.sodium),
+            sugar: nutrient(.sugar),
+            cholesterol: nutrient(.cholesterol),
+            caffeine: nutrient(.caffeine),
+            teaPolyphenols: nutrient(.teaPolyphenols),
+            calcium: nutrient(.calcium),
+            magnesium: nutrient(.magnesium),
+            potassium: nutrient(.potassium),
+            iron: nutrient(.iron),
+            zinc: nutrient(.zinc),
+            vitaminA: nutrient(.vitaminA),
+            vitaminC: nutrient(.vitaminC),
+            vitaminD: nutrient(.vitaminD),
+            vitaminE: nutrient(.vitaminE),
+            vitaminB1: nutrient(.vitaminB1),
+            vitaminB2: nutrient(.vitaminB2),
+            niacin: nutrient(.niacin),
+            vitaminB6: nutrient(.vitaminB6),
+            folate: nutrient(.folate),
+            vitaminB12: nutrient(.vitaminB12)
         )
         foodItems.append(item)
         searchText = ""

@@ -126,3 +126,71 @@ final class UserFood {
         updatedAt = .now
     }
 }
+
+/// What one default serving of a `UserFood` is worth, computed the same way for every
+/// entry point.
+struct UserFoodServingProfile {
+    let amount: Double
+    let unit: String
+    let servingGrams: Double
+    let calories: Double
+    let nutrients: [NutrientKey: Double]
+}
+
+extension UserFood {
+    /// Per-serving values win; the legacy `…Per100g` columns are only a fallback for rows
+    /// created before `servingNutrition` existed. Before this, 饮食页 multiplied legacy
+    /// values by the serving size while AI Chat ignored `servingNutrition` entirely, so
+    /// the same food produced different calories depending on how it was logged.
+    func servingProfile() -> UserFoodServingProfile {
+        let serving = servingNutrition
+        let legacyScale = defaultServingGrams / 100 * defaultAmount
+
+        var nutrients: [NutrientKey: Double] = [:]
+        for key in NutrientKey.allCases {
+            if let perServing = serving[key.rawValue] {
+                nutrients[key] = perServing * defaultAmount
+            } else if let legacy = legacyPer100gValue(for: key) {
+                nutrients[key] = legacy * legacyScale
+            }
+        }
+
+        let calories = serving["calories"].map { $0 * defaultAmount } ?? (caloriesPer100g * legacyScale)
+        return UserFoodServingProfile(
+            amount: defaultAmount,
+            unit: defaultUnit,
+            servingGrams: defaultServingGrams,
+            calories: calories,
+            nutrients: nutrients
+        )
+    }
+
+    private func legacyPer100gValue(for key: NutrientKey) -> Double? {
+        switch key {
+        case .protein: return proteinPer100g
+        case .carbs: return carbsPer100g
+        case .fat: return fatPer100g
+        case .fiber: return fiberPer100g
+        case .sodium: return sodiumPer100g
+        case .sugar: return sugarPer100g
+        case .cholesterol: return cholesterolPer100g
+        case .caffeine: return caffeinePer100g
+        case .teaPolyphenols: return teaPolyphenolsPer100g
+        case .calcium: return calciumPer100g
+        case .magnesium: return magnesiumPer100g
+        case .potassium: return potassiumPer100g
+        case .iron: return ironPer100g
+        case .zinc: return zincPer100g
+        case .vitaminA: return vitaminAPer100g
+        case .vitaminC: return vitaminCPer100g
+        case .vitaminD: return vitaminDPer100g
+        case .vitaminE: return vitaminEPer100g
+        case .vitaminB1: return vitaminB1Per100g
+        case .vitaminB2: return vitaminB2Per100g
+        case .niacin: return niacinPer100g
+        case .vitaminB6: return vitaminB6Per100g
+        case .folate: return folatePer100g
+        case .vitaminB12: return vitaminB12Per100g
+        }
+    }
+}

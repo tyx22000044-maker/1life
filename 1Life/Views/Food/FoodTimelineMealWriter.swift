@@ -59,44 +59,20 @@ struct FoodTimelineMealWriter {
             modelContext.insert(meal)
         }
 
-        let serving = food.servingNutrition
-        let scale = food.defaultServingGrams / 100
-        func nutrient(_ key: String, legacy: Double?) -> Double? {
-            if let value = serving[key] { return value * food.defaultAmount }
-            return legacy.map { $0 * scale }
-        }
+        let profile = food.servingProfile()
         let item = FoodItem(
             name: food.name,
-            amount: food.defaultAmount,
-            unit: food.defaultUnit,
+            amount: profile.amount,
+            unit: profile.unit,
             servingGrams: 0,
-            calories: (serving["calories"] ?? food.caloriesPer100g * scale) * (serving["calories"] == nil ? 1 : food.defaultAmount),
-            protein: nutrient("protein", legacy: food.proteinPer100g),
-            carbs: nutrient("carbs", legacy: food.carbsPer100g),
-            fat: nutrient("fat", legacy: food.fatPer100g),
-            fiber: nutrient("fiber", legacy: food.fiberPer100g),
-            sodium: nutrient("sodium", legacy: food.sodiumPer100g),
-            sugar: nutrient("sugar", legacy: food.sugarPer100g),
-            cholesterol: nutrient("cholesterol", legacy: food.cholesterolPer100g),
-            caffeine: nutrient("caffeine", legacy: food.caffeinePer100g),
-            teaPolyphenols: nutrient("teaPolyphenols", legacy: food.teaPolyphenolsPer100g),
-            calcium: nutrient("calcium", legacy: food.calciumPer100g),
-            magnesium: nutrient("magnesium", legacy: food.magnesiumPer100g),
-            potassium: nutrient("potassium", legacy: food.potassiumPer100g),
-            iron: nutrient("iron", legacy: food.ironPer100g),
-            zinc: nutrient("zinc", legacy: food.zincPer100g),
-            vitaminA: nutrient("vitaminA", legacy: food.vitaminAPer100g),
-            vitaminC: nutrient("vitaminC", legacy: food.vitaminCPer100g),
-            vitaminD: nutrient("vitaminD", legacy: food.vitaminDPer100g),
-            vitaminE: nutrient("vitaminE", legacy: food.vitaminEPer100g),
-            vitaminB1: nutrient("vitaminB1", legacy: food.vitaminB1Per100g),
-            vitaminB2: nutrient("vitaminB2", legacy: food.vitaminB2Per100g),
-            niacin: nutrient("niacin", legacy: food.niacinPer100g),
-            vitaminB6: nutrient("vitaminB6", legacy: food.vitaminB6Per100g),
-            folate: nutrient("folate", legacy: food.folatePer100g),
-            vitaminB12: nutrient("vitaminB12", legacy: food.vitaminB12Per100g),
+            calories: profile.calories,
             source: .manual
         )
+        for (key, value) in profile.nutrients {
+            if let path = key.foodItemKeyPath {
+                item[keyPath: path] = value
+            }
+        }
         item.meal = meal
         modelContext.insert(item)
         food.incrementUseCount()

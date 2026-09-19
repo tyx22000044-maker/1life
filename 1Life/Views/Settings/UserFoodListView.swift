@@ -188,7 +188,7 @@ private struct UserFoodRow: View {
                 Text(food.name)
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
-                Text("\(food.brand.isEmpty ? "未标品牌" : food.brand) · \(Int(food.servingNutrition["calories"] ?? food.caloriesPer100g)) kcal / 份 · USED \(food.useCount)")
+                Text("\(food.brand.isEmpty ? "未标品牌" : food.brand) · \(Int(food.servingProfile().calories)) kcal / 份 · USED \(food.useCount)")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .monospacedDigit()

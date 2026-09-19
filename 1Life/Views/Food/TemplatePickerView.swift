@@ -269,7 +269,7 @@ struct TemplatePickerView: View {
 
             Spacer()
 
-            Text("\(Int(food.servingNutrition["calories"] ?? food.caloriesPer100g)) kcal")
+            Text("\(Int(food.servingProfile().calories)) kcal")
                 .font(.caption.weight(.bold))
                 .foregroundStyle(FamilyUI.accent)
                 .monospacedDigit()

@@ -469,7 +469,7 @@ struct FoodTimelineView: View {
                         } label: {
                             QuickFoodChip(
                                 title: food.name,
-                                subtitle: "\(food.defaultAmount.nutritionDecimal)\(food.defaultUnit) · \(Int(food.caloriesPer100g * food.defaultServingGrams / 100)) kcal",
+                                subtitle: "\(food.defaultAmount.nutritionDecimal)\(food.defaultUnit) · \(Int(food.servingProfile().calories)) kcal",
                                 icon: "heart.fill",
                                 color: .pink
                             )
@@ -528,7 +528,7 @@ struct FoodTimelineView: View {
                     } label: {
                         searchQuickAddRow(
                             title: food.name,
-                            subtitle: "\(food.defaultAmount.nutritionDecimal)\(food.defaultUnit) · \(Int(food.caloriesPer100g * food.defaultServingGrams / 100)) kcal",
+                            subtitle: "\(food.defaultAmount.nutritionDecimal)\(food.defaultUnit) · \(Int(food.servingProfile().calories)) kcal",
                             icon: "heart.fill",
                             color: .pink
                         )

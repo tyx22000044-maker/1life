@@ -440,40 +440,22 @@ struct LocalAIIntentParser {
     }
 
     private func userFoodToItem(_ uf: UserFood) -> AIParsedFoodItem {
-        let factor = uf.defaultServingGrams / 100 * uf.defaultAmount
-        return AIParsedFoodItem(
+        let profile = uf.servingProfile()
+        var item = AIParsedFoodItem(
             name: uf.name,
-            amount: uf.defaultAmount,
-            unit: uf.defaultUnit,
-            calories: uf.caloriesPer100g * factor,
-            protein: uf.proteinPer100g.map { $0 * factor },
-            carbs: uf.carbsPer100g.map { $0 * factor },
-            fat: uf.fatPer100g.map { $0 * factor },
-            fiber: uf.fiberPer100g.map { $0 * factor },
-            sodium: uf.sodiumPer100g.map { $0 * factor },
-            sugar: uf.sugarPer100g.map { $0 * factor },
-            cholesterol: uf.cholesterolPer100g.map { $0 * factor },
-            caffeine: uf.caffeinePer100g.map { $0 * factor },
-            teaPolyphenols: uf.teaPolyphenolsPer100g.map { $0 * factor },
-            calcium: uf.calciumPer100g.map { $0 * factor },
-            magnesium: uf.magnesiumPer100g.map { $0 * factor },
-            potassium: uf.potassiumPer100g.map { $0 * factor },
-            iron: uf.ironPer100g.map { $0 * factor },
-            zinc: uf.zincPer100g.map { $0 * factor },
-            vitaminA: uf.vitaminAPer100g.map { $0 * factor },
-            vitaminC: uf.vitaminCPer100g.map { $0 * factor },
-            vitaminD: uf.vitaminDPer100g.map { $0 * factor },
-            vitaminE: uf.vitaminEPer100g.map { $0 * factor },
-            vitaminB1: uf.vitaminB1Per100g.map { $0 * factor },
-            vitaminB2: uf.vitaminB2Per100g.map { $0 * factor },
-            niacin: uf.niacinPer100g.map { $0 * factor },
-            vitaminB6: uf.vitaminB6Per100g.map { $0 * factor },
-            folate: uf.folatePer100g.map { $0 * factor },
-            vitaminB12: uf.vitaminB12Per100g.map { $0 * factor },
+            amount: profile.amount,
+            unit: profile.unit,
+            calories: profile.calories,
             nutritionDataBasis: .direct,
             nutritionDataNote: "数据来源：我的食物",
             confidence: "high"
         )
+        for (key, value) in profile.nutrients {
+            if let path = key.parsedItemKeyPath {
+                item[keyPath: path] = value
+            }
+        }
+        return item
     }
 
     private func detectMealType(_ text: String) -> MealType {
