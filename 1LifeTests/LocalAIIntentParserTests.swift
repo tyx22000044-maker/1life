@@ -182,4 +182,33 @@ final class LocalAIIntentParserTests: XCTestCase {
         }
         XCTAssertEqual(workout.durationMinutes, 90, accuracy: 0.0001)
     }
+
+    func testRecordTodayAteIsAMealNotAJournal() throws {
+        let parser = LocalAIIntentParser()
+        let result = try XCTUnwrap(parser.parse("记录今天吃了一个苹果"))
+        guard case .addMeal(let meal) = result else {
+            return XCTFail("expected addMeal, got \(result)")
+        }
+        XCTAssertEqual(meal.mealType, .fruit)
+        XCTAssertTrue(meal.items.contains { $0.name.contains("苹果") })
+    }
+
+    func testRecordTodayDrankWaterIsWaterNotAJournal() throws {
+        let parser = LocalAIIntentParser()
+        let result = try XCTUnwrap(parser.parse("记录今天喝了500ml水"))
+        guard case .addWater(let amount) = result else {
+            return XCTFail("expected addWater, got \(result)")
+        }
+        XCTAssertEqual(amount, 500)
+    }
+
+    func testExplicitStatusSentenceStillBecomesJournal() throws {
+        let parser = LocalAIIntentParser()
+        let result = try XCTUnwrap(parser.parse("帮我记录今天的状态：有点累"))
+        guard case .addJournal(let content, let mood, _) = result else {
+            return XCTFail("expected addJournal, got \(result)")
+        }
+        XCTAssertEqual(content, "有点累")
+        XCTAssertEqual(mood, .tired)
+    }
 }

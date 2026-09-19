@@ -297,7 +297,11 @@ struct LocalAIIntentParser {
     }
 
     private func parseJournal(_ text: String) -> AIChatIntentResult? {
-        let journalKeywords = ["状态", "复盘", "日记", "日志", "心情", "记录今天", "记录一下", "帮我记录", "写一下", "今天发生"]
+        // Only substantive diary words trigger a journal entry. Phrases like
+        // “记录今天”/“帮我记录” are bare record verbs: they accompany meal, water and
+        // workout records just as often, and claiming them here swallowed
+        // “记录今天吃了一个苹果” before parseMeal ever ran.
+        let journalKeywords = ["状态", "复盘", "日记", "日志", "心情"]
         guard journalKeywords.contains(where: { text.contains($0) }) else { return nil }
 
         let content = cleanJournalContent(text)
@@ -321,7 +325,9 @@ struct LocalAIIntentParser {
         for prefix in prefixes {
             cleaned = cleaned.replacingOccurrences(of: prefix, with: "")
         }
+        // Stripping the label leaves its separator behind: "状态：有点累" → "：有点累".
         return cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "：:，,。.；;"))
     }
 
     private func detectMood(_ text: String) -> Mood? {
@@ -439,12 +445,12 @@ struct LocalAIIntentParser {
         var cleaned = text
         let removeWords = ["吃了", "吃的", "吃过", "吃", "早餐", "午餐", "午饭", "晚餐", "晚饭", "早饭",
                            "夜宵", "宵夜", "加餐", "零食", "今天", "昨天", "前天", "中午", "早上", "晚上", "下午",
-                           "喝了", "喝的", "喝过", "喝", "饮料",
+                           "喝了", "喝的", "喝过", "喝", "饮料", "记录", "帮我",
                            "正常糖", "全糖", "标准糖", "标准甜", "正常甜", "七分糖", "7分糖", "少糖",
                            "五分糖", "5分糖", "半糖", "三分糖", "3分糖", "无糖", "零糖", "0糖",
                            "不加糖", "不另外加糖", "无额外糖", "无额外糖浆",
                            "超大杯", "大杯", "中杯", "小杯", "标准杯",
-                           "了", "的", "一份", "一碗", "一盘", "一块", "一杯"]
+                           "了", "的", "一份", "一碗", "一盘", "一块", "一杯", "一个", "一只", "一根"]
         for word in removeWords {
             cleaned = cleaned.replacingOccurrences(of: word, with: "")
         }
