@@ -378,7 +378,7 @@ private struct MealTemplateRow: View {
                     Text(showsTemplateName ? template.name : detail)
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(.primary)
-                        .lineLimit(1)
+                        .lineLimit(1...2)
                     SystemStatusBadge(text: category.title, tone: .neutral)
                 }
                 Text(showsTemplateName ? detail : "使用 \(template.useCount) 次")
@@ -386,6 +386,7 @@ private struct MealTemplateRow: View {
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
             }
+            .accessibilityElement(children: .combine)
 
             Spacer()
 
@@ -534,12 +535,13 @@ private struct MealTemplateGroupHeader: View {
                 Text(group.title)
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
                 Text("\(group.templates.count) 个版本 · 默认 \(defaultSpecLine)")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
             }
+            .accessibilityElement(children: .combine)
 
             Spacer()
 
@@ -700,12 +702,13 @@ private struct MealTemplateJSONExportSheet: View {
                     Text(template.name.isEmpty ? "未命名模板" : template.name)
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.primary)
-                        .lineLimit(1)
+                        .lineLimit(1...2)
                     Text("\(template.foodItems.count) 项 · 使用 \(template.useCount) 次")
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                        .lineLimit(1...2)
                 }
+                .accessibilityElement(children: .combine)
 
                 Spacer()
 
@@ -871,12 +874,13 @@ private struct MealTemplateDrinkBrandGroupHeader: View {
                 Text(brandGroup.brand)
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
                 Text("\(brandGroup.productGroups.count) 款饮品 · \(brandGroup.recordCount) 条记录")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
             }
+            .accessibilityElement(children: .combine)
 
             Spacer()
 
@@ -935,12 +939,13 @@ private struct MealTemplateDrinkRecordGroupHeader: View {
                 Text(showsBrandName ? "\(group.brand) \(group.productName)" : group.productName)
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
                 Text("\(group.records.count) 个版本 · 默认 \(defaultSpecLine)")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
             }
+            .accessibilityElement(children: .combine)
 
             Spacer()
 
@@ -1012,7 +1017,7 @@ private struct MealTemplateDrinkRecordRow: View {
                     Text(showsProductName ? "\(record.brand) \(record.productName)" : specLine)
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(.primary)
-                        .lineLimit(1)
+                        .lineLimit(1...2)
                     SystemStatusBadge(
                         text: record.confidence.rawValue,
                         tone: record.confidence == .high ? .success : (record.confidence == .medium ? .neutral : .warning)
@@ -1021,8 +1026,9 @@ private struct MealTemplateDrinkRecordRow: View {
                 Text(showsProductName ? specLine : sourceLine)
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
             }
+            .accessibilityElement(children: .combine)
 
             Spacer()
 
@@ -1568,7 +1574,7 @@ private struct TemplateFoodItemEditRow: View {
             Text(label)
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.secondary)
-                .lineLimit(1)
+                .lineLimit(1...2)
             HStack(spacing: 3) {
                 numericField(label, text: text, field: field, width: 48)
                 Text(unit)

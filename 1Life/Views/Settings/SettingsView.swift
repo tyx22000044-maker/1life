@@ -1167,12 +1167,13 @@ private struct MealLibraryFoodPreviewRow: View {
                 Text(food.name)
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
                 Text("\(Int(caloriesPerServing)) kcal / 份 · 默认 \(food.defaultAmount.nutritionDecimal)\(food.defaultUnit)")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
             }
+            .accessibilityElement(children: .combine)
 
             Spacer()
 
@@ -1234,12 +1235,13 @@ private struct MealLibraryTemplatePreviewRow: View {
                 Text(template.name)
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
                 Text("\(Int(template.totalCalories)) kcal · \(template.foodItems.count) 个食材 · \(template.mealType.displayName)")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
             }
+            .accessibilityElement(children: .combine)
 
             Spacer()
 

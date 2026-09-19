@@ -692,12 +692,13 @@ private struct SupplementRecordGroupHeader: View {
                 Text(group.brand.isEmpty ? "未标品牌" : group.brand)
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(.primary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
                 Text("\(group.records.count) 条记录 · \(group.productCount) 个商品")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
             }
+            .accessibilityElement(children: .combine)
 
             Spacer()
 
@@ -756,7 +757,7 @@ private struct SupplementRecordRow: View {
                     Text(showsProductName ? "\(record.brand) \(record.productName)" : specLine)
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(.primary)
-                        .lineLimit(1)
+                        .lineLimit(1...2)
                     SystemStatusBadge(
                         text: record.confidence.rawValue,
                         tone: record.confidence == .high ? .success : (record.confidence == .medium ? .neutral : .warning)
@@ -765,8 +766,9 @@ private struct SupplementRecordRow: View {
                 Text(showsProductName ? specLine : sourceLine)
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                    .lineLimit(1...2)
             }
+            .accessibilityElement(children: .combine)
 
             Spacer()
 
@@ -1889,12 +1891,13 @@ private struct SupplementPDFExportSheet: View {
                     Text(record.productName.isEmpty ? "未命名补剂" : record.productName)
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.primary)
-                        .lineLimit(1)
+                        .lineLimit(1...2)
                     Text(specs.isEmpty ? "规格未知" : specs.joined(separator: " · "))
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                        .lineLimit(1...2)
                 }
+                .accessibilityElement(children: .combine)
                 Spacer()
                 Text(record.calories.map { "\(Int($0)) kcal" } ?? "—")
                     .font(.caption.weight(.bold))
