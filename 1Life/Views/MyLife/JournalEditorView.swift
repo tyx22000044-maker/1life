@@ -142,6 +142,7 @@ struct JournalEditorView: View {
                                                 HapticEngine.tap()
                                             } label: {
                                                 Image(systemName: "xmark.circle.fill")
+                                                    .accessibilityLabel("移除这张照片")
                                                     .symbolRenderingMode(.palette)
                                                     .foregroundStyle(.white, .black.opacity(0.55))
                                             }
@@ -216,6 +217,7 @@ struct JournalEditorView: View {
                     applyMarkdown(shortcut)
                 } label: {
                     Image(systemName: shortcut.icon)
+                        .accessibilityLabel(shortcut.label)
                         .font(.caption.weight(.bold))
                         .frame(width: 32, height: 28)
                         .background(FamilyUI.panelMutedBackground)
@@ -336,6 +338,15 @@ private enum MarkdownShortcut: CaseIterable, Identifiable {
         case .italic: return "italic"
         case .list:   return "list.bullet"
         case .quote:  return "text.quote"
+        }
+    }
+
+    var label: String {
+        switch self {
+        case .bold:   return "加粗"
+        case .italic: return "斜体"
+        case .list:   return "无序列表"
+        case .quote:  return "引用"
         }
     }
 }

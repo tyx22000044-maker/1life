@@ -84,6 +84,7 @@ struct MealNutritionRecognitionPluginView: View {
                 } label: {
                     HStack(spacing: 10) {
                         Image(systemName: "camera.viewfinder")
+                            .accessibilityLabel("拍照识别")
                             .font(.headline.weight(.bold))
                         Text("开始餐食识别")
                             .font(.headline.weight(.bold))
@@ -307,6 +308,7 @@ struct MealNutritionExtractSheet: View {
                                                 imageDataList.remove(at: index)
                                             } label: {
                                                 Image(systemName: "xmark.circle.fill")
+                                                    .accessibilityLabel("移除这张照片")
                                                     .font(.caption)
                                                     .foregroundStyle(.white, .black.opacity(0.6))
                                             }
@@ -791,6 +793,7 @@ private struct MealNutritionCandidateEditor: View {
                 Button(role: .destructive, action: onDelete) {
                     HStack {
                         Image(systemName: "trash")
+                            .accessibilityLabel("删除这条记录")
                         Text("删除候选")
                     }
                     .font(.caption.weight(.bold))
@@ -913,6 +916,7 @@ private struct MealNutritionDraftEditor: View {
                     Button(role: .destructive, action: onDelete) {
                         HStack {
                             Image(systemName: "trash")
+                                .accessibilityLabel("删除这条记录")
                             Text("删除这条")
                         }
                         .font(.caption.weight(.bold))

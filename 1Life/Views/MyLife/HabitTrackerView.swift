@@ -28,6 +28,7 @@ struct HabitTrackerView: View {
                     isShowingAddHabit = true
                 } label: {
                     Image(systemName: "plus")
+                        .accessibilityLabel("新建习惯")
                         .font(.caption.weight(.black))
                         .foregroundStyle(.white)
                         .frame(width: 34, height: 34)
@@ -128,6 +129,7 @@ private struct HabitRow: View {
 
                 Button { cycleState() } label: {
                     Image(systemName: stateIcon(for: rowState))
+                        .accessibilityLabel("切换今天的打卡状态")
                         .font(.title3)
                         .foregroundStyle(stateColor(for: rowState))
                 }
@@ -271,6 +273,7 @@ struct AddHabitSheet: View {
                                     iconSymbol = icon
                                 } label: {
                                     Image(systemName: icon)
+                                        .accessibilityLabel("选择习惯图标")
                                         .font(.title3)
                                         .frame(width: 40, height: 40)
                                         .background(iconSymbol == icon ? Color(hex: colorHex) : FamilyUI.panelMutedBackground)

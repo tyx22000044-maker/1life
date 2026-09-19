@@ -1175,6 +1175,7 @@ private struct BodyMetricsCard: View {
                     isShowingEditor = true
                 } label: {
                     Image(systemName: "plus")
+                        .accessibilityLabel("新增身体测量")
                         .font(.caption.weight(.black))
                         .foregroundStyle(.white)
                         .frame(width: 34, height: 34)
@@ -1578,6 +1579,7 @@ private struct BowelTrackerCard: View {
                     showAddSheet = true
                 } label: {
                     Image(systemName: "plus")
+                        .accessibilityLabel("新增排便记录")
                         .font(.caption.weight(.black))
                         .foregroundStyle(.white)
                         .frame(width: 34, height: 34)

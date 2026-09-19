@@ -10,6 +10,7 @@ struct OnboardingHeader: View {
             HStack {
                 Button(action: { HapticEngine.tap(); onBack() }) {
                     Image(systemName: "chevron.left")
+                        .accessibilityLabel("返回上一步")
                         .font(.body.weight(.semibold))
                         .frame(width: 36, height: 36)
                         .background(FamilyUI.panelMutedBackground)

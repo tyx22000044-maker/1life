@@ -75,6 +75,7 @@ struct MealTypeSection: View {
 
                 Button(action: onAdd) {
                     Image(systemName: "plus")
+                        .accessibilityLabel("添加")
                         .font(.caption.weight(.black))
                         .foregroundStyle(.primary)
                         .frame(width: 32, height: 32)

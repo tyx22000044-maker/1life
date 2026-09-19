@@ -70,6 +70,7 @@ struct WorkoutTimelineView: View {
                     isShowingEditor = true
                 } label: {
                     Image(systemName: "plus")
+                        .accessibilityLabel("记录一次训练")
                         .font(.caption.weight(.black))
                         .foregroundStyle(.white)
                         .frame(width: 34, height: 34)
@@ -233,6 +234,7 @@ struct WorkoutTimelineView: View {
                     withAnimation { showGoalSettings.toggle() }
                 } label: {
                     Image(systemName: "gearshape")
+                        .accessibilityLabel("训练目标设置")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -424,6 +426,7 @@ struct WorkoutTimelineView: View {
                     calendarMonth = Calendar.current.date(byAdding: .month, value: -1, to: calendarMonth) ?? calendarMonth
                 } label: {
                     Image(systemName: "chevron.left")
+                        .accessibilityLabel("前一天")
                         .font(.caption.weight(.bold))
                         .frame(width: 28, height: 28)
                         .background(FamilyUI.panelBackground)
@@ -442,6 +445,7 @@ struct WorkoutTimelineView: View {
                     calendarMonth = Calendar.current.date(byAdding: .month, value: 1, to: calendarMonth) ?? calendarMonth
                 } label: {
                     Image(systemName: "chevron.right")
+                        .accessibilityLabel("后一天")
                         .font(.caption.weight(.bold))
                         .frame(width: 28, height: 28)
                         .background(FamilyUI.panelBackground)
@@ -656,6 +660,7 @@ private struct WorkoutDetailView: View {
                     } label: {
                         HStack {
                             Image(systemName: "trash")
+                                .accessibilityLabel("删除这次训练")
                             Text("删除训练")
                             Spacer()
                         }

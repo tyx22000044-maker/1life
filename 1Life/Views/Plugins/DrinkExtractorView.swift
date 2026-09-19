@@ -265,6 +265,7 @@ struct DrinkLibraryPluginView: View {
                             isShowingExtractSheet = true
                         } label: {
                             Image(systemName: "camera.viewfinder")
+                                .accessibilityLabel("拍照识别")
                         }
                     }
                 }
@@ -446,6 +447,7 @@ struct DrinkNutritionRecognitionPluginView: View {
                 } label: {
                     HStack(spacing: 10) {
                         Image(systemName: "camera.viewfinder")
+                            .accessibilityLabel("从相册选择照片")
                             .font(.headline.weight(.bold))
                         Text("开始饮品识别")
                             .font(.headline.weight(.bold))
@@ -673,6 +675,7 @@ private struct DrinkRecordGroupSection: View {
                                     else { selectedIDs.insert(record.id) }
                                 } label: {
                                     Image(systemName: selectedIDs.contains(record.id) ? "checkmark.circle.fill" : "circle")
+                                        .accessibilityLabel(selectedIDs.contains(record.id) ? "取消选择这条记录" : "选择这条记录")
                                         .foregroundStyle(selectedIDs.contains(record.id) ? FamilyUI.accent : .secondary)
                                 }
                                 .buttonStyle(.plain)
@@ -698,6 +701,7 @@ private struct DrinkRecordGroupSection: View {
                                 onDelete(record)
                             } label: {
                                 Image(systemName: "trash")
+                                    .accessibilityLabel("删除这条记录")
                                     .font(.caption.weight(.bold))
                                     .foregroundStyle(FamilyUI.danger)
                                     .frame(width: 34, height: 34)
@@ -1019,6 +1023,7 @@ private struct DrinkExtractSheet: View {
                                                 imageDataList.remove(at: index)
                                             } label: {
                                                 Image(systemName: "xmark.circle.fill")
+                                                    .accessibilityLabel("移除这张照片")
                                                     .font(.caption)
                                                     .foregroundStyle(.white, .black.opacity(0.6))
                                             }
@@ -1451,6 +1456,7 @@ private struct DrinkCandidateEditor: View {
                 Button(role: .destructive, action: onDelete) {
                     HStack {
                         Image(systemName: "trash")
+                            .accessibilityLabel("删除这条记录")
                         Text("删除候选")
                     }
                     .font(.caption.weight(.bold))
@@ -1553,6 +1559,7 @@ private struct DrinkDraftEditor: View {
                     Button(role: .destructive, action: onDelete) {
                         HStack {
                             Image(systemName: "trash")
+                                .accessibilityLabel("删除这条记录")
                             Text("删除这条")
                         }
                         .font(.caption.weight(.bold))

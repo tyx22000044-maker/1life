@@ -186,6 +186,7 @@ struct BodyParamsSettingsView: View {
             } label: {
                 HStack {
                     Image(systemName: "arrow.clockwise")
+                        .accessibilityLabel("从 Apple Health 重新读取")
                     Text("根据新参数重新推荐营养目标")
                     Spacer()
                     Image(systemName: "arrow.right")

@@ -62,6 +62,7 @@ struct UserFoodListView: View {
                                             HStack(spacing: 8) {
                                                 if isSelectionMode {
                                                     Image(systemName: selectedFoodIDs.contains(food.id) ? "checkmark.circle.fill" : "circle")
+                                                        .accessibilityLabel(selectedFoodIDs.contains(food.id) ? "取消选择这条记录" : "选择这条记录")
                                                         .foregroundStyle(selectedFoodIDs.contains(food.id) ? FamilyUI.accent : .secondary)
                                                 }
                                                 UserFoodRow(food: food)
@@ -100,6 +101,7 @@ struct UserFoodListView: View {
                         isAddingFood = true
                     } label: {
                         Image(systemName: "plus")
+                            .accessibilityLabel("新建我的食物")
                     }
                 }
             }

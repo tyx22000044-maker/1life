@@ -219,6 +219,7 @@ struct MealTemplateListView: View {
                         isAddingTemplate = true
                     } label: {
                         Image(systemName: "plus")
+                            .accessibilityLabel("新建模板")
                     }
                 }
             }
@@ -489,6 +490,7 @@ private struct MealTemplateGroupSection: View {
                                 onDelete(template)
                             } label: {
                                 Image(systemName: "trash")
+                                    .accessibilityLabel("删除这个模板")
                                     .font(.caption.weight(.bold))
                                     .foregroundStyle(FamilyUI.danger)
                                     .frame(width: 34, height: 34)
@@ -1174,6 +1176,7 @@ private struct MealTemplateEditorView: View {
                         } label: {
                             HStack {
                                 Image(systemName: isAddingFood ? "minus.circle" : "plus.circle")
+                                    .accessibilityLabel(isAddingFood ? "移除这一项" : "添加这一项")
                                 Text(isAddingFood ? "收起搜索" : "添加食物")
                                 Spacer()
                             }
@@ -1400,6 +1403,7 @@ private struct TemplateFoodItemEditRow: View {
                 }
                 Button(role: .destructive, action: onDelete) {
                     Image(systemName: "trash")
+                        .accessibilityLabel("删除这一项")
                         .font(.caption.weight(.bold))
                 }
             }

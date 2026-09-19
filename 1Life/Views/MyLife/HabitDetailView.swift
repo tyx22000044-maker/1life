@@ -79,6 +79,7 @@ struct HabitDetailView: View {
                     } label: {
                         HStack {
                             Image(systemName: "archivebox")
+                                .accessibilityLabel("归档这个习惯")
                             Text("归档习惯")
                             Spacer()
                         }
@@ -313,6 +314,7 @@ struct EditHabitSheet: View {
                                         iconSymbol = icon
                                     } label: {
                                         Image(systemName: icon)
+                                            .accessibilityLabel("选择习惯图标")
                                             .font(.title3)
                                             .frame(width: 40, height: 40)
                                             .background(iconSymbol == icon ? Color(hex: colorHex) : FamilyUI.panelMutedBackground)

@@ -82,6 +82,7 @@ struct JournalDetailView: View {
                     } label: {
                         HStack {
                             Image(systemName: "pencil")
+                                .accessibilityLabel("编辑这篇日志")
                             Text("编辑日志")
                             Spacer()
                             Image(systemName: "chevron.right")
@@ -102,6 +103,7 @@ struct JournalDetailView: View {
                     } label: {
                         HStack {
                             Image(systemName: "trash")
+                                .accessibilityLabel("删除这篇日志")
                             Text("删除日志")
                             Spacer()
                         }

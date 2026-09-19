@@ -79,6 +79,7 @@ struct AIChatView: View {
                         showClearAlert = true
                     } label: {
                         Image(systemName: "trash")
+                            .accessibilityLabel("清空对话")
                     }
                     .disabled(storedMessages.isEmpty)
                 }
@@ -287,6 +288,7 @@ struct AIChatView: View {
                                 selectedImageDataList.remove(at: index)
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
+                                    .accessibilityLabel("移除这张照片")
                                     .font(.caption)
                                     .foregroundStyle(.white, .black.opacity(0.45))
                             }
@@ -371,6 +373,7 @@ struct AIChatView: View {
                 toggleVoiceInput()
             } label: {
                 Image(systemName: speechInput.isRecording ? "mic.fill" : "mic")
+                    .accessibilityLabel(speechInput.isRecording ? "停止语音输入" : "开始语音输入")
                     .fontWeight(.semibold)
                     .frame(width: 38, height: 38)
                     .background(speechInput.isRecording ? FamilyUI.danger : FamilyUI.panelMutedBackground)
@@ -409,6 +412,7 @@ struct AIChatView: View {
                 sendMessage()
             } label: {
                 Image(systemName: viewModel.isLoading ? "hourglass" : "arrow.up")
+                    .accessibilityLabel(viewModel.isLoading ? "正在请求 AI" : "发送")
                     .fontWeight(.bold)
                     .frame(width: 38, height: 38)
                     .background(Color.black)

@@ -286,6 +286,7 @@ struct FoodTimelineView: View {
                     HapticEngine.tap()
                 } label: {
                     Image(systemName: "xmark")
+                        .accessibilityLabel("清空搜索")
                         .font(.caption.weight(.black))
                         .foregroundStyle(.secondary)
                         .frame(width: 26, height: 26)

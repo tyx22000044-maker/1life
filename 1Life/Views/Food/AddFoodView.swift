@@ -82,6 +82,7 @@ struct AddMealSheet: View {
                         isShowingAddFood = true
                     } label: {
                         Image(systemName: "plus")
+                            .accessibilityLabel("添加这个食物")
                     }
                 }
             }

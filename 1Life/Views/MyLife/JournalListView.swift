@@ -49,6 +49,7 @@ struct JournalListView: View {
                     isShowingEditor = true
                 } label: {
                     Image(systemName: "plus")
+                        .accessibilityLabel("新建日志")
                         .font(.caption.weight(.black))
                         .foregroundStyle(.white)
                         .frame(width: 34, height: 34)
@@ -68,6 +69,7 @@ struct JournalListView: View {
                             searchText = ""
                         } label: {
                             Image(systemName: "xmark.circle.fill")
+                                .accessibilityLabel("移除照片")
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -109,6 +111,7 @@ struct JournalListView: View {
                 } label: {
                     HStack {
                         Image(systemName: "pencil.line")
+                            .accessibilityLabel("编辑这篇日志")
                             .foregroundStyle(.secondary)
                         Text("记录今天的状态")
                             .font(.subheadline)

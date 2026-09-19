@@ -71,6 +71,7 @@ struct AppErrorBanner: View {
                         dismiss()
                     } label: {
                             Image(systemName: "xmark")
+                                .accessibilityLabel("关闭提示")
                                 .font(.caption.weight(.black))
                                 .foregroundStyle(tone.foreground.opacity(0.78))
                                 .frame(width: 28, height: 28)

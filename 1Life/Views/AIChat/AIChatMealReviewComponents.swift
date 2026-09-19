@@ -48,6 +48,7 @@ struct AIMealIdentificationConfirmationView: View {
                     onCancel()
                 } label: {
                     Image(systemName: "xmark")
+                        .accessibilityLabel("关闭确认卡片")
                         .font(.caption.weight(.bold))
                         .frame(width: 30, height: 30)
                         .background(FamilyUI.panelMutedBackground)

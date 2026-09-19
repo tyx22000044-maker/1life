@@ -148,6 +148,7 @@ struct DaySelectorView: View {
             } label: {
                 dayControlIcon("chevron.left")
             }
+            .accessibilityLabel("前一天")
 
             Spacer()
 
@@ -183,6 +184,7 @@ struct DaySelectorView: View {
                 dayControlIcon("chevron.right", disabled: isToday)
             }
             .disabled(isToday)
+            .accessibilityLabel("后一天")
         }
         .padding(.horizontal, 2)
         .frame(minHeight: 40)
