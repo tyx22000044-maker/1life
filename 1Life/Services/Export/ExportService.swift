@@ -9,11 +9,14 @@ nonisolated enum ExportService {
 
     enum BackupError: LocalizedError {
         case invalidVersion(Int)
+        case corruptPayload(String)
 
         var errorDescription: String? {
             switch self {
             case .invalidVersion(let version):
                 return "不支持的备份版本：\(version)"
+            case .corruptPayload(let detail):
+                return "备份文件内容不完整或非法，原有数据未被修改（\(detail)）"
             }
         }
     }
@@ -153,7 +156,7 @@ extension ExportService {
     }
 
     @MainActor
-    static func importJSON(_ data: Data, into context: ModelContext, existingSettings: UserSettings?) throws {
+    static func importJSON(_ data: Data, into context: ModelContext, existingSettings: UserSettings?) throws -> BackupImportSummary {
         try BackupExportService.importJSON(data, into: context, existingSettings: existingSettings)
     }
 }

@@ -120,7 +120,7 @@ struct SettingsDataCoordinator {
         return tempURL
     }
 
-    static func importJSON(from url: URL, into modelContext: ModelContext, existingSettings: UserSettings?) throws {
+    static func importJSON(from url: URL, into modelContext: ModelContext, existingSettings: UserSettings?) throws -> BackupImportSummary {
         let didStart = url.startAccessingSecurityScopedResource()
         defer {
             if didStart {
@@ -128,7 +128,7 @@ struct SettingsDataCoordinator {
             }
         }
         let data = try Data(contentsOf: url)
-        try ExportService.importJSON(data, into: modelContext, existingSettings: existingSettings)
+        return try ExportService.importJSON(data, into: modelContext, existingSettings: existingSettings)
     }
 
     static func clearAllData(modelContext: ModelContext, currentSettings: UserSettings?) throws {

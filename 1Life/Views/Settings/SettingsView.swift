@@ -889,13 +889,13 @@ struct SettingsView: View {
     private func importJSON(_ result: Result<URL, Error>) {
         do {
             let url = try result.get()
-            try SettingsDataCoordinator.importJSON(from: url, into: modelContext, existingSettings: currentSettings)
+            let summary = try SettingsDataCoordinator.importJSON(from: url, into: modelContext, existingSettings: currentSettings)
             HapticEngine.success()
-            bannerCenter.show(title: "导入完成", message: "JSON 备份已恢复到本机。", tone: .success)
+            bannerCenter.show(title: "导入完成", message: summary.detailText, tone: .success)
             LegacyDrinkTemplateMigrator.migrate(in: modelContext)
         } catch {
             HapticEngine.warning()
-            bannerCenter.show(title: "导入失败", message: error.localizedDescription, tone: .error)
+            bannerCenter.show(title: "导入失败", message: "原有数据保持不变。\(error.localizedDescription)", tone: .error)
         }
     }
 
