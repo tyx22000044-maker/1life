@@ -132,7 +132,8 @@ extension ExportService {
                            userFoods: [UserFood],
                            mealTemplates: [MealTemplate],
                            chatMessages: [AIChatMessage],
-                           supplementRecords: [SupplementRecord] = []) throws -> Data {
+                           supplementRecords: [SupplementRecord] = [],
+                           drinkRecords: [DrinkRecord] = []) throws -> Data {
         try BackupExportService.exportJSON(
             settings: settings,
             nutritionGoals: nutritionGoals,
@@ -146,7 +147,8 @@ extension ExportService {
             userFoods: userFoods,
             mealTemplates: mealTemplates,
             chatMessages: chatMessages,
-            supplementRecords: supplementRecords
+            supplementRecords: supplementRecords,
+            drinkRecords: drinkRecords
         )
     }
 

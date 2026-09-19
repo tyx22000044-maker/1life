@@ -876,7 +876,8 @@ struct SettingsView: View {
                     userFoods: userFoods,
                     mealTemplates: mealTemplates,
                     chatMessages: chatMessages,
-                    supplementRecords: supplementRecords
+                    supplementRecords: supplementRecords,
+                    drinkRecords: drinkRecords
                 )
                 shareItem = ShareSheetItem(url: url)
             } catch {

@@ -133,6 +133,80 @@ final class BackupRecordsTests: XCTestCase {
         XCTAssertEqual(decoded.version, 2)
         XCTAssertTrue(decoded.meals.isEmpty)
         XCTAssertTrue(decoded.habits.isEmpty)
+        XCTAssertTrue(decoded.drinkRecords.isEmpty)
+        XCTAssertTrue(decoded.supplementRecords.isEmpty)
         XCTAssertNil(decoded.settings)
+    }
+
+    // MARK: - DrinkRecord knowledge base
+
+    func testDrinkRecordRoundTripPreservesLibraryFieldsAndTimestamps() throws {
+        let original = DrinkRecord(
+            brand: "喜茶",
+            productName: "多肉葡萄",
+            sizeML: 650,
+            sugarLevel: "七分糖",
+            toppings: "珍珠",
+            calories: 320,
+            protein: 3,
+            carbs: 55,
+            fat: 9,
+            sugar: 44,
+            sodium: 120,
+            caffeine: 90,
+            teaPolyphenols: 210,
+            sourceNote: "官方小程序",
+            sourceDate: Date(timeIntervalSince1970: 1_700_000_000),
+            confidence: .high
+        )
+        let record = DrinkRecordBackupRecord(original)
+
+        let data = try JSONEncoder().encode(record)
+        let decoded = try JSONDecoder().decode(DrinkRecordBackupRecord.self, from: data)
+        let rebuilt = decoded.model()
+
+        XCTAssertEqual(rebuilt.id, original.id)
+        XCTAssertEqual(rebuilt.brand, "喜茶")
+        XCTAssertEqual(rebuilt.productName, "多肉葡萄")
+        XCTAssertEqual(rebuilt.sizeML, 650)
+        XCTAssertEqual(rebuilt.sugarLevel, "七分糖")
+        XCTAssertEqual(rebuilt.toppings, "珍珠")
+        XCTAssertEqual(rebuilt.calories, 320)
+        XCTAssertEqual(rebuilt.sugar, 44)
+        XCTAssertEqual(rebuilt.caffeine, 90)
+        XCTAssertEqual(rebuilt.teaPolyphenols, 210)
+        XCTAssertEqual(rebuilt.sourceNote, "官方小程序")
+        XCTAssertEqual(rebuilt.sourceDate, original.sourceDate)
+        XCTAssertEqual(rebuilt.confidence, .high)
+        XCTAssertEqual(rebuilt.createdAt, original.createdAt)
+        XCTAssertEqual(rebuilt.updatedAt, original.updatedAt)
+    }
+
+    func testBackupFileCarriesDrinkRecordsThroughEncodeDecode() throws {
+        let drink = DrinkRecord(brand: "Manner", productName: "冰美式", sizeML: 473, calories: 15, caffeine: 190)
+        let file = BackupFile(
+            version: 8,
+            exportedAt: Date(timeIntervalSince1970: 1_700_000_000),
+            settings: nil,
+            nutritionGoals: [],
+            meals: [],
+            waterLogs: [],
+            habits: [],
+            journalEntries: [],
+            workouts: [],
+            bodyMeasurements: [],
+            bowelLogs: [],
+            userFoods: [],
+            mealTemplates: [],
+            chatMessages: [],
+            drinkRecords: [DrinkRecordBackupRecord(drink)]
+        )
+
+        let data = try JSONEncoder().encode(file)
+        let decoded = try JSONDecoder().decode(BackupFile.self, from: data)
+
+        XCTAssertEqual(decoded.version, 8)
+        XCTAssertEqual(decoded.drinkRecords.count, 1)
+        XCTAssertEqual(decoded.drinkRecords.first?.model().displayName, "Manner 冰美式（473ml）")
     }
 }

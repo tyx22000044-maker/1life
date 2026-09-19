@@ -96,7 +96,8 @@ struct SettingsDataCoordinator {
         userFoods: [UserFood],
         mealTemplates: [MealTemplate],
         chatMessages: [AIChatMessage],
-        supplementRecords: [SupplementRecord] = []
+        supplementRecords: [SupplementRecord] = [],
+        drinkRecords: [DrinkRecord] = []
     ) throws -> URL {
         let data = try ExportService.exportJSON(
             settings: settings,
@@ -111,7 +112,8 @@ struct SettingsDataCoordinator {
             userFoods: userFoods,
             mealTemplates: mealTemplates,
             chatMessages: chatMessages,
-            supplementRecords: supplementRecords
+            supplementRecords: supplementRecords,
+            drinkRecords: drinkRecords
         )
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("1Life_backup.json")
         try data.write(to: tempURL, options: [.atomic])

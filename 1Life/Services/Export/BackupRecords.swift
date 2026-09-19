@@ -16,6 +16,7 @@ nonisolated struct BackupFile: Codable {
     let mealTemplates: [TemplateRecord]
     let chatMessages: [ChatRecord]
     let supplementRecords: [SupplementRecordBackupRecord]
+    let drinkRecords: [DrinkRecordBackupRecord]
 
     init(version: Int,
          exportedAt: Date,
@@ -31,7 +32,8 @@ nonisolated struct BackupFile: Codable {
          userFoods: [UserFoodRecord],
          mealTemplates: [TemplateRecord],
          chatMessages: [ChatRecord],
-         supplementRecords: [SupplementRecordBackupRecord] = []) {
+         supplementRecords: [SupplementRecordBackupRecord] = [],
+         drinkRecords: [DrinkRecordBackupRecord] = []) {
         self.version = version
         self.exportedAt = exportedAt
         self.settings = settings
@@ -47,6 +49,7 @@ nonisolated struct BackupFile: Codable {
         self.mealTemplates = mealTemplates
         self.chatMessages = chatMessages
         self.supplementRecords = supplementRecords
+        self.drinkRecords = drinkRecords
     }
 
     init(from decoder: Decoder) throws {
@@ -66,6 +69,7 @@ nonisolated struct BackupFile: Codable {
         mealTemplates = try container.decodeIfPresent([TemplateRecord].self, forKey: .mealTemplates) ?? []
         chatMessages = try container.decodeIfPresent([ChatRecord].self, forKey: .chatMessages) ?? []
         supplementRecords = try container.decodeIfPresent([SupplementRecordBackupRecord].self, forKey: .supplementRecords) ?? []
+        drinkRecords = try container.decodeIfPresent([DrinkRecordBackupRecord].self, forKey: .drinkRecords) ?? []
     }
 }
 
@@ -166,6 +170,75 @@ nonisolated struct SupplementRecordBackupRecord: Codable {
             sourceNote: sourceNote,
             sourceDate: sourceDate,
             confidence: SupplementConfidence(rawValue: confidenceRaw) ?? .medium
+        )
+        record.id = id
+        record.createdAt = createdAt
+        record.updatedAt = updatedAt
+        return record
+    }
+}
+
+nonisolated struct DrinkRecordBackupRecord: Codable {
+    let id: UUID
+    let brand: String
+    let productName: String
+    let sizeML: Double?
+    let sugarLevel: String
+    let toppings: String
+    let calories: Double?
+    let protein: Double?
+    let carbs: Double?
+    let fat: Double?
+    let sugar: Double?
+    let sodium: Double?
+    let caffeine: Double?
+    let teaPolyphenols: Double?
+    let sourceNote: String
+    let sourceDate: Date
+    let confidenceRaw: String
+    let createdAt: Date
+    let updatedAt: Date
+
+    init(_ record: DrinkRecord) {
+        id = record.id
+        brand = record.brand
+        productName = record.productName
+        sizeML = record.sizeML
+        sugarLevel = record.sugarLevel
+        toppings = record.toppings
+        calories = record.calories
+        protein = record.protein
+        carbs = record.carbs
+        fat = record.fat
+        sugar = record.sugar
+        sodium = record.sodium
+        caffeine = record.caffeine
+        teaPolyphenols = record.teaPolyphenols
+        sourceNote = record.sourceNote
+        sourceDate = record.sourceDate
+        confidenceRaw = record.confidenceRaw
+        createdAt = record.createdAt
+        updatedAt = record.updatedAt
+    }
+
+    func model() -> DrinkRecord {
+        let record = DrinkRecord(
+            brand: brand,
+            productName: productName,
+            sizeML: sizeML,
+            sugarLevel: sugarLevel,
+            toppings: toppings,
+            calories: calories,
+            protein: protein,
+            carbs: carbs,
+            fat: fat,
+            sugar: sugar,
+            sodium: sodium,
+            caffeine: caffeine,
+            teaPolyphenols: teaPolyphenols,
+            sourceNote: sourceNote,
+            sourceDate: sourceDate,
+            confidence: DrinkConfidence(rawValue: confidenceRaw) ?? .medium
         )
         record.id = id
         record.createdAt = createdAt

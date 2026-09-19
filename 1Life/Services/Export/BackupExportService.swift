@@ -2,8 +2,8 @@ import Foundation
 import SwiftData
 
 nonisolated enum BackupExportService {
-    private static let supportedBackupVersion = 7
-    private static let importableBackupVersions: Set<Int> = [5, 6, 7]
+    private static let supportedBackupVersion = 8
+    private static let importableBackupVersions: Set<Int> = [5, 6, 7, 8]
 
     static func exportJSON(settings: UserSettings?,
                            nutritionGoals: [NutritionGoal],
@@ -17,7 +17,8 @@ nonisolated enum BackupExportService {
                            userFoods: [UserFood],
                            mealTemplates: [MealTemplate],
                            chatMessages: [AIChatMessage],
-                           supplementRecords: [SupplementRecord] = []) throws -> Data {
+                           supplementRecords: [SupplementRecord] = [],
+                           drinkRecords: [DrinkRecord] = []) throws -> Data {
         let backup = BackupFile(
             version: supportedBackupVersion,
             exportedAt: .now,
@@ -33,7 +34,8 @@ nonisolated enum BackupExportService {
             userFoods: userFoods.map(UserFoodRecord.init),
             mealTemplates: mealTemplates.map(TemplateRecord.init),
             chatMessages: chatMessages.map(ChatRecord.init),
-            supplementRecords: supplementRecords.map(SupplementRecordBackupRecord.init)
+            supplementRecords: supplementRecords.map(SupplementRecordBackupRecord.init),
+            drinkRecords: drinkRecords.map(DrinkRecordBackupRecord.init)
         )
 
         let encoder = JSONEncoder()
@@ -66,6 +68,7 @@ nonisolated enum BackupExportService {
         try? context.delete(model: NutritionGoal.self)
         try? context.delete(model: AIChatMessage.self)
         try? context.delete(model: SupplementRecord.self)
+        try? context.delete(model: DrinkRecord.self)
 
         if let record = backup.settings {
             let settings = existingSettings ?? UserSettings()
@@ -141,6 +144,12 @@ nonisolated enum BackupExportService {
             context.insert(supplementRecord.model())
         }
 
+        for drinkRecord in backup.drinkRecords {
+            context.insert(drinkRecord.model())
+        }
+
         try context.save()
+        DrinkLibraryIndex.shared.invalidate()
+        SupplementLibraryIndex.shared.invalidate()
     }
 }
