@@ -75,7 +75,7 @@ struct SettingsDataSection: View {
                     icon: "trash",
                     iconColor: FamilyUI.danger,
                     title: "清空所有数据",
-                    subtitle: "删除饮食、习惯、日志、模板和聊天历史",
+                    subtitle: "删除饮食、饮水、习惯、日志与照片、训练、身体与排便记录、我的食物与模板、饮品/补剂知识库、聊天历史和 AI Key",
                     value: "不可恢复"
                 )
             }
@@ -87,7 +87,7 @@ struct SettingsDataSection: View {
                 Button("取消", role: .cancel) { clearDataStep = 0 }
                 Button("继续", role: .destructive) { clearDataStep = 2 }
             } message: {
-                Text("此操作将删除所有饮食记录、习惯、状态记录和设置，且不可恢复。")
+                Text("此操作会删除本机全部记录（含照片数据）、重置偏好、取消待发送通知并移除 AI API Key，且不可恢复。iCloud 不提供任何备份。")
             }
             .alert("确认清空", isPresented: Binding(
                 get: { clearDataStep == 2 },
@@ -100,7 +100,7 @@ struct SettingsDataSection: View {
                     clearDataStep = 0
                 }
             } message: {
-                Text("最后确认：所有数据将被永久删除。")
+                Text("最后确认：数据将被永久删除，只有已经导出的 JSON 备份可以恢复。")
             }
         }
     }

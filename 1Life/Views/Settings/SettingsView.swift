@@ -901,9 +901,9 @@ struct SettingsView: View {
 
     private func clearAllData() {
         do {
-            try SettingsDataCoordinator.clearAllData(modelContext: modelContext, currentSettings: currentSettings)
+            let summary = try SettingsDataCoordinator.clearAllData(modelContext: modelContext, currentSettings: currentSettings)
             HapticEngine.success()
-            bannerCenter.show(title: "数据已清空", message: "所有本机数据已清空。", tone: .success)
+            bannerCenter.show(title: "数据已清空", message: summary.detailText, tone: .success)
         } catch {
             HapticEngine.warning()
             bannerCenter.show(title: "清空失败", message: error.localizedDescription, tone: .error)

@@ -131,12 +131,44 @@ struct SettingsDataCoordinator {
         return try ExportService.importJSON(data, into: modelContext, existingSettings: existingSettings)
     }
 
-    static func clearAllData(modelContext: ModelContext, currentSettings: UserSettings?) throws {
+    /// What a destructive operation actually removed, so the UI can say it out loud
+    /// instead of claiming “全部已清空” on a partial delete.
+    struct ClearAllDataSummary {
+        let sections: [(label: String, count: Int)]
+
+        var totalRecords: Int { sections.reduce(0) { $0 + $1.count } }
+
+        var detailText: String {
+            let parts = sections.filter { $0.count > 0 }.map { "\($0.label) \($0.count)" }
+            return parts.isEmpty ? "没有需要删除的记录" : parts.joined(separator: " · ")
+        }
+    }
+
+    static func clearAllData(modelContext: ModelContext, currentSettings: UserSettings?) throws -> ClearAllDataSummary {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         let configService = LocalAIConfigurationService()
         for provider in AIProvider.allCases {
             try? configService.deleteAPIKey(provider: provider)
         }
+
+        let sections: [(label: String, count: Int)] = [
+            ("餐食", try modelContext.fetchCount(FetchDescriptor<Meal>())),
+            ("食物项", try modelContext.fetchCount(FetchDescriptor<FoodItem>())),
+            ("饮水", try modelContext.fetchCount(FetchDescriptor<WaterLog>())),
+            ("习惯", try modelContext.fetchCount(FetchDescriptor<Habit>())),
+            ("习惯打卡", try modelContext.fetchCount(FetchDescriptor<HabitLog>())),
+            ("日志", try modelContext.fetchCount(FetchDescriptor<JournalEntry>())),
+            ("日志照片", try modelContext.fetchCount(FetchDescriptor<JournalPhoto>())),
+            ("训练", try modelContext.fetchCount(FetchDescriptor<WorkoutLog>())),
+            ("身体测量", try modelContext.fetchCount(FetchDescriptor<BodyMeasurement>())),
+            ("排便", try modelContext.fetchCount(FetchDescriptor<BowelLog>())),
+            ("营养目标", try modelContext.fetchCount(FetchDescriptor<NutritionGoal>())),
+            ("我的食物", try modelContext.fetchCount(FetchDescriptor<UserFood>())),
+            ("餐食模板", try modelContext.fetchCount(FetchDescriptor<MealTemplate>())),
+            ("补剂库", try modelContext.fetchCount(FetchDescriptor<SupplementRecord>())),
+            ("饮品库", try modelContext.fetchCount(FetchDescriptor<DrinkRecord>())),
+            ("AI 对话", try modelContext.fetchCount(FetchDescriptor<AIChatMessage>()))
+        ]
 
         try modelContext.delete(model: Meal.self)
         try modelContext.delete(model: FoodItem.self)
@@ -153,6 +185,7 @@ struct SettingsDataCoordinator {
         try modelContext.delete(model: NutritionGoal.self)
         try modelContext.delete(model: AIChatMessage.self)
         try modelContext.delete(model: SupplementRecord.self)
+        try modelContext.delete(model: DrinkRecord.self)
 
         if let currentSettings {
             currentSettings.isAIConfigured = false
@@ -163,5 +196,8 @@ struct SettingsDataCoordinator {
         }
 
         try modelContext.save()
+        DrinkLibraryIndex.shared.invalidate()
+        SupplementLibraryIndex.shared.invalidate()
+        return ClearAllDataSummary(sections: sections)
     }
 }
