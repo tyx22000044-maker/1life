@@ -136,13 +136,17 @@ struct AIMealIdentificationConfirmationView: View {
             }
 
             HStack(spacing: 10) {
-                Button {
-                    HapticEngine.tap()
-                    onSaveAsTemplate()
-                } label: {
-                    Label("存到模板库", systemImage: "doc.on.doc")
+                // A batch review holds several meals; naming one template for all of them
+                // would be ambiguous, so the action only appears for a single meal.
+                if case .meal = confirmation.identificationType {
+                    Button {
+                        HapticEngine.tap()
+                        onSaveAsTemplate()
+                    } label: {
+                        Label("存到模板库", systemImage: "doc.on.doc")
+                    }
+                    .buttonStyle(.borderless)
                 }
-                .buttonStyle(.borderless)
 
                 Spacer()
 

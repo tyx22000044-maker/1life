@@ -461,3 +461,63 @@ private struct ChatBubbleContent: View {
         .clipShape(RoundedRectangle(cornerRadius: FamilyUI.panelCornerRadius))
     }
 }
+
+/// Names a meal review result before it is saved into the template library.
+struct SaveTemplateFromReviewSheet: View {
+    @Binding var name: String
+    var onSave: () -> Void
+    var onCancel: () -> Void
+
+    private var isNameValid: Bool {
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                SystemPanel(title: "模板名称") {
+                    TextField("例如：健身房午餐", text: $name)
+                        .font(FamilyTypography.text(size: 16, weight: .medium))
+                        .foregroundStyle(FamilyUI.ink)
+                        .padding(12)
+                        .background(FamilyUI.panelMutedBackground)
+                        .overlay(
+                            Rectangle()
+                                .stroke(FamilyUI.panelBorder, lineWidth: 1)
+                        )
+                        .accessibilityLabel("模板名称")
+                }
+
+                Text("保存后可以直接说“吃了这个名字”，按同一份份量和营养记录，不需要重新识别。")
+                    .font(FamilyTypography.text(size: 12))
+                    .foregroundStyle(FamilyUI.inkSoft)
+
+                Button(action: onSave) {
+                    Text("保存")
+                        .font(FamilyTypography.button)
+                        .foregroundStyle(FamilyUI.pageBackground)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(isNameValid ? FamilyUI.accent : FamilyUI.panelMutedBackground)
+                        .overlay(
+                            Rectangle()
+                                .stroke(FamilyUI.panelBorder, lineWidth: 1)
+                        )
+                }
+                .buttonStyle(.plain)
+                .disabled(!isNameValid)
+
+                Button("取消", role: .cancel, action: onCancel)
+                    .font(FamilyTypography.text(size: 14, weight: .semibold))
+                    .foregroundStyle(FamilyUI.inkSoft)
+                    .frame(maxWidth: .infinity)
+
+                Spacer()
+            }
+            .padding(18)
+            .background(FamilyUI.pageBackground)
+            .navigationTitle("存到模板库")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}

@@ -215,6 +215,23 @@ final class AIChatPendingMealReviewTests: XCTestCase {
         XCTAssertEqual(try container.mainContext.fetch(FetchDescriptor<Meal>()).count, 1)
     }
 
+    func testSavingAReviewAsATemplatePersistsIt() throws {
+        let (container, viewModel) = try makeViewModel()
+        viewModel.beginMealReview(.addMeal(meal(.lunch, calories: 620)), originalText: "午餐", isLocal: true)
+        let parsed = try XCTUnwrap(viewModel.pendingMeals.first)
+
+        XCTAssertTrue(viewModel.saveAsTemplate(parsed, name: "  健身房午餐  "))
+        var templates = try container.mainContext.fetch(FetchDescriptor<MealTemplate>())
+        XCTAssertEqual(templates.map(\.name), ["健身房午餐"], "名称要修剪后再落库")
+        XCTAssertEqual(templates.first?.foodItems.count, 1)
+        XCTAssertEqual(templates.first?.foodItems.first?.calories ?? -1, 620, accuracy: 0.0001)
+
+        XCTAssertFalse(viewModel.saveAsTemplate(parsed, name: "健身房午餐"), "重名不得静默新增第二份")
+        XCTAssertFalse(viewModel.saveAsTemplate(parsed, name: "   "), "空名称不得创建模板")
+        templates = try container.mainContext.fetch(FetchDescriptor<MealTemplate>())
+        XCTAssertEqual(templates.count, 1)
+    }
+
     func testBatchResultsFlattenEveryMeal() {
         let workout = AIChatIntentResult.addWorkout(AIParsedWorkout(
             workoutType: .running, durationMinutes: 30, caloriesBurned: nil, intensity: .moderate, note: ""

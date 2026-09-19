@@ -445,12 +445,20 @@ final class AIChatViewModel {
         pendingMeals = []
     }
 
-    func saveAsTemplate(_ parsed: AIParsedMeal, name: String) {
-        guard let modelContext else { return }
+    @discardableResult
+    func saveAsTemplate(_ parsed: AIParsedMeal, name: String) -> Bool {
+        guard let modelContext else { return false }
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return false }
+        guard !fetchMealTemplates().contains(where: { $0.name.localizedCaseInsensitiveCompare(trimmedName) == .orderedSame }) else {
+            return false
+        }
         let items = parsed.items.map(AIParsedMealPersistenceMapper.templateFoodItem)
-        let template = MealTemplate(name: name, mealType: parsed.mealType, foodItems: items)
+        let template = MealTemplate(name: trimmedName, mealType: parsed.mealType, foodItems: items)
         modelContext.insert(template)
+        persist(reason: "save meal as template")
         HapticEngine.success()
+        return true
     }
 
     func cancelMeal() {
@@ -599,7 +607,10 @@ final class AIChatViewModel {
             return
         }
 
-        saveAsTemplate(reviewed, name: trimmedName)
+        guard saveAsTemplate(reviewed, name: trimmedName) else {
+            appendAssistant("没能创建模板「\(trimmedName)」：名称可能已存在。换个名字再试。", provider: provider)
+            return
+        }
         persist(reason: "create template from AI chat")
 
         let itemSummary = reviewed.items

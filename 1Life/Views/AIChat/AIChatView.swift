@@ -22,6 +22,8 @@ struct AIChatView: View {
     @State private var selectedPhotoItems: [PhotosPickerItem] = []
     @State private var showClearAlert = false
     @State private var isShowingPendingMealEditor = false
+    @State private var isShowingSaveTemplateSheet = false
+    @State private var saveTemplateName = ""
     @State private var speechInput = SpeechInputController()
     @State private var requestElapsedSeconds = 0
     @State private var requestHasImages = false
@@ -113,6 +115,25 @@ struct AIChatView: View {
                         viewModel.applyManualMealEdit(updatedMeal)
                     }
                 }
+            }
+            .sheet(isPresented: $isShowingSaveTemplateSheet) {
+                SaveTemplateFromReviewSheet(name: $saveTemplateName) {
+                    let trimmed = saveTemplateName.trimmingCharacters(in: .whitespacesAndNewlines)
+                    var saved = false
+                    if let meal = viewModel.pendingMeals.first {
+                        saved = viewModel.saveAsTemplate(meal, name: trimmed)
+                    }
+                    if saved {
+                        bannerCenter.show(title: "已存入模板库", message: "之后说“吃了\(trimmed)”即可按这份模板记录。", tone: .success)
+                    } else {
+                        bannerCenter.show(title: "没能保存模板", message: "名称为空或模板库里已有同名模板。", tone: .warning)
+                    }
+                    isShowingSaveTemplateSheet = false
+                } onCancel: {
+                    isShowingSaveTemplateSheet = false
+                }
+                .presentationDetents([.height(240)])
+                .presentationDragIndicator(.visible)
             }
             .photosPicker(isPresented: $isShowingPhotosPicker, selection: $selectedPhotoItems, maxSelectionCount: max(1, 6 - selectedImageDataList.count), matching: .images)
             .onChange(of: selectedPhotoItems) { _, items in
@@ -211,7 +232,10 @@ struct AIChatView: View {
                     isShowingPendingMealEditor = true
                 },
                 onCancel: { viewModel.cancelMeal() },
-                onSaveAsTemplate: {}
+                onSaveAsTemplate: {
+                    saveTemplateName = viewModel.pendingMeals.first?.nameSuggestion ?? ""
+                    isShowingSaveTemplateSheet = true
+                }
             )
         }
     }

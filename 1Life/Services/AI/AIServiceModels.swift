@@ -185,6 +185,18 @@ struct AIParsedMeal: Identifiable {
     var note: String
 }
 
+extension AIParsedMeal {
+    /// Default name offered when the user saves this meal as a template.
+    var nameSuggestion: String {
+        items.first?.name.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty ?? mealType.displayName
+    }
+}
+
+private extension String {
+    var nilIfEmpty: String? { isEmpty ? nil : self }
+}
+
+
 struct AIParsedWorkout {
     var workoutType: WorkoutType
     var durationMinutes: Double
