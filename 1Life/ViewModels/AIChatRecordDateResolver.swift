@@ -45,13 +45,13 @@ struct AIChatRecordDateResolver {
               let valueRange = Range(match.range(at: 1), in: text),
               let matchRange = Range(match.range, in: text) else { return nil }
 
-        guard let rawHour = Int(normalizedNumber(String(text[valueRange]))) else { return nil }
+        guard let rawHour = ChineseNumber.double(in: String(text[valueRange])) else { return nil }
         let prefix = String(text[text.startIndex..<matchRange.lowerBound])
         let suffix = String(text[matchRange.upperBound...]).prefix(4)
 
-        var hour = rawHour
-        if rawHour >= 1 && rawHour <= 12 {
-            hour = applyMeridiem(rawHour, prefix: prefix)
+        var hour = Int(rawHour)
+        if Int(rawHour) >= 1 && Int(rawHour) <= 12 {
+            hour = applyMeridiem(Int(rawHour), prefix: prefix)
         }
         guard (0...23).contains(hour) else { return nil }
 
@@ -75,48 +75,15 @@ struct AIChatRecordDateResolver {
         if tail.hasPrefix("一刻") { return 15 }
         if tail.hasPrefix("两刻") || tail.hasPrefix("二刻") { return 30 }
         if tail.hasPrefix("三刻") { return 45 }
-        if let range = tail.range(of: #"^[0-9]{1,2}\s*分"#, options: .regularExpression) {
-            let digits = tail[range].filter { $0.isASCII && $0.isNumber }
-            if let minute = Int(digits), (0...59).contains(minute) { return minute }
-        }
-        if let range = tail.range(of: #"^([一二三四五六七八九十]+)\s*分"#, options: .regularExpression) {
-            let converted = normalizedNumber(String(tail[range]).replacingOccurrences(of: "分", with: ""))
-            if let minute = Int(converted), (0...59).contains(minute) { return minute }
+        let minutePattern = #"^([0-9]{1,2}|[一二三四五六七八九十]+)\s*分"#
+        if let range = tail.range(of: minutePattern, options: .regularExpression) {
+            let captured = String(tail[range])
+                .replacingOccurrences(of: "分", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            if let minute = ChineseNumber.double(in: captured), (0...59).contains(Int(minute)) {
+                return Int(minute)
+            }
         }
         return 0
-    }
-
-    private static func normalizedNumber(_ raw: String) -> String {
-        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        // ASCII-only check: `Character.isNumber` is true for 七, so a CJK hour would
-        // otherwise be handed to `Int()` untouched.
-        if trimmed.allSatisfy({ $0.isASCII && $0.isNumber }) { return trimmed }
-        return chineseNumber(toInt: trimmed).map(String.init) ?? trimmed
-    }
-
-    /// Covers 一 … 二十 (enough for hours and minutes spoken aloud).
-    private static func chineseNumber(toInt text: String) -> Int? {
-        let digits: [Character: Int] = ["一": 1, "二": 2, "两": 2, "三": 3, "四": 4, "五": 5,
-                                        "六": 6, "七": 7, "八": 8, "九": 9]
-        let characters = Array(text)
-        guard !characters.isEmpty, characters.count <= 3 else { return nil }
-
-        if let tenIndex = characters.firstIndex(of: "十") {
-            let tens: Int
-            switch tenIndex {
-            case 0: tens = 10
-            case 1:
-                guard let leading = digits[characters[0]] else { return nil }
-                tens = leading * 10
-            default: return nil
-            }
-            let ones = characters[(tenIndex + 1)...]
-            if ones.isEmpty { return tens }
-            guard ones.count == 1, let trailing = digits[ones.first!] else { return nil }
-            return tens + trailing
-        }
-
-        guard characters.count == 1 else { return nil }
-        return digits[characters[0]]
     }
 }

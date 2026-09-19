@@ -242,4 +242,34 @@ final class LocalAIIntentParserTests: XCTestCase {
         }
         XCTAssertEqual(workout.caloriesBurned, 300)
     }
+
+    private func waterAmount(from text: String, cupML: Double = 250, bottleML: Double = 500) throws -> Double {
+        let parser = LocalAIIntentParser(cupML: cupML, bottleML: bottleML)
+        guard case .addWater(let amount)? = parser.parse(text) else {
+            XCTFail("expected addWater for \(text)")
+            return -1
+        }
+        return amount
+    }
+
+    func testChineseNumeralCupCountMultipliesCupSize() throws {
+        XCTAssertEqual(try waterAmount(from: "喝了两杯水"), 500)
+        XCTAssertEqual(try waterAmount(from: "喝了3杯水"), 750)
+        XCTAssertEqual(try waterAmount(from: "喝了一大杯水"), 250)
+    }
+
+    func testBottleCountUsesBottleSize() throws {
+        XCTAssertEqual(try waterAmount(from: "喝了一瓶水"), 500)
+        XCTAssertEqual(try waterAmount(from: "喝了两瓶水"), 1000)
+        XCTAssertEqual(try waterAmount(from: "喝了一大瓶水", bottleML: 600), 600)
+    }
+
+    func testConfiguredCupSizeIsUsed() throws {
+        XCTAssertEqual(try waterAmount(from: "喝了两杯水", cupML: 300), 600)
+    }
+
+    func testExplicitMillilitresBeatContainerCount() throws {
+        XCTAssertEqual(try waterAmount(from: "喝了一杯500ml的水"), 500)
+        XCTAssertEqual(try waterAmount(from: "喝了500ml水"), 500)
+    }
 }

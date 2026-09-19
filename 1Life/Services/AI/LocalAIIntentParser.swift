@@ -3,10 +3,17 @@ import Foundation
 struct LocalAIIntentParser {
     let userFoods: [UserFood]
     let mealTemplates: [MealTemplate]
+    let cupML: Double
+    let bottleML: Double
 
-    init(userFoods: [UserFood] = [], mealTemplates: [MealTemplate] = []) {
+    init(userFoods: [UserFood] = [],
+         mealTemplates: [MealTemplate] = [],
+         cupML: Double = 250,
+         bottleML: Double = 500) {
         self.userFoods = userFoods
         self.mealTemplates = mealTemplates
+        self.cupML = cupML
+        self.bottleML = bottleML
     }
 
     func parse(_ text: String) -> AIChatIntentResult? {
@@ -201,15 +208,29 @@ struct LocalAIIntentParser {
                                 "柠檬水", "冰红茶", "绿茶", "乌龙", "椰奶", "燕麦奶"]
         if beverageKeywords.contains(where: { text.contains($0) }) { return nil }
 
-        if text.contains("一瓶") { return .addWater(500) }
-        if text.contains("一杯") || text.contains("喝水") { return .addWater(250) }
+        if let amount = explicitWaterAmount(in: text) { return .addWater(amount) }
+        if text.contains("一杯") || text.contains("喝水") { return .addWater(cupML) }
 
-        if let match = text.range(of: #"(\d+)\s*(ml|毫升)"#, options: .regularExpression) {
-            let numStr = text[match].filter(\.isNumber)
-            if let amount = Double(numStr) { return .addWater(amount) }
+        return .addWater(cupML)
+    }
+
+    /// Explicit volume wins over a container count; “两杯水” is two cups, not one.
+    private func explicitWaterAmount(in text: String) -> Double? {
+        if let millilitres = firstCapture(#"([0-9]+(?:\.[0-9]+)?)\s*(?:ml|毫升)"#, in: text) {
+            return millilitres
         }
+        return containerServing(in: text)
+    }
 
-        return .addWater(250)
+    private func containerServing(in text: String) -> Double? {
+        let pattern = #"([0-9]+|[一二两三四五六七八九十])\s*[大小]?(杯|瓶)"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
+        let range = NSRange(text.startIndex..<text.endIndex, in: text)
+        guard let match = regex.firstMatch(in: text, range: range),
+              let numberRange = Range(match.range(at: 1), in: text),
+              let unitRange = Range(match.range(at: 2), in: text) else { return nil }
+        guard let count = ChineseNumber.double(in: String(text[numberRange])), count > 0 else { return nil }
+        return String(text[unitRange]) == "瓶" ? count * bottleML : count * cupML
     }
 
     // MARK: - Meal

@@ -62,7 +62,12 @@ final class AIChatViewModel {
             // 1. 本地解析
             let userFoods = fetchUserFoods()
             let mealTemplates = fetchMealTemplates()
-            let localParser = LocalAIIntentParser(userFoods: userFoods, mealTemplates: mealTemplates)
+            let localParser = LocalAIIntentParser(
+                userFoods: userFoods,
+                mealTemplates: mealTemplates,
+                cupML: settings.defaultCupMl,
+                bottleML: settings.defaultBottleMl
+            )
             if let localResult = localParser.parse(text) {
                 let libraryAwareResult = AIChatSupplementLibraryResolver.applyMatch(
                     to: AIChatDrinkLibraryResolver.applyMatch(

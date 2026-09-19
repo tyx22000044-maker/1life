@@ -279,6 +279,49 @@ enum AppCornerRadius {
     static let photo: CGFloat = 2
 }
 
+// MARK: - Chinese numerals
+//
+// Voice dictation yields “两杯水” and “七点半”; `Character.isNumber` is true for those
+// ideographs, so `Int(text)` still fails on them. Covers one … ninety-nine, which is all
+// durations, counts, hours and minutes need here.
+
+enum ChineseNumber {
+    private static let digits: [Character: Int] = [
+        "一": 1, "二": 2, "两": 2, "三": 3, "四": 4, "五": 5,
+        "六": 6, "七": 7, "八": 8, "九": 9
+    ]
+
+    static func value(in text: String) -> Int? {
+        let characters = Array(text.trimmingCharacters(in: .whitespacesAndNewlines))
+        guard !characters.isEmpty, characters.count <= 3 else { return nil }
+
+        if let tenIndex = characters.firstIndex(of: "十") {
+            let tens: Int
+            switch tenIndex {
+            case 0: tens = 10
+            case 1:
+                guard let leading = digits[characters[0]] else { return nil }
+                tens = leading * 10
+            default: return nil
+            }
+            let ones = characters[(tenIndex + 1)...]
+            if ones.isEmpty { return tens }
+            guard ones.count == 1, let trailing = digits[ones.first!] else { return nil }
+            return tens + trailing
+        }
+
+        guard characters.count == 1 else { return nil }
+        return digits[characters[0]]
+    }
+
+    /// Parses ASCII digits as well, so callers can hand it whatever the regex captured.
+    static func double(in text: String) -> Double? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.allSatisfy({ $0.isASCII && ($0.isNumber || $0 == ".") }) { return Double(trimmed) }
+        return value(in: trimmed).map(Double.init)
+    }
+}
+
 // MARK: - NutrientKey UI helpers
 //
 // Nutrient colors are *informational* color-coding, not signal color, so they stay
